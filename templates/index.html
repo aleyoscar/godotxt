@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Groc.txt</title>
+		<link rel="stylesheet" href="/static/pico.min.css">
+		<link rel="stylesheet" href="/static/styles.css">
+		<script src="/static/main.js" defer></script>
+	</head>
+	<body>
+		{% include 'icons.html' %}
+		<main class="container">
+			<h1>Shopping List</h1>
+
+			<form id="add-task-form">
+				<div class="grid">
+					<input type="text" id="priority" placeholder="Priority (A-Z, optional)" maxlength="1">
+					<input type="text" id="description" placeholder="Task description (e.g., Milk)" required>
+					<button type="submit"><svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg></button>
+				</div>
+				<p id="add-error" class="error" style="dislay: none;"></p>
+			</form>
+
+			<table id="task-table">
+				<thead>
+					<tr>
+						<th></th>
+						<th class="sort-btn click" data-sort="priority"><span>Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></span></th>
+						<th class="sort-btn click" data-sort="description"><span>Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></span></th>
+						<th></th>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="text" id="filter-priority" placeholder="Filter by priority" maxlength="1"></td>
+						<td><input type="text" id="filter-description" placeholder="Filter by description"></td>
+						<td>
+							<button onclick="applyFilters()"><svg width="1em" height="1em"><use xlink:href="#icon-check"/></svg></button>
+							<button class="secondary" onclick="clearFilters()"><svg width="1em" height="1em"><use xlink:href="#icon-cancel"/></svg></button>
+						</td>
+					</tr>
+				</thead>
+				<tbody id="task-list"></tbody>
+			</table>
+		</main>
+	</body>
+</html>
+
+<!-- <svg><use xlink:href="#icon-logo"/></svg> -->
