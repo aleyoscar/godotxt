@@ -7,6 +7,7 @@ ul { padding-left: 0; }
 .flex-grow { flex: 1; }
 .float-left { float: left; }
 .hide { display: none; }
+.max-width-xs { max-width: 576px; }
 .show-hover-parent .show-hover { display:none; }
 .show-hover-parent:hover .show-hover { display: unset; }
 .space-between { justify-content: space-between; }
