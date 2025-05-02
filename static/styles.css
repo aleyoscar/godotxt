@@ -1,4 +1,5 @@
 svg, use { pointer-events: none; }
+ul { padding-left: 0; }
 
 .align-center { align-items: center; }
 .flex { display: flex; gap: var(--pico-spacing); }
