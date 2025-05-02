@@ -1,6 +1,8 @@
-const taskTable = document.getElementById('task-list');
+const taskList = document.getElementById('task-list');
 const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
+const editForm = document.getElementById('edit-task-form');
+const editError = document.getElementById('edit-error');
 const filterDescription = document.getElementById('filter-description');
 const filterPriority = document.getElementById('filter-priority');
 const sortBtns = document.querySelectorAll('.sort-btn');
@@ -51,36 +53,19 @@ function renderTasks() {
 	});
 
 	// Render tasks
-	taskTable.innerHTML = '';
+	taskList.innerHTML = '';
 	filteredTasks.forEach(task => {
-		const row = document.createElement('tr');
+		const row = document.createElement('li');
 		row.id = `task-${task.id}`;
+		row.classList.add('flex');
 		row.innerHTML = `
-			<td><input class="complete-checkbox" type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}"/></td>
-			<td class="strike">${task.priority || ''}</td>
-			<td class="strike">${task.description}</td>
-			<td>
-				<button onclick="editTask(${task.id})"><svg width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></button>
-				<button class="outline contrast" onclick="deleteTask(${task.id})"><svg width="1em" height="1em"><use xlink:href="#icon-x"/></svg></button>
-			</td>
+			<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)"/>
+			<hgroup class="pointer flex-grow hover-background" onclick="editTask(${task.id})">
+				<h6 class="flex space-between show-hover-parent">${task.description}<svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h6>
+				<p>${task.priority || ''}</p>
+			</hgroup>
 		`;
-		taskTable.appendChild(row);
-	});
-
-	// Add event listeners for checkboxes
-	document.querySelectorAll('.complete-checkbox').forEach(checkbox => {
-		checkbox.addEventListener('change', async (e) => {
-			const id = parseInt(e.target.dataset.id);
-			const task = tasks.find(t => t.id === id);
-			if (!task) return;
-			const complete = e.target.checked;
-			try {
-				await saveTask(id, task.description, task.priority, complete);
-			} catch (error) {
-				e.target.checked = !complete; // Revert checkbox on error
-				alert('Error: ' + error.message);
-			}
-		});
+		taskList.appendChild(row);
 	});
 }
 
@@ -131,8 +116,8 @@ sortBtns.forEach((btn) => btn.addEventListener('click', (e) => {
 // Add task
 addForm.addEventListener('submit', async (e) => {
 	e.preventDefault();
-	const description = document.getElementById('description').value.trim();
-	const priority = document.getElementById('priority').value.trim().toUpperCase();
+	const description = document.getElementById('add-description').value.trim();
+	const priority = document.getElementById('add-priority').value.trim().toUpperCase();
 	const complete = false;
 	addError.style.display = 'none';
 
@@ -148,6 +133,7 @@ addForm.addEventListener('submit', async (e) => {
 		}
 		addForm.reset();
 		await fetchTasks();
+		if (visibleModal) closeModal(visibleModal);
 	} catch (error) {
 		addError.textContent = error.message;
 		addError.style.display = 'block';
@@ -155,30 +141,46 @@ addForm.addEventListener('submit', async (e) => {
 });
 
 // Edit task
-async function editTask(id) {
+function editTask(id) {
 	const task = tasks.find(t => t.id === id);
 	if (!task) return;
 
-	const row = taskTable.querySelector(`#task-${id}`);
-	if (!row) return;
+	const modal = document.getElementById(`edit-task-modal`);
+	const modalForm = document.getElementById('edit-task-form');
+	const deleteBtn = document.getElementById('delete-task-btn');
 
-	row.innerHTML = `
-		<td><input type="checkbox" class="edit-complete" ${task.complete ? 'checked' : ''} /></td>
-		<td><input type="text" value="${task.priority || ''}" maxlength="1" class="edit-priority"></td>
-		<td><input type="text" value="${task.description}" class="edit-description"></td>
-		<td>
-			<button onclick="saveTask(
-				${id},
-				document.querySelector('.edit-description').value.trim(),
-				document.querySelector('.edit-priority').value.trim().toUpperCase(),
-				document.querySelector('.edit-complete').checked)"><svg width="1em" height="1em"><use xlink:href="#icon-check"/></svg></button>
-			<button class="secondary" onclick="renderTasks()"><svg width="1em" height="1em"><use xlink:href="#icon-cancel"/></svg></button>
-		</td>
+	modalForm.innerHTML = `
+		<fieldset>
+			<input type="hidden" id="edit-id" value="${task.id}" />
+			<label>Priority
+				<input type="text" id="edit-priority" placeholder="Priority (A-Z, optional)" value="${task.priority || ''}" maxlength="1" />
+			</label>
+			<label>Task
+				<input type="text" id="edit-description" placeholder="Task description (e.g., Milk)" value="${task.description}" required>
+			</label>
+			<label>
+				<input type="checkbox" id="edit-complete" role="switch" ${task.complete ? 'checked' : ''} />
+				Completed
+			</label>
+		</fieldset>
 	`;
+	deleteBtn.dataset.id = task.id;
+
+	openModal(modal);
 }
 
 // Save edited task
-async function saveTask(id, description, priority, complete) {
+editForm.addEventListener('submit', async (e) => {
+	e.preventDefault();
+	const id = parseInt(document.getElementById('edit-id').value);
+	const task = tasks.find(t => t.id === id);
+	if (!task) return;
+
+	const description = document.getElementById('edit-description').value.trim();
+	const priority = document.getElementById('edit-priority').value.trim().toUpperCase();
+	const complete = document.getElementById('edit-complete').checked;
+	editError.style.display = 'none';
+
 	try {
 		const response = await fetch(`/edit/${id}`, {
 			method: 'PUT',
@@ -196,6 +198,39 @@ async function saveTask(id, description, priority, complete) {
 		if (taskIndex !== -1) {
 			tasks[taskIndex] = updatedTask;
 		}
+		if (visibleModal) closeModal(visibleModal);
+		renderTasks();
+	} catch (error) {
+		editError.textContent = error.message;
+		editError.style.display = 'block';
+	}
+});
+
+// Complete task
+async function completeTask(event) {
+	const id = parseInt(event.target.dataset.id);
+	const task = tasks.find(t => t.id === id);
+	if (!task) return;
+
+	const complete = event.target.checked;
+
+	try {
+		const response = await fetch(`/complete/${id}`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ complete })
+		});
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.description || 'Failed to complete task');
+		}
+		// Update the local tasks array with the response data
+		const data = await response.json();
+		const updatedTask = data.task;
+		const taskIndex = tasks.findIndex(t => t.id === id);
+		if (taskIndex !== -1) {
+			tasks[taskIndex] = updatedTask;
+		}
 		renderTasks();
 	} catch (error) {
 		alert('Error: ' + error.message);
@@ -204,7 +239,9 @@ async function saveTask(id, description, priority, complete) {
 }
 
 // Delete task
-async function deleteTask(id) {
+async function deleteTask(event) {
+	console.log(event.target);
+	const id = event.target.dataset.id;
 	if (!confirm('Are you sure you want to delete this task?')) return;
 	try {
 		const response = await fetch(`/delete/${id}`, {
@@ -212,6 +249,7 @@ async function deleteTask(id) {
 		});
 		if (!response.ok) throw new Error('Failed to delete task');
 		await fetchTasks();
+		if (visibleModal) closeModal(visibleModal);
 	} catch (error) {
 		alert('Error: ' + error.message);
 	}

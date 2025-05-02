@@ -7,43 +7,73 @@
 		<title>Groc.txt</title>
 		<link rel="stylesheet" href="/static/pico.min.css">
 		<link rel="stylesheet" href="/static/styles.css">
+		<script src="/static/modal.js" defer></script>
 		<script src="/static/main.js" defer></script>
 	</head>
 	<body>
 		{% include 'icons.html' %}
+		<header class="container flex space-between align-center">
+			<h1>Groc.txt</h1>
+			<div role="search">
+				<input type="search" id="filter-description" placeholder="Search">
+				<button onclick="applyFilters()"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
+			</div>
+		</header>
 		<main class="container">
-			<h1>Shopping List</h1>
-
-			<form id="add-task-form">
-				<div class="grid">
-					<input type="text" id="priority" placeholder="Priority (A-Z, optional)" maxlength="1">
-					<input type="text" id="description" placeholder="Task description (e.g., Milk)" required>
-					<button type="submit"><svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg></button>
-				</div>
-				<p id="add-error" class="error" style="dislay: none;"></p>
-			</form>
-
-			<table id="task-table">
-				<thead>
-					<tr>
-						<th></th>
-						<th class="sort-btn click" data-sort="priority"><span>Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></span></th>
-						<th class="sort-btn click" data-sort="description"><span>Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></span></th>
-						<th></th>
-					</tr>
-					<tr>
-						<td><button id="complete-toggle" class="outline secondary" onclick="toggleCompleteFilter(!filterComp)"><svg width="1em" height="1em"><use xlink:href="#icon-eye-fill"/></svg></button></td>
-						<td><input type="text" id="filter-priority" placeholder="Filter by priority" maxlength="1"></td>
-						<td><input type="text" id="filter-description" placeholder="Filter by description"></td>
-						<td>
-							<button onclick="applyFilters()"><svg width="1em" height="1em"><use xlink:href="#icon-check"/></svg></button>
-							<button class="secondary" onclick="clearFilters()"><svg width="1em" height="1em"><use xlink:href="#icon-cancel"/></svg></button>
-						</td>
-					</tr>
-				</thead>
-				<tbody id="task-list"></tbody>
-			</table>
+			<header class="flex space-between align-center">
+				<h3>Shopping List</h3>
+				<button id="add-task-btn" onclick="toggleModal(event)" data-target="add-task-modal"><svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg></button>
+			</header>
+			<section class="overflow-auto">
+				<button id="complete-toggle" class="outline" onclick="toggleCompleteFilter(!filterComp)"><svg width="1em" height="1em"><use xlink:href="#icon-eye-fill"/></svg></button>
+				<button class="outline sort-btn" data-sort="priority"><span>Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></span></button>
+				<button class="outline sort-btn" data-sort="description"><span>Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></span></button>
+			</section>
+			<section>
+				<button class="secondary" onclick="clearFilters()">Show All</button>
+			</section>
+			<section>
+				<ul id="task-list"></ul>
+			</section>
 		</main>
+		<dialog id="add-task-modal">
+			<article>
+				<header>
+					<button aria-label="Close" rel="prev" data-target="add-task-modal" onclick="toggleModal(event)"></button>
+					<h3>Add Task</h3>
+				</header>
+				<form id="add-task-form">
+					<p id="add-error" class="error" style="dislay: none;"></p>
+					<fieldset>
+						<label>Priority
+							<input type="text" id="add-priority" placeholder="Priority (A-Z, optional)" maxlength="1" />
+						</label>
+						<label>Task
+							<input type="text" id="add-description" placeholder="Task description (e.g., Milk)" required>
+						</label>
+					</fieldset>
+				</form>
+				<footer>
+					<button class="secondary" data-target="add-task-modal" onclick="toggleModal(event)">Cancel</button>
+					<button form="add-task-form">Add</button>
+				</footer>
+			</article>
+		</dialog>
+		<dialog id="edit-task-modal">
+			<article>
+				<header>
+					<button aria-label="Close" rel="prev" data-target="edit-task-modal" onclick="toggleModal(event)"></button>
+					<h3>Task</h3>
+				</header>
+				<p id="edit-error" class="error" style="dislay: none;"></p>
+				<form id="edit-task-form"></form>
+				<footer>
+					<button id="delete-task-btn" class="float-left" data-id="" onclick="deleteTask(event)"><svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg></button>
+					<button class="secondary" data-target="edit-task-modal" onclick="toggleModal(event)">Cancel</button>
+					<button form="edit-task-form">Save</button>
+				</footer>
+			</article>
+		</dialog>
 	</body>
 </html>
 

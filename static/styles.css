@@ -1,62 +1,10 @@
-thead th span {
-	align-items: center;
-	color: var(--pico-muted-color);
-	display: flex;
-	justify-content: space-between;
-}
+svg, use { pointer-events: none; }
 
-thead th span, thead th span svg, thead th span svg use {
-	pointer-events: none;
-}
-
-thead th:hover span {
-	color: var(--pico-color);
-}
-
-th, td {
-	vertical-align: middle;
-}
-
-#task-table input {
-	margin-bottom: 0;
-}
-
-#task-table tr:has(.complete-checkbox:checked) .strike {
-	color: var(--pico-muted-color);
-}
-
-#task-table tr:has(.complete-checkbox:checked) .strike:before {
-	content: " ";
-	position: absolute;
-	top: 50%;
-	left: 0;
-	border-bottom: 1px solid var(--pico-muted-border-color);
-	width: 100%;
-}
-
-#task-table tr:has(.complete-checkbox:checked) .strike:after {
-	content: "\00B7";
-	font-size: 1px;
-}
-
-#task-table {
-	border-collapse: collapse;
-	empty-cells: show;
-}
-
-#task-table td {
-	position: relative;
-}
-
-#task-table thead td input, #task-table thead td button {
-	border-width: 1px;
-}
-
-#complete-toggle.outline {
-	background-color: var(--pico-form-element-background-color);
-	border-color: var(--pico-form-element-border-color);
-}
-
-.click {
-	cursor: pointer;
-}
+.align-center { align-items: center; }
+.flex { display: flex; gap: var(--pico-spacing); }
+.flex-grow { flex: 1; }
+.float-left { float: left; }
+.show-hover-parent .show-hover { display:none; }
+.show-hover-parent:hover .show-hover { display: unset; }
+.space-between { justify-content: space-between; }
+.pointer { cursor: pointer; }

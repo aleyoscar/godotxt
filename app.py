@@ -95,6 +95,28 @@ def edit_item(id):
 		}
 	})
 
+@app.route('/complete/<int:id>', methods=['PUT'])
+def complete_item(id):
+	data = request.get_json()
+
+	todotxt = get_todotxt()
+	if id < 1 or id > len(todotxt.tasks):
+		abort(404, description="Task not found")
+
+	task = todotxt.tasks[id - 1]
+	task.is_completed = data['complete']
+
+	todotxt.save()
+
+	return jsonify({
+		'task': {
+			'id': id,
+			'priority': task.priority,
+			'description': task.description,
+			'complete': task.is_completed
+		}
+	})
+
 @app.route('/delete/<int:id>', methods=['DELETE'])
 def delete_item(id):
 	todotxt = get_todotxt()
