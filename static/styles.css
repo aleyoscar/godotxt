@@ -39,8 +39,6 @@ th, td {
 	font-size: 1px;
 }
 
-#task-ta
-
 #task-table {
 	border-collapse: collapse;
 	empty-cells: show;
@@ -50,7 +48,14 @@ th, td {
 	position: relative;
 }
 
-#task-table
+#task-table thead td input, #task-table thead td button {
+	border-width: 1px;
+}
+
+#complete-toggle.outline {
+	background-color: var(--pico-form-element-background-color);
+	border-color: var(--pico-form-element-border-color);
+}
 
 .click {
 	cursor: pointer;

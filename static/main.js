@@ -61,7 +61,7 @@ function renderTasks() {
 			<td class="strike">${task.description}</td>
 			<td>
 				<button onclick="editTask(${task.id})"><svg width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></button>
-				<button class="contrast" onclick="deleteTask(${task.id})"><svg width="1em" height="1em"><use xlink:href="#icon-x"/></svg></button>
+				<button class="outline contrast" onclick="deleteTask(${task.id})"><svg width="1em" height="1em"><use xlink:href="#icon-x"/></svg></button>
 			</td>
 		`;
 		taskTable.appendChild(row);
