@@ -15,21 +15,21 @@
 		<header class="container flex space-between align-center">
 			<h1>Groc.txt</h1>
 			<div role="search">
-				<input type="search" id="filter-description" placeholder="Search">
-				<button onclick="applyFilters()"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
+				<input type="search" id="search" placeholder="Search">
+				<button onclick="search()"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
 			</div>
 		</header>
 		<main class="container">
-			<header class="flex space-between align-center">
+			<section class="flex space-between align-center">
 				<h3>Shopping List</h3>
-				<button id="add-task-btn" onclick="toggleModal(event)" data-target="add-task-modal"><svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg></button>
-			</header>
-			<section class="overflow-auto">
-				<button id="complete-toggle" class="outline" onclick="toggleCompleteFilter(!filterComp)"><svg width="1em" height="1em"><use xlink:href="#icon-eye-fill"/></svg></button>
-				<button class="outline sort-btn" data-sort="priority"><span>Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></span></button>
-				<button class="outline sort-btn" data-sort="description"><span>Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></span></button>
+				<button id="add-task-btn" onclick="toggleModal(event)" data-target="add-task-modal">Add Task</svg></button>
 			</section>
-			<section>
+			<section class="overflow-auto">
+				<button class="flex-inline align-center sort-btn" data-sort="description" onclick="sortTasks(event)">Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></button>
+				<button class="flex-inline align-center outline sort-btn" data-sort="priority" onclick="sortTasks(event)">Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></button>
+				<button id="complete-toggle" class="flex-inline align-center outline" onclick="toggleComplete(!filterComp)">Completed<svg width="1em" height="1em"><use xlink:href="#icon-eye-fill"/></svg></button>
+			</section>
+			<section id="show-all" class="hide">
 				<button class="secondary" onclick="clearFilters()">Show All</button>
 			</section>
 			<section>

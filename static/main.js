@@ -3,17 +3,18 @@ const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
 const editForm = document.getElementById('edit-task-form');
 const editError = document.getElementById('edit-error');
-const filterDescription = document.getElementById('filter-description');
+const searchBtn = document.getElementById('search');
 const filterPriority = document.getElementById('filter-priority');
 const sortBtns = document.querySelectorAll('.sort-btn');
 const sortIcons = document.querySelectorAll('.sort-btn svg');
 const completeToggle = document.getElementById('complete-toggle');
+const showAll = document.getElementById('show-all');
 
 let tasks = [];
 let sortBy = 'description';
 let sortAscending = true;
-let filterDesc = '';
-let filterPrio = '';
+let filterSearch = '';
+// let filterPrio = '';
 let filterComp = false;
 
 // Fetch tasks from API
@@ -33,10 +34,9 @@ async function fetchTasks() {
 function renderTasks() {
 	// Filter tasks
 	let filteredTasks = tasks.filter(task => {
-		const matchesDesc = filterDesc ? task.description.toLowerCase().includes(filterDesc.toLowerCase()) : true;
-		const matchesPrio = filterPrio ? task.priority === filterPrio : true;
+		const matchesSearch = filterSearch ? task.description.toLowerCase().includes(filterSearch.toLowerCase()) : true;
 		const matchesComp = filterComp ? task.complete === false : true;
-		return matchesDesc && matchesPrio && matchesComp;
+		return matchesSearch && matchesComp;
 	});
 
 	//Sort tasks
@@ -67,22 +67,26 @@ function renderTasks() {
 		`;
 		taskList.appendChild(row);
 	});
+
+	// Show 'Show All' button if filters in place
+	if (filteredTasks.length < tasks.length) showAll.classList.remove('hide');
+	else showAll.classList.add('hide');
 }
 
 // Apply filters
-function applyFilters() {
-	filterDesc = filterDescription.value.trim();
-	filterPrio = filterPriority.value.trim().toUpperCase();
-	if (filterPrio && !/^[A-Z]$/.test(filterPrio)) {
-		alert('Priority filter must be a single uppercase letter (A-Z).');
-		filterPriority.value = '';
-		filterPrio = '';
-	}
+function search() {
+	filterSearch = searchBtn.value.trim();
+	// filterPrio = filterPriority.value.trim().toUpperCase();
+	// if (filterPrio && !/^[A-Z]$/.test(filterPrio)) {
+	// 	alert('Priority filter must be a single uppercase letter (A-Z).');
+	// 	filterPriority.value = '';
+	// 	filterPrio = '';
+	// }
 	renderTasks();
 }
 
 // Toggle complete filter
-function toggleCompleteFilter(setComplete) {
+function toggleComplete(setComplete) {
 	filterComp = setComplete;
 	newIcon = '#icon-eye';
 	if (!filterComp) {
@@ -95,23 +99,26 @@ function toggleCompleteFilter(setComplete) {
 
 // Clear filters
 function clearFilters() {
-	filterDescription.value = '';
-	filterPriority.value = '';
-	filterDesc = '';
-	filterPrio = '';
-	toggleCompleteFilter(false);
+	searchBtn.value = '';
+	// filterPriority.value = '';
+	filterSearch = '';
+	// filterPrio = '';
+	toggleComplete(false);
+	showAll.classList.add('hide');
 	renderTasks();
 }
 
 // Toggle sort
-sortBtns.forEach((btn) => btn.addEventListener('click', (e) => {
-	if (sortBy === e.target.dataset.sort) sortAscending = !sortAscending;
+function sortTasks(event) {
+	if (sortBy === event.target.dataset.sort) sortAscending = !sortAscending;
 	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up';
-	sortBy = e.target.dataset.sort;
+	sortBy = event.target.dataset.sort;
+	sortBtns.forEach((btn) => btn.classList.add('outline'));
 	sortIcons.forEach((icon) => icon.querySelector('use').setAttribute('xlink:href', newIcon));
-	e.target.querySelector('use').setAttribute('xlink:href', `${newIcon}-fill`);
+	event.target.querySelector('use').setAttribute('xlink:href', `${newIcon}-fill`);
+	event.target.classList.remove('outline');
 	renderTasks();
-}));
+}
 
 // Add task
 addForm.addEventListener('submit', async (e) => {

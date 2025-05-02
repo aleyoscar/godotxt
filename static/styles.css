@@ -2,8 +2,10 @@ svg, use { pointer-events: none; }
 
 .align-center { align-items: center; }
 .flex { display: flex; gap: var(--pico-spacing); }
+.flex-inline { display: inline-flex; gap: var(--pico-spacing); }
 .flex-grow { flex: 1; }
 .float-left { float: left; }
+.hide { display: none; }
 .show-hover-parent .show-hover { display:none; }
 .show-hover-parent:hover .show-hover { display: unset; }
 .space-between { justify-content: space-between; }
