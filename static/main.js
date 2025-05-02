@@ -5,12 +5,14 @@ const filterDescription = document.getElementById('filter-description');
 const filterPriority = document.getElementById('filter-priority');
 const sortBtns = document.querySelectorAll('.sort-btn');
 const sortIcons = document.querySelectorAll('.sort-btn svg');
+const completeToggle = document.getElementById('complete-toggle');
 
 let tasks = [];
 let sortBy = 'description';
 let sortAscending = true;
 let filterDesc = '';
 let filterPrio = '';
+let filterComp = false;
 
 // Fetch tasks from API
 async function fetchTasks() {
@@ -31,7 +33,8 @@ function renderTasks() {
 	let filteredTasks = tasks.filter(task => {
 		const matchesDesc = filterDesc ? task.description.toLowerCase().includes(filterDesc.toLowerCase()) : true;
 		const matchesPrio = filterPrio ? task.priority === filterPrio : true;
-		return matchesDesc && matchesPrio;
+		const matchesComp = filterComp ? task.complete === false : true;
+		return matchesDesc && matchesPrio && matchesComp;
 	});
 
 	//Sort tasks
@@ -93,12 +96,25 @@ function applyFilters() {
 	renderTasks();
 }
 
+// Toggle complete filter
+function toggleCompleteFilter(setComplete) {
+	filterComp = setComplete;
+	newIcon = '#icon-eye';
+	if (!filterComp) {
+		newIcon += '-fill';
+		completeToggle.classList.add('outline');
+	} else completeToggle.classList.remove('outline');
+	completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+	renderTasks();
+}
+
 // Clear filters
 function clearFilters() {
 	filterDescription.value = '';
 	filterPriority.value = '';
 	filterDesc = '';
 	filterPrio = '';
+	toggleCompleteFilter(false);
 	renderTasks();
 }
 
