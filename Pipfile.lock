@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "dc3813b8c8f0ab3e4d9e905e12c67ef3e057d9882fd850d29c4fd896720727fc"
+            "sha256": "9045cda40d6ae6f884453fced9b63b788b2767ac2038be513fffafbee4d9c87c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,13 +32,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==8.1.8"
         },
-        "dotenv": {
-            "hashes": [
-                "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9"
-            ],
-            "index": "pypi",
-            "version": "==0.9.9"
-        },
         "flask": {
             "hashes": [
                 "sha256:5f873c5184c897c8d9d1b05df1e3d01b14910ce69607a117bd3277098a5836ac",
@@ -47,6 +40,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.9'",
             "version": "==3.1.0"
+        },
+        "gunicorn": {
+            "hashes": [
+                "sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d",
+                "sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==23.0.0"
         },
         "itsdangerous": {
             "hashes": [
@@ -131,13 +133,13 @@
             "markers": "python_version >= '3.9'",
             "version": "==3.0.2"
         },
-        "python-dotenv": {
+        "packaging": {
             "hashes": [
-                "sha256:41f90bc6f5f177fb41f53e87666db362025010eb28f60a01c9143bfa33a2b2d5",
-                "sha256:d7c01d9e2293916c18baf562d95698754b0dbbb5e74d457c45d4f6561fb9d55d"
+                "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484",
+                "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"
             ],
-            "markers": "python_version >= '3.9'",
-            "version": "==1.1.0"
+            "markers": "python_version >= '3.8'",
+            "version": "==25.0"
         },
         "pytodotxt": {
             "hashes": [

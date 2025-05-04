@@ -1,14 +1,11 @@
 from flask import Flask, jsonify, request, abort, render_template, session, redirect, url_for, flash
 from functools import wraps
-from dotenv import load_dotenv
 import pytodotxt, hashlib, os
-
-load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 USERNAME = os.getenv('USERNAME')
 PASSWORD_HASH = os.getenv('PASSWORD_HASH')
-TODO_FILE = 'todo.txt'
+TODO_FILE = 'data/todo.txt'
 
 if not all([SECRET_KEY, USERNAME, PASSWORD_HASH]):
 	raise ValueError('Missing required environment variables: SECRET_KEY, USERNAME or PASSWORD_HASH')
