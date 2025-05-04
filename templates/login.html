@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Login - Groc.txt</title>
+	<link rel="stylesheet" href="/static/pico.min.css">
+	<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+	<main>
+		<article class="max-width-xs centered-card">
+			<header><h1>Login</h1></header>
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+						<p class="error">{{ message }}</p>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
+			<form method="POST" action="{{ url_for('login') }}">
+				<fieldset>
+				<input type="hidden" name="next" value="{{ next }}">
+				<label for="username">Username
+					<input type="text" id="username" name="username" placeholder="Username" required />
+				</label>
+				<label for="password">Password
+					<input type="password" id="password" name="password" placeholder="Password" required>
+				</label>
+				</fieldset>
+				<input type="submit" value="Login" />
+			</form>
+		</article>
+	</main>
+</body>
+</html>

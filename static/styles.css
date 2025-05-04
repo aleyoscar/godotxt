@@ -2,6 +2,7 @@ svg, use { pointer-events: none; }
 ul { padding-left: 0; }
 
 .align-center { align-items: center; }
+.centered-card { margin: 0 auto; }
 .flex { display: flex; gap: var(--pico-spacing); }
 .flex-inline { display: inline-flex; gap: var(--pico-spacing); }
 .flex-grow { flex: 1; }

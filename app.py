@@ -1,19 +1,62 @@
-from flask import Flask, jsonify, request, abort, render_template
-import pytodotxt
+from flask import Flask, jsonify, request, abort, render_template, session, redirect, url_for, flash
+from functools import wraps
+from dotenv import load_dotenv
+import pytodotxt, hashlib, os
+
+load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+USERNAME = os.getenv('USERNAME')
+PASSWORD_HASH = os.getenv('PASSWORD_HASH')
+TODO_FILE = 'todo.txt'
+
+if not all([SECRET_KEY, USERNAME, PASSWORD_HASH]):
+	raise ValueError('Missing required environment variables: SECRET_KEY, USERNAME or PASSWORD_HASH')
 
 app = Flask(__name__)
-TODO_FILE = 'todo.txt'
+app.secret_key = SECRET_KEY
+
+def login_required(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		if 'logged_in' not in session:
+			return redirect(url_for('login', next=request.url))
+		return f(*args, **kwargs)
+	return decorated_function
 
 def get_todotxt():
 	todotxt = pytodotxt.TodoTxt(TODO_FILE)
 	todotxt.parse()
 	return todotxt
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+	if request.method == 'POST':
+		username = request.form.get('username')
+		password = request.form.get('password')
+		password_hash = hashlib.sha256(password.encode()).hexdigest()
+		if username == USERNAME and password_hash == PASSWORD_HASH:
+			session['logged_in'] = True
+			next_url = request.form.get('next') or url_for('index')
+			return redirect(next_url)
+		else:
+			flash('Invalid username or password', 'error')
+	next_url = request.args.get('next') or url_for('index')
+	return render_template('login.html', next=next_url)
+
+@app.route('/logout')
+@login_required
+def logout():
+	session.pop('logged_in', None)
+	return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def index():
 	return render_template('index.html')
 
 @app.route('/list', methods=['GET'])
+@login_required
 def list_items():
 	todotxt = get_todotxt()
 	tasks = [
@@ -28,6 +71,7 @@ def list_items():
 	return jsonify({'tasks': tasks})
 
 @app.route('/add', methods=['POST'])
+@login_required
 def add_item():
 	data = request.get_json()
 	if not data or 'description' not in data:
@@ -61,6 +105,7 @@ def add_item():
 	}), 201
 
 @app.route('/edit/<int:id>', methods=['PUT'])
+@login_required
 def edit_item(id):
 	data = request.get_json()
 	if not data or 'description' not in data:
@@ -96,6 +141,7 @@ def edit_item(id):
 	})
 
 @app.route('/complete/<int:id>', methods=['PUT'])
+@login_required
 def complete_item(id):
 	data = request.get_json()
 
@@ -118,6 +164,7 @@ def complete_item(id):
 	})
 
 @app.route('/delete/<int:id>', methods=['DELETE'])
+@login_required
 def delete_item(id):
 	todotxt = get_todotxt()
 	if id < 1 or id > len(todotxt.tasks):
