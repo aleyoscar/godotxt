@@ -9,9 +9,11 @@ ul { padding-left: 0; }
 .float-left { float: left; }
 .hide { display: none; }
 .max-width-xs { max-width: 576px; }
+.muted-color { color: var(--pico-muted-color); }
 .show-hover-parent .show-hover { display:none; }
 .show-hover-parent:hover .show-hover { display: unset; }
 .space-between { justify-content: space-between; }
+.strike { text-decoration: line-through; }
 .pointer { cursor: pointer; }
 
 @media only screen and (max-width: 1024px) {

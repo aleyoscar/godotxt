@@ -60,12 +60,12 @@ function renderTasks() {
 		row.id = `task-${task.id}`;
 		row.classList.add('flex');
 		let taskSub = '';
-		if (task.priority) taskSub = `<kbd><svg width="1em" height="1em"><use xlink:href="#icon-flag"/></svg> ${task.priority}</kbd>`
+		if (task.priority) taskSub = `<kbd><svg width="1em" height="1em"><use xlink:href="#icon-flag"/></svg> ${task.priority}</kbd>`;
 		row.innerHTML = `
 			<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)"/>
 			<hgroup class="pointer flex-grow hover-background show-hover-parent" onclick="editTask(${task.id})">
-				<h5 class="flex space-between">${task.description}<svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
-				<p>${taskSub}</p>
+				<h5 class="flex space-between mb-xs ${task.complete ? 'muted-color strike' : ''}">${task.description}<svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
+				<p class="${task.complete ? 'muted-color strike' : ''}">${taskSub}</p>
 			</hgroup>
 		`;
 		taskList.appendChild(row);
