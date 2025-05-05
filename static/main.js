@@ -16,7 +16,7 @@ let sortBy = 'description';
 let sortAscending = true;
 let filterSearch = '';
 // let filterPrio = '';
-let filterComp = false;
+let filterComp = true;
 
 // Fetch tasks from API
 async function fetchTasks() {
@@ -93,10 +93,11 @@ searchForm.addEventListener('submit', async (e) => {
 function toggleComplete(setComplete) {
 	filterComp = setComplete;
 	newIcon = '#icon-eye';
-	if (!filterComp) {
+	if (filterComp) completeToggle.classList.add('outline');
+	else {
 		newIcon += '-fill';
-		completeToggle.classList.add('outline');
-	} else completeToggle.classList.remove('outline');
+		completeToggle.classList.remove('outline');
+	}
 	completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
 	renderTasks();
 }
