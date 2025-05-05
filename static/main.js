@@ -3,6 +3,7 @@ const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
 const editForm = document.getElementById('edit-task-form');
 const editError = document.getElementById('edit-error');
+const searchForm = document.getElementById('search-form');
 const searchBtn = document.getElementById('search');
 const filterPriority = document.getElementById('filter-priority');
 const sortBtns = document.querySelectorAll('.sort-btn');
@@ -75,8 +76,9 @@ function renderTasks() {
 	else showAll.classList.add('hide');
 }
 
-// Apply filters
-function search() {
+// Search filter
+searchForm.addEventListener('submit', async (e) => {
+	e.preventDefault();
 	filterSearch = searchBtn.value.trim();
 	// filterPrio = filterPriority.value.trim().toUpperCase();
 	// if (filterPrio && !/^[A-Z]$/.test(filterPrio)) {
@@ -85,7 +87,7 @@ function search() {
 	// 	filterPrio = '';
 	// }
 	renderTasks();
-}
+});
 
 // Toggle complete filter
 function toggleComplete(setComplete) {

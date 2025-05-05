@@ -12,12 +12,12 @@
 	</head>
 	<body>
 		{% include 'icons.html' %}
-		<header class="container flex space-between align-center">
+		<header class="container flex space-between align-center flex-column-lg">
 			<h1>Groc.txt <a href="/logout"><svg width="1em" height="1em"><use xlink:href="#icon-logout"/></svg></a></h1>
-			<div class="max-width-xs" role="search">
+			<form id="search-form" class="max-width-xs" role="search">
 				<input type="search" id="search" placeholder="Search">
-				<button onclick="search()"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
-			</div>
+				<button type="submit"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
+			</form>
 		</header>
 		<main class="container">
 			<section class="flex space-between align-center">

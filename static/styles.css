@@ -13,3 +13,7 @@ ul { padding-left: 0; }
 .show-hover-parent:hover .show-hover { display: unset; }
 .space-between { justify-content: space-between; }
 .pointer { cursor: pointer; }
+
+@media only screen and (max-width: 1024px) {
+	.flex-column-lg { flex-direction: column; }
+}
