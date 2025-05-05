@@ -7,8 +7,9 @@ name = "pypi"
 flask = "*"
 pytodotxt = "*"
 gunicorn = "*"
-
-[dev-packages]
+python-dotenv = "*"
 
 [requires]
 python_version = "3.13"
+
+[dev-packages]

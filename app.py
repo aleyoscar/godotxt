@@ -1,6 +1,10 @@
 from flask import Flask, jsonify, request, abort, render_template, session, redirect, url_for, flash
 from functools import wraps
+from dotenv import load_dotenv
 import pytodotxt, hashlib, os
+
+if os.getenv('FLASK_ENV') == 'development':
+	load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 USERNAME = os.getenv('USERNAME')
