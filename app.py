@@ -127,8 +127,11 @@ def edit_item(id):
 
 	task = todotxt.tasks[id - 1]
 	task.description = description
-	task.priority = priority if priority else None
 	task.is_completed = complete
+	if task.is_completed:
+		task.priority = None
+	else:
+		task.priority = priority if priority else None
 
 	todotxt.save()
 
@@ -152,6 +155,8 @@ def complete_item(id):
 
 	task = todotxt.tasks[id - 1]
 	task.is_completed = data['complete']
+	if task.is_completed:
+		task.priority = None
 
 	todotxt.save()
 
