@@ -128,7 +128,8 @@ function sortTasks(event) {
 addForm.addEventListener('submit', async (e) => {
 	e.preventDefault();
 	const description = document.getElementById('add-description').value.trim();
-	const priority = document.getElementById('add-priority').value.trim().toUpperCase();
+	let priority = document.getElementById('add-priority').value;
+	if (priority === '--') priority = null;
 	const complete = false;
 	addError.style.display = 'none';
 
@@ -160,12 +161,19 @@ function editTask(id) {
 	const modalForm = document.getElementById('edit-task-form');
 	const deleteBtn = document.getElementById('delete-task-btn');
 
+	let options = '';
+	for (let letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+		options += `<option value="${letter}" ${letter == task.priority ? 'selected' : ''}>${letter}</option>`;
+	}
+
 	modalForm.innerHTML = `
 		<fieldset>
 			<input type="hidden" id="edit-id" value="${task.id}" />
-			<label>Priority
-				<input type="text" id="edit-priority" placeholder="Priority (A-Z, optional)" value="${task.priority || ''}" maxlength="1" />
-			</label>
+			<label>Priority</label>
+			<select id="edit-priority" aria-label="Priority">
+				<option ${!task.priority ? 'selected' : ''} value="--">--</option>
+				${options}
+			</select>
 			<label>Task
 				<input type="text" id="edit-description" placeholder="Task description (e.g., Milk)" value="${task.description}" required>
 			</label>
@@ -188,7 +196,8 @@ editForm.addEventListener('submit', async (e) => {
 	if (!task) return;
 
 	const description = document.getElementById('edit-description').value.trim();
-	const priority = document.getElementById('edit-priority').value.trim().toUpperCase();
+	let priority = document.getElementById('edit-priority').value;
+	if (priority === '--') priority = null;
 	const complete = document.getElementById('edit-complete').checked;
 	editError.style.display = 'none';
 

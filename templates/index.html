@@ -47,9 +47,13 @@
 				<form id="add-task-form">
 					<p id="add-error" class="error" style="dislay: none;"></p>
 					<fieldset>
-						<label>Priority
-							<input type="text" id="add-priority" placeholder="Priority (A-Z, optional)" maxlength="1" />
-						</label>
+						<label>Priority</label>
+						<select id="add-priority" aria-label="Priority">
+							<option selected value="--">--</option>
+							{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+							<option value="{{ letter }}">{{ letter }}</option>
+							{% endfor %}
+						</select>
 						<label>Task
 							<input type="text" id="add-description" placeholder="Task description (e.g., Milk)" required>
 						</label>
