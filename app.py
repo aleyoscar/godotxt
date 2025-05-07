@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, abort, render_template, session, redi
 from functools import wraps
 from dotenv import load_dotenv
 import pytodotxt, hashlib, os
+from datetime import date
 
 if os.getenv('FLASK_ENV') == 'development':
 	load_dotenv()
@@ -68,7 +69,9 @@ def list_items():
 			'raw_description': task.description,
 			'complete': task.is_completed,
 			'projects': task.projects,
-			'contexts': task.contexts
+			'contexts': task.contexts,
+			'created': task.creation_date,
+			'completed': task.completion_date
 		}
 		for i, task in enumerate(todotxt.tasks)
 	]
@@ -95,6 +98,7 @@ def add_item():
 	if priority:
 		task.priority = priority
 	task.is_completed = complete
+	task.creation_date = date.today()
 
 	todotxt.tasks.append(task)
 	todotxt.save()
@@ -107,7 +111,9 @@ def add_item():
 			'raw_description': task.description,
 			'complete': task.is_completed,
 			'projects': task.projects,
-			'contexts': task.contexts
+			'contexts': task.contexts,
+			'created': task.creation_date,
+			'completed': task.completion_date
 		}
 	}), 201
 
@@ -133,11 +139,14 @@ def edit_item(id):
 
 	task = todotxt.tasks[id - 1]
 	task.description = description
+	was_complete = task.is_completed
 	task.is_completed = complete
 	if task.is_completed:
 		task.priority = None
+		if not was_complete: task.completion_date = date.today()
 	else:
 		task.priority = priority if priority else None
+		task.completion_date = None
 
 	todotxt.save()
 
@@ -149,7 +158,9 @@ def edit_item(id):
 			'raw_description': task.description,
 			'complete': task.is_completed,
 			'projects': task.projects,
-			'contexts': task.contexts
+			'contexts': task.contexts,
+			'created': task.creation_date,
+			'completed': task.completion_date
 		}
 	})
 
@@ -163,9 +174,14 @@ def complete_item(id):
 		abort(404, description="Task not found")
 
 	task = todotxt.tasks[id - 1]
+	was_complete = task.is_completed
 	task.is_completed = data['complete']
+
 	if task.is_completed:
 		task.priority = None
+		if not was_complete: task.completion_date = date.today()
+	else:
+		task.completion_date = None
 
 	todotxt.save()
 
@@ -177,7 +193,9 @@ def complete_item(id):
 			'raw_description': task.description,
 			'complete': task.is_completed,
 			'projects': task.projects,
-			'contexts': task.contexts
+			'contexts': task.contexts,
+			'created': task.creation_date,
+			'completed': task.completion_date
 		}
 	})
 
@@ -199,7 +217,9 @@ def delete_item(id):
 			'raw_description': task.description,
 			'complete': deleted_task.is_completed,
 			'projects': task.projects,
-			'contexts': task.contexts
+			'contexts': task.contexts,
+			'created': task.creation_date,
+			'completed': task.completion_date
 		}
 	})
 

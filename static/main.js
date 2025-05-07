@@ -36,18 +36,29 @@ async function fetchTasks() {
 	}
 }
 
+// Get date in YYYY-MM-DD format
+function getDateString(date) {
+	const yyyy = date.getFullYear();
+	const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so +1
+	const dd = String(date.getDate()).padStart(2, '0');
+	return `${yyyy}-${mm}-${dd}`;
+}
+
 // Parse task into html
 function parseTask(task) {
 	const projectRegex = /\+[A-Za-z0-9_]+/g;
 	const contextRegex = /@[A-Za-z0-9_]+/g;
 	let taskSub = '';
-	if (task.priority) taskSub = `<kbd><svg width="1em" height="1em"><use xlink:href="#icon-flag"/></svg> ${task.priority}</kbd>`;
+	if (task.priority) taskSub = `<a>(${task.priority})</a>`;
+	let taskDates = '';
+	if (task.created) taskDates += `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(new Date(task.created))}</small>`;
+	if (task.completed) taskDates += `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(new Date(task.completed))}</ins></small>`;
 	let taskDesc = task.raw_description.replace(projectRegex, (match) => task.projects.includes(match.slice(1)) ? `<a>${match}</a>` : match);
 	taskDesc = taskDesc.replace(contextRegex, (match) => task.contexts.includes(match.slice(1)) ? `<a class="contrast">${match}</a>` : match);
 	return `<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)"/>
 		<hgroup class="pointer flex-grow hover-background show-hover-parent" onclick="editTask(${task.id})">
-			<h5 class="flex space-between mb-xs ${task.complete ? 'muted-color strike' : ''}"><span>${taskDesc}</span><svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
-			<p class="${task.complete ? 'muted-color strike' : ''}">${taskSub}</p>
+			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}"><span>${taskSub} ${taskDesc}</span><svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
+			<p class="flex gap-xs align-center">${taskDates}</p>
 		</hgroup>
 	`;
 }
