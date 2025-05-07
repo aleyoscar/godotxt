@@ -64,8 +64,11 @@ def list_items():
 		{
 			'id': i + 1,
 			'priority': task.priority,
-			'description': task.description,
-			'complete': task.is_completed
+			'description': task.bare_description(),
+			'raw_description': task.description,
+			'complete': task.is_completed,
+			'projects': task.projects,
+			'contexts': task.contexts
 		}
 		for i, task in enumerate(todotxt.tasks)
 	]
@@ -100,8 +103,11 @@ def add_item():
 		'task': {
 			'id': len(todotxt.tasks),
 			'priority': task.priority,
-			'description': task.description,
-			'complete': task.is_completed
+			'description': task.bare_description(),
+			'raw_description': task.description,
+			'complete': task.is_completed,
+			'projects': task.projects,
+			'contexts': task.contexts
 		}
 	}), 201
 
@@ -139,8 +145,11 @@ def edit_item(id):
 		'task': {
 			'id': id,
 			'priority': task.priority,
-			'description': task.description,
-			'complete': task.is_completed
+			'description': task.bare_description(),
+			'raw_description': task.description,
+			'complete': task.is_completed,
+			'projects': task.projects,
+			'contexts': task.contexts
 		}
 	})
 
@@ -164,8 +173,11 @@ def complete_item(id):
 		'task': {
 			'id': id,
 			'priority': task.priority,
-			'description': task.description,
-			'complete': task.is_completed
+			'description': task.bare_description(),
+			'raw_description': task.description,
+			'complete': task.is_completed,
+			'projects': task.projects,
+			'contexts': task.contexts
 		}
 	})
 
@@ -183,8 +195,11 @@ def delete_item(id):
 		'task': {
 			'id': id,
 			'priority': deleted_task.priority,
-			'description': deleted_task.description,
-			'complete': deleted_task.is_completed
+			'description': deleted_task.bare_description(),
+			'raw_description': task.description,
+			'complete': deleted_task.is_completed,
+			'projects': task.projects,
+			'contexts': task.contexts
 		}
 	})
 

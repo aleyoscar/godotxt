@@ -31,11 +31,27 @@ async function fetchTasks() {
 	}
 }
 
+// Parse task into html
+function parseTask(task) {
+	const projectRegex = /\+[A-Za-z0-9_]+/g;
+	const contextRegex = /@[A-Za-z0-9_]+/g;
+	let taskSub = '';
+	if (task.priority) taskSub = `<kbd><svg width="1em" height="1em"><use xlink:href="#icon-flag"/></svg> ${task.priority}</kbd>`;
+	let taskDesc = task.raw_description.replace(projectRegex, (match) => task.projects.includes(match.slice(1)) ? `<a>${match}</a>` : match);
+	taskDesc = taskDesc.replace(contextRegex, (match) => task.contexts.includes(match.slice(1)) ? `<a class="contrast">${match}</a>` : match);
+	return `<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)"/>
+		<hgroup class="pointer flex-grow hover-background show-hover-parent" onclick="editTask(${task.id})">
+			<h5 class="flex space-between mb-xs ${task.complete ? 'muted-color strike' : ''}"><span>${taskDesc}</span><svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
+			<p class="${task.complete ? 'muted-color strike' : ''}">${taskSub}</p>
+		</hgroup>
+	`;
+}
+
 // Render tasks with sorting & filtering
 function renderTasks() {
 	// Filter tasks
 	let filteredTasks = tasks.filter(task => {
-		const matchesSearch = filterSearch ? task.description.toLowerCase().includes(filterSearch.toLowerCase()) : true;
+		const matchesSearch = filterSearch ? task.raw_description.toLowerCase().includes(filterSearch.toLowerCase()) : true;
 		const matchesComp = filterComp ? task.complete === false : true;
 		return matchesSearch && matchesComp;
 	});
@@ -59,15 +75,7 @@ function renderTasks() {
 		const row = document.createElement('li');
 		row.id = `task-${task.id}`;
 		row.classList.add('flex');
-		let taskSub = '';
-		if (task.priority) taskSub = `<kbd><svg width="1em" height="1em"><use xlink:href="#icon-flag"/></svg> ${task.priority}</kbd>`;
-		row.innerHTML = `
-			<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)"/>
-			<hgroup class="pointer flex-grow hover-background show-hover-parent" onclick="editTask(${task.id})">
-				<h5 class="flex space-between mb-xs ${task.complete ? 'muted-color strike' : ''}">${task.description}<svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
-				<p class="${task.complete ? 'muted-color strike' : ''}">${taskSub}</p>
-			</hgroup>
-		`;
+		row.innerHTML = parseTask(task);
 		taskList.appendChild(row);
 	});
 
