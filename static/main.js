@@ -77,17 +77,19 @@ function renderTasks() {
 }
 
 // Search filter
-searchForm.addEventListener('submit', async (e) => {
-	e.preventDefault();
-	filterSearch = searchBtn.value.trim();
-	// filterPrio = filterPriority.value.trim().toUpperCase();
-	// if (filterPrio && !/^[A-Z]$/.test(filterPrio)) {
-	// 	alert('Priority filter must be a single uppercase letter (A-Z).');
-	// 	filterPriority.value = '';
-	// 	filterPrio = '';
-	// }
-	renderTasks();
-});
+if (searchForm) {
+	searchForm.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		filterSearch = searchBtn.value.trim();
+		// filterPrio = filterPriority.value.trim().toUpperCase();
+		// if (filterPrio && !/^[A-Z]$/.test(filterPrio)) {
+		// 	alert('Priority filter must be a single uppercase letter (A-Z).');
+		// 	filterPriority.value = '';
+		// 	filterPrio = '';
+		// }
+		renderTasks();
+	});
+}
 
 // Toggle complete filter
 function toggleComplete(setComplete) {
@@ -126,32 +128,34 @@ function sortTasks(event) {
 }
 
 // Add task
-addForm.addEventListener('submit', async (e) => {
-	e.preventDefault();
-	const description = document.getElementById('add-description').value.trim();
-	let priority = document.getElementById('add-priority').value;
-	if (priority === '--') priority = null;
-	const complete = false;
-	addError.style.display = 'none';
+if (addForm) {
+	addForm.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const description = document.getElementById('add-description').value.trim();
+		let priority = document.getElementById('add-priority').value;
+		if (priority === '--') priority = null;
+		const complete = false;
+		addError.style.display = 'none';
 
-	try {
-		const response = await fetch("/add", {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ description, priority: priority || null , complete})
-		});
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.description || 'Failed to add task');
+		try {
+			const response = await fetch("/add", {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ description, priority: priority || null , complete})
+			});
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.description || 'Failed to add task');
+			}
+			addForm.reset();
+			await fetchTasks();
+			if (visibleModal) closeModal(visibleModal);
+		} catch (error) {
+			addError.textContent = error.message;
+			addError.style.display = 'block';
 		}
-		addForm.reset();
-		await fetchTasks();
-		if (visibleModal) closeModal(visibleModal);
-	} catch (error) {
-		addError.textContent = error.message;
-		addError.style.display = 'block';
-	}
-});
+	});
+}
 
 // Edit task
 function editTask(id) {
@@ -190,42 +194,44 @@ function editTask(id) {
 }
 
 // Save edited task
-editForm.addEventListener('submit', async (e) => {
-	e.preventDefault();
-	const id = parseInt(document.getElementById('edit-id').value);
-	const task = tasks.find(t => t.id === id);
-	if (!task) return;
+if (editForm) {
+	editForm.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const id = parseInt(document.getElementById('edit-id').value);
+		const task = tasks.find(t => t.id === id);
+		if (!task) return;
 
-	const description = document.getElementById('edit-description').value.trim();
-	let priority = document.getElementById('edit-priority').value;
-	if (priority === '--') priority = null;
-	const complete = document.getElementById('edit-complete').checked;
-	editError.style.display = 'none';
+		const description = document.getElementById('edit-description').value.trim();
+		let priority = document.getElementById('edit-priority').value;
+		if (priority === '--') priority = null;
+		const complete = document.getElementById('edit-complete').checked;
+		editError.style.display = 'none';
 
-	try {
-		const response = await fetch(`/edit/${id}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ description, priority: priority || null, complete })
-		});
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.description || 'Failed to edit task');
+		try {
+			const response = await fetch(`/edit/${id}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ description, priority: priority || null, complete })
+			});
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.description || 'Failed to edit task');
+			}
+			// Update the local tasks array with the response data
+			const data = await response.json();
+			const updatedTask = data.task;
+			const taskIndex = tasks.findIndex(t => t.id === id);
+			if (taskIndex !== -1) {
+				tasks[taskIndex] = updatedTask;
+			}
+			if (visibleModal) closeModal(visibleModal);
+			renderTasks();
+		} catch (error) {
+			editError.textContent = error.message;
+			editError.style.display = 'block';
 		}
-		// Update the local tasks array with the response data
-		const data = await response.json();
-		const updatedTask = data.task;
-		const taskIndex = tasks.findIndex(t => t.id === id);
-		if (taskIndex !== -1) {
-			tasks[taskIndex] = updatedTask;
-		}
-		if (visibleModal) closeModal(visibleModal);
-		renderTasks();
-	} catch (error) {
-		editError.textContent = error.message;
-		editError.style.display = 'block';
-	}
-});
+	});
+}
 
 // Complete task
 async function completeTask(event) {
@@ -276,4 +282,4 @@ async function deleteTask(event) {
 	}
 }
 
-fetchTasks();
+if (addForm) fetchTasks();

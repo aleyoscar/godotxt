@@ -1,92 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<link rel="icon" type="image/png" href="/static/images/favicon-96x96.png" sizes="96x96" />
-	<link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg" />
-	<link rel="shortcut icon" href="/static/images/favicon.ico" />
-	<link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png" />
-	<meta name="apple-mobile-web-app-title" content="Groc.txt" />
-	<link rel="manifest" href="/static/images/site.webmanifest" />
-	<title>Groc.txt</title>
-	<link rel="stylesheet" href="/static/pico.min.css">
-	<link rel="stylesheet" href="/static/styles.css">
-	<script src="/static/modal.js" defer></script>
-	<script src="/static/main.js" defer></script>
-</head>
-<body>
-	{% include 'icons.html' %}
-	<header class="container flex space-between align-center flex-column-lg">
-		<h1>Groc.txt <a href="/logout"><svg width="1em" height="1em"><use xlink:href="#icon-logout"/></svg></a></h1>
-		<form id="search-form" class="max-width-xs" role="search">
-			<input type="search" id="search" placeholder="Search">
-			<button type="submit"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
+{% extends 'base.html' %}
+{% block title %}Groc.txt{% endblock %}
+{% block content %}
+<header class="container flex space-between align-center flex-column-lg">
+	<h1>Groc.txt <a href="/logout"><svg width="1em" height="1em"><use xlink:href="#icon-logout"/></svg></a></h1>
+	<form id="search-form" class="max-width-xs" role="search">
+		<input type="search" id="search" placeholder="Search">
+		<button type="submit"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
+	</form>
+</header>
+<main class="container">
+	<section class="flex space-between align-center">
+		<h3>Shopping List</h3>
+		<button id="add-task-btn" onclick="toggleModal(event)" data-target="add-task-modal">Add Task</svg></button>
+	</section>
+	<section class="overflow-auto">
+		<div class="horizontal-scroll">
+			<button class="flex-inline align-center sort-btn" data-sort="description" onclick="sortTasks(event)">Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></button>
+			<button class="flex-inline align-center outline sort-btn" data-sort="priority" onclick="sortTasks(event)">Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></button>
+			<button id="complete-toggle" class="flex-inline align-center outline" onclick="toggleComplete(!filterComp)">Completed<svg width="1em" height="1em"><use xlink:href="#icon-eye"/></svg></button>
+		</div>
+	</section>
+	<section id="show-all" class="hide">
+		<button class="secondary" onclick="clearFilters()">Show All</button>
+	</section>
+	<section>
+		<ul id="task-list"></ul>
+	</section>
+</main>
+<dialog id="add-task-modal">
+	<article>
+		<header>
+			<button aria-label="Close" rel="prev" data-target="add-task-modal" onclick="toggleModal(event)"></button>
+			<h3>Add Task</h3>
+		</header>
+		<form id="add-task-form">
+			<p id="add-error" class="error" style="dislay: none;"></p>
+			<fieldset>
+				<label>Priority</label>
+				<select id="add-priority" aria-label="Priority">
+					<option selected value="--">--</option>
+					{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+					<option value="{{ letter }}">{{ letter }}</option>
+					{% endfor %}
+				</select>
+				<label>Task
+					<input type="text" id="add-description" placeholder="Task description (e.g., Milk)" required>
+				</label>
+			</fieldset>
 		</form>
-	</header>
-	<main class="container">
-		<section class="flex space-between align-center">
-			<h3>Shopping List</h3>
-			<button id="add-task-btn" onclick="toggleModal(event)" data-target="add-task-modal">Add Task</svg></button>
-		</section>
-		<section class="overflow-auto">
-			<div class="horizontal-scroll">
-				<button class="flex-inline align-center sort-btn" data-sort="description" onclick="sortTasks(event)">Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></button>
-				<button class="flex-inline align-center outline sort-btn" data-sort="priority" onclick="sortTasks(event)">Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></button>
-				<button id="complete-toggle" class="flex-inline align-center outline" onclick="toggleComplete(!filterComp)">Completed<svg width="1em" height="1em"><use xlink:href="#icon-eye"/></svg></button>
-			</div>
-		</section>
-		<section id="show-all" class="hide">
-			<button class="secondary" onclick="clearFilters()">Show All</button>
-		</section>
-		<section>
-			<ul id="task-list"></ul>
-		</section>
-	</main>
-	<dialog id="add-task-modal">
-		<article>
-			<header>
-				<button aria-label="Close" rel="prev" data-target="add-task-modal" onclick="toggleModal(event)"></button>
-				<h3>Add Task</h3>
-			</header>
-			<form id="add-task-form">
-				<p id="add-error" class="error" style="dislay: none;"></p>
-				<fieldset>
-					<label>Priority</label>
-					<select id="add-priority" aria-label="Priority">
-						<option selected value="--">--</option>
-						{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-						<option value="{{ letter }}">{{ letter }}</option>
-						{% endfor %}
-					</select>
-					<label>Task
-						<input type="text" id="add-description" placeholder="Task description (e.g., Milk)" required>
-					</label>
-				</fieldset>
-			</form>
-			<footer>
-				<button class="secondary" data-target="add-task-modal" onclick="toggleModal(event)">Cancel</button>
-				<button form="add-task-form">Add</button>
-			</footer>
-		</article>
-	</dialog>
-	<dialog id="edit-task-modal">
-		<article>
-			<header>
-				<button aria-label="Close" rel="prev" data-target="edit-task-modal" onclick="toggleModal(event)"></button>
-				<h3>Task</h3>
-			</header>
-			<p id="edit-error" class="error" style="dislay: none;"></p>
-			<form id="edit-task-form"></form>
-			<footer>
-				<button id="delete-task-btn" class="float-left" data-id="" onclick="deleteTask(event)"><svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg></button>
-				<button class="secondary" data-target="edit-task-modal" onclick="toggleModal(event)">Cancel</button>
-				<button form="edit-task-form">Save</button>
-			</footer>
-		</article>
-	</dialog>
-</body>
-</html>
-
-<!-- <svg><use xlink:href="#icon-logo"/></svg> -->
+		<footer>
+			<button class="secondary" data-target="add-task-modal" onclick="toggleModal(event)">Cancel</button>
+			<button form="add-task-form">Add</button>
+		</footer>
+	</article>
+</dialog>
+<dialog id="edit-task-modal">
+	<article>
+		<header>
+			<button aria-label="Close" rel="prev" data-target="edit-task-modal" onclick="toggleModal(event)"></button>
+			<h3>Task</h3>
+		</header>
+		<p id="edit-error" class="error" style="dislay: none;"></p>
+		<form id="edit-task-form"></form>
+		<footer>
+			<button id="delete-task-btn" class="float-left" data-id="" onclick="deleteTask(event)"><svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg></button>
+			<button class="secondary" data-target="edit-task-modal" onclick="toggleModal(event)">Cancel</button>
+			<button form="edit-task-form">Save</button>
+		</footer>
+	</article>
+</dialog>
+{% endblock %}
