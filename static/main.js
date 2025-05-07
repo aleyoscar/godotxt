@@ -202,7 +202,7 @@ function editTask(id) {
 				${options}
 			</select>
 			<label>Task
-				<input type="text" id="edit-description" placeholder="Task description (e.g., Milk)" value="${task.description}" required>
+				<input type="text" id="edit-description" placeholder="Task description (e.g., Milk)" value="${task.raw_description}" required>
 			</label>
 			<label>
 				<input type="checkbox" id="edit-complete" role="switch" ${task.complete ? 'checked' : ''} />
