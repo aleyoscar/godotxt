@@ -61,18 +61,26 @@ function renderTasks() {
 		return matchesSearch && matchesComp;
 	});
 
-	//Sort tasks
+	// Sort tasks by description first
 	filteredTasks.sort((a, b) => {
-		let valA = a[sortBy] || '';
-		let valB = b[sortBy] || '';
-		if (sortBy === 'priority' && (!valA || !valB)) {
-			valA = valA || 'ZZ'; // Null priorities sort last
-			valB = valB || 'ZZ';
-		}
-		if (valA < valB) return sortAscending ? -1 : 1;
-		if (valA > valB) return sortAscending ? 1 : -1;
-		return 0;
+		if (a.description < b.description) return sortAscending ? -1 : 1;
+		if (a.description > b.description) return sortAscending ? 1 : -1;
 	});
+
+	// Then by sortBy if not description
+	if (sortBy !== 'description') {
+		filteredTasks.sort((a, b) => {
+			let valA = a[sortBy] || '';
+			let valB = b[sortBy] || '';
+			if (sortBy === 'priority' && (!valA || !valB)) {
+				valA = valA || 'ZZ'; // Null priorities sort last
+				valB = valB || 'ZZ';
+			}
+			if (valA < valB) return sortAscending ? -1 : 1;
+			if (valA > valB) return sortAscending ? 1 : -1;
+			return 0;
+		});
+	}
 
 	// Render tasks
 	taskList.innerHTML = '';
