@@ -3,13 +3,18 @@ const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
 const editForm = document.getElementById('edit-task-form');
 const editError = document.getElementById('edit-error');
-const searchForm = document.getElementById('search-form');
-const searchBtn = document.getElementById('search');
+const search = document.getElementById('search');
+const searchBtn = document.getElementById('search-btn');
 const filterPriority = document.getElementById('filter-priority');
 const sortBtns = document.querySelectorAll('.sort-btn');
 const sortIcons = document.querySelectorAll('.sort-btn svg');
 const completeToggle = document.getElementById('complete-toggle');
 const showAll = document.getElementById('show-all');
+
+const clearBtn = document.createElement('button');
+clearBtn.classList.add('secondary');
+clearBtn.addEventListener('click', clearSearch);
+clearBtn.textContent = 'Clear';
 
 let tasks = [];
 let sortBy = 'description';
@@ -80,22 +85,27 @@ function renderTasks() {
 	});
 
 	// Show 'Show All' button if filters in place
-	if (filteredTasks.length < tasks.length) showAll.classList.remove('hide');
-	else showAll.classList.add('hide');
+	if (showAll) {
+		if (filteredTasks.length < tasks.length) showAll.classList.remove('hide');
+		else showAll.classList.add('hide');
+	}
 }
 
 // Search filter
-if (searchForm) {
-	searchForm.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		filterSearch = searchBtn.value.trim();
+if (search) {
+	search.addEventListener('input', async (e) => {
+		// e.preventDefault();
+		if (search.value) {
+			filterSearch = search.value.trim();
+			search.parentElement.appendChild(clearBtn);
+			renderTasks();
+		} else clearSearch();
 		// filterPrio = filterPriority.value.trim().toUpperCase();
 		// if (filterPrio && !/^[A-Z]$/.test(filterPrio)) {
 		// 	alert('Priority filter must be a single uppercase letter (A-Z).');
 		// 	filterPriority.value = '';
 		// 	filterPrio = '';
 		// }
-		renderTasks();
 	});
 }
 
@@ -112,15 +122,19 @@ function toggleComplete(setComplete) {
 	renderTasks();
 }
 
+// Clear search only
+function clearSearch() {
+	search.value = '';
+	filterSearch = '';
+	clearBtn.remove();
+	renderTasks();
+}
+
 // Clear filters
 function clearFilters() {
-	searchBtn.value = '';
-	// filterPriority.value = '';
-	filterSearch = '';
-	// filterPrio = '';
 	toggleComplete(false);
 	showAll.classList.add('hide');
-	renderTasks();
+	clearSearch();
 }
 
 // Toggle sort

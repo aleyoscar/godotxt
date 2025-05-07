@@ -7,10 +7,9 @@
 		<span>Groc.txt</span>
 		<a class="ml-xs" href="/logout"><svg width="1em" height="1em"><use xlink:href="#icon-logout"/></svg></a>
 	</h1>
-	<form id="search-form" class="max-width-xs" role="search">
+	<div class="max-width-xs" role="search">
 		<input type="search" id="search" placeholder="Search">
-		<button type="submit"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
-	</form>
+	</div>
 </header>
 <main class="container">
 	<section class="flex space-between align-center">
@@ -19,13 +18,11 @@
 	</section>
 	<section class="overflow-auto">
 		<div class="horizontal-scroll">
+			<!-- <button id="show-all" class="secondary hide" onclick="clearFilters()">Show All</button> -->
 			<button class="flex-inline align-center sort-btn" data-sort="description" onclick="sortTasks(event)">Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></button>
 			<button class="flex-inline align-center outline sort-btn" data-sort="priority" onclick="sortTasks(event)">Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></button>
 			<button id="complete-toggle" class="flex-inline align-center outline" onclick="toggleComplete(!filterComp)">Completed<svg width="1em" height="1em"><use xlink:href="#icon-eye"/></svg></button>
 		</div>
-	</section>
-	<section id="show-all" class="hide">
-		<button class="secondary" onclick="clearFilters()">Show All</button>
 	</section>
 	<section>
 		<ul id="task-list"></ul>
