@@ -3,7 +3,8 @@
 {% block content %}
 <main>
 	<article class="max-width-xs centered-card">
-		<header><h1>Login</h1></header>
+		<header class="text-center primary"><svg width="5em" height="5em"><use xlink:href="#icon-logo"/></svg></header>
+		<h1>Login</h1>
 		{% with messages = get_flashed_messages(with_categories=true) %}
 			{% if messages %}
 				{% for category, message in messages %}

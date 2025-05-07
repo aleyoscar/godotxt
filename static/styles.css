@@ -7,11 +7,13 @@ ul { padding-left: 0; }
 .flex-inline { display: inline-flex; gap: var(--pico-spacing); }
 .flex-grow { flex: 1; }
 .float-left { float: left; }
+.gap-xs { gap: calc(var(--pico-spacing) / 1.6); }
 .hide { display: none; }
 .horizontal-scroll { display: flex; flex-wrap: nowrap; gap: calc(var(--pico-spacing) / 3); }
 .horizontal-scroll button { white-space: nowrap; flex: 0 0 auto; }
 .max-width-xs { max-width: 576px; }
 .mb-xs { margin-bottom: calc(var(--pico-spacing) / 3); }
+.ml-xs { margin-left: calc(var(--pico-spacing) / 3); }
 .muted-color { color: var(--pico-muted-color); }
 .overflow-auto {
 	-webkit-overflow-scrolling: touch;
@@ -19,10 +21,12 @@ ul { padding-left: 0; }
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }
+.primary { color: var(--pico-primary); }
 .show-hover-parent .show-hover { display:none; }
 .show-hover-parent:hover .show-hover { display: unset; }
 .space-between { justify-content: space-between; }
 .strike { text-decoration: line-through; }
+.text-center { text-align: center; }
 .pointer { cursor: pointer; }
 
 #task-list input[type='checkbox'] { margin-top: 0; }

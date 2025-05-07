@@ -2,7 +2,11 @@
 {% block title %}Groc.txt{% endblock %}
 {% block content %}
 <header class="container flex space-between align-center flex-column-lg">
-	<h1>Groc.txt <a href="/logout"><svg width="1em" height="1em"><use xlink:href="#icon-logout"/></svg></a></h1>
+	<h1 class="flex align-center gap-xs">
+		<svg width="1.6em" height="1.6em"><use xlink:href="#icon-logo"/></svg>
+		<span>Groc.txt</span>
+		<a class="ml-xs" href="/logout"><svg width="1em" height="1em"><use xlink:href="#icon-logout"/></svg></a>
+	</h1>
 	<form id="search-form" class="max-width-xs" role="search">
 		<input type="search" id="search" placeholder="Search">
 		<button type="submit"><svg width="1em" height="1em"><use xlink:href="#icon-search"/></svg></button>
