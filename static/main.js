@@ -46,8 +46,8 @@ function getDateString(date) {
 
 // Parse task into html
 function parseTask(task) {
-	const projectRegex = /\+[A-Za-z0-9_]+/g;
-	const contextRegex = /@[A-Za-z0-9_]+/g;
+	const projectRegex = /\+[A-Za-z0-9_-]+/g;
+	const contextRegex = /@[A-Za-z0-9_-]+/g;
 	let taskSub = '';
 	if (task.priority) taskSub = `<a>(${task.priority})</a>`;
 	let taskDates = '';
