@@ -208,16 +208,16 @@ def delete_item(id):
 	if id < 1 or id > len(todotxt.tasks):
 		abort(404, description="Task not found")
 
-	deleted_task = todotxt.tasks.pop(id - 1)
+	task = todotxt.tasks.pop(id - 1)
 	todotxt.save()
 
 	return jsonify({
 		'task': {
 			'id': id,
-			'priority': deleted_task.priority,
-			'description': deleted_task.bare_description(),
+			'priority': task.priority,
+			'description': task.bare_description(),
 			'raw_description': task.description,
-			'complete': deleted_task.is_completed,
+			'complete': task.is_completed,
 			'projects': task.projects,
 			'contexts': task.contexts,
 			'created': task.creation_date,
