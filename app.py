@@ -147,6 +147,7 @@ def edit_item(id):
 	else:
 		task.priority = priority if priority else None
 		task.completion_date = None
+	if not task.creation_date: task.creation_date = date.today()
 
 	todotxt.save()
 
@@ -182,6 +183,7 @@ def complete_item(id):
 		if not was_complete: task.completion_date = date.today()
 	else:
 		task.completion_date = None
+	if not task.creation_date: task.creation_date = date.today()
 
 	todotxt.save()
 
