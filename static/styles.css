@@ -1,5 +1,6 @@
 svg, use { pointer-events: none; }
-ul { padding-left: 0; }
+ul { list-style-type: none; padding-left: 0; }
+ul li { list-style-type: none; }
 
 .align-center { align-items: center; }
 .centered-card { margin: 0 auto; }
@@ -21,6 +22,7 @@ ul { padding-left: 0; }
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }
+.position-relative { position: relative; }
 .primary { color: var(--pico-primary); }
 .show-hover-parent .show-hover { display:none; }
 .show-hover-parent:hover .show-hover { display: unset; }
@@ -30,6 +32,24 @@ ul { padding-left: 0; }
 .pointer { cursor: pointer; }
 
 #task-list input[type='checkbox'] { margin-top: 0; }
+#autocomplete {
+	background: var(--pico-form-element-background-color);
+	border: 1px solid var(--pico-form-element-border-color);
+	border-radius: var(--pico-border-radius);
+	left: 0;
+	list-style-type: none;
+	max-height: 200px;
+	overflow-y: auto;
+	position: absolute;
+	right: 0;
+	top: calc(100% - var(--pico-spacing));
+	z-index: 10;
+}
+#autocomplete li {
+	cursor: pointer;
+	padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+}
+#autocomplete li.selected { background: var(--pico-dropdown-hover-background-color); }
 
 @media only screen and (max-width: 1024px) {
 	.flex-column-lg { flex-direction: column; }

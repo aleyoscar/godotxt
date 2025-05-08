@@ -1,6 +1,7 @@
 const taskList = document.getElementById('task-list');
 const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
+const addDescription = document.getElementById('add-description');
 const editForm = document.getElementById('edit-task-form');
 const editError = document.getElementById('edit-error');
 const search = document.getElementById('search');
@@ -200,7 +201,7 @@ if (addForm) {
 
 // Edit task
 function editTask(id) {
-	const task = tasks.find(t => t.id === id);
+	const task = tasks.find(t => t.id === parseInt(id));
 	if (!task) return;
 
 	const modal = document.getElementById(`edit-task-modal`);
@@ -230,7 +231,6 @@ function editTask(id) {
 		</fieldset>
 	`;
 	deleteBtn.dataset.id = task.id;
-
 	openModal(modal);
 }
 
@@ -308,7 +308,6 @@ async function completeTask(event) {
 
 // Delete task
 async function deleteTask(event) {
-	console.log(event.target);
 	const id = event.target.dataset.id;
 	if (!confirm('Are you sure you want to delete this task?')) return;
 	try {
@@ -322,5 +321,83 @@ async function deleteTask(event) {
 		alert('Error: ' + error.message);
 	}
 }
+
+if (addDescription) addDescription.addEventListener('input', (e) => {
+	const autocomplete = document.getElementById('autocomplete');
+	const query = e.target.value.toLowerCase().trim();
+	if (query) {
+		const filteredTasks = tasks.filter(task =>
+			task.raw_description.toLowerCase().includes(query)
+		);
+		if (filteredTasks.length) {
+			autocomplete.innerHTML = '';
+			filteredTasks.sort((a, b) => a.description < b.description ? -1 : 1);
+			filteredTasks.forEach(task => {
+				const li = document.createElement('li');
+				li.textContent = task.raw_description;
+				li.dataset.id = task.id;
+				li.addEventListener('click', (e) => {
+					closeModal(visibleModal);
+					autocomplete.classList.add('hide');
+					autocomplete.innerHTML = '';
+					setTimeout(() => {
+						editTask(e.target.dataset.id);
+					}, animationDuration);
+				});
+				autocomplete.appendChild(li);
+			});
+			autocomplete.classList.remove('hide');
+		} else autocomplete.classList.add('hide');
+	} else autocomplete.classList.add('hide');
+});
+
+addDescription.addEventListener('keydown', (e) => {
+	const items = autocomplete.querySelectorAll('li');
+	if (items.length === 0) return;
+
+	let index = Array.from(items).findIndex(item => item.classList.contains('selected'));
+
+	if (e.key === 'ArrowDown') {
+		e.preventDefault();
+		if (index < items.length - 1) {
+			items[index]?.classList.remove('selected');
+			items[index + 1].classList.add('selected');
+			items[index + 1].scrollIntoView({ block: 'nearest' });
+		}
+	} else if (e.key === 'ArrowUp') {
+		e.preventDefault();
+		if (index > 0) {
+			items[index].classList.remove('selected');
+			items[index - 1].classList.add('selected');
+			items[index - 1].scrollIntoView({ block: 'nearest' });
+		}
+	} else if (e.key === 'Enter' && index >= 0) {
+		e.preventDefault();
+		closeModal(visibleModal);
+		autocomplete.classList.add('hide');
+		autocomplete.innerHTML = '';
+		setTimeout(() => {
+			editTask(items[index].dataset.id);
+		}, animationDuration);
+	} else if (e.key === 'Tab' && index >= 0) {
+		e.preventDefault();
+		addDescription.value = items[index].textContent;
+		autocomplete.classList.add('hide');
+		autocomplete.innerHTML = '';
+	}
+});
+
+autocomplete.addEventListener('mouseover', (e) => {
+	if (e.target.tagName === 'LI') {
+		autocomplete.querySelectorAll('li').forEach(item => item.classList.remove('selected'));
+		e.target.classList.add('selected');
+	}
+});
+
+document.addEventListener('click', (e) => {
+	if (!addDescription.contains(e.target) && !autocomplete.contains(e.target)) {
+		autocomplete.classList.add('hide');
+	}
+});
 
 if (addForm) fetchTasks();
