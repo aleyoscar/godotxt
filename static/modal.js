@@ -27,6 +27,7 @@ const openModal = (modal) => {
 		html.classList.remove(openingClass);
 	}, animationDuration);
 	modal.showModal();
+	modal.querySelector('.modal-focus').focus();
 };
 
 // Close modal

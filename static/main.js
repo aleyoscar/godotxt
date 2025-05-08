@@ -215,14 +215,14 @@ function editTask(id) {
 	modalForm.innerHTML = `
 		<fieldset>
 			<input type="hidden" id="edit-id" value="${task.id}" />
+			<label>Task
+				<input class="modal-focus" type="text" id="edit-description" placeholder="Task description (e.g., Milk)" value="${task.raw_description}" required>
+			</label>
 			<label>Priority</label>
 			<select id="edit-priority" aria-label="Priority">
 				<option ${!task.priority ? 'selected' : ''} value="--">--</option>
 				${options}
 			</select>
-			<label>Task
-				<input type="text" id="edit-description" placeholder="Task description (e.g., Milk)" value="${task.raw_description}" required>
-			</label>
 			<label>
 				<input type="checkbox" id="edit-complete" role="switch" ${task.complete ? 'checked' : ''} />
 				Completed

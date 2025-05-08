@@ -37,6 +37,10 @@
 		<form id="add-task-form">
 			<p id="add-error" class="error" style="dislay: none;"></p>
 			<fieldset>
+				<label class="position-relative">Task
+					<input class="modal-focus" type="text" id="add-description" placeholder="Task description (e.g., Milk)" required autocomplete="off">
+					<ul class="hide" id="autocomplete"></ul>
+				</label>
 				<label>Priority</label>
 				<select id="add-priority" aria-label="Priority">
 					<option selected value="--">--</option>
@@ -44,9 +48,6 @@
 					<option value="{{ letter }}">{{ letter }}</option>
 					{% endfor %}
 				</select>
-				<label>Task
-					<input type="text" id="add-description" placeholder="Task description (e.g., Milk)" required>
-				</label>
 			</fieldset>
 		</form>
 		<footer>
