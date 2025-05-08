@@ -11,6 +11,10 @@ const sortBtns = document.querySelectorAll('.sort-btn');
 const sortIcons = document.querySelectorAll('.sort-btn svg');
 const completeToggle = document.getElementById('complete-toggle');
 const showAll = document.getElementById('show-all');
+const projectsModal = document.getElementById('projects-modal');
+const projectsBtn = document.getElementById('projects-btn');
+const contextsModal = document.getElementById('contexts-modal');
+const contextsBtn = document.getElementById('contexts-btn');
 
 const clearBtn = document.createElement('button');
 clearBtn.classList.add('secondary');
@@ -18,11 +22,15 @@ clearBtn.addEventListener('click', clearSearch);
 clearBtn.textContent = 'Clear';
 
 let tasks = [];
+let projects = [];
+let contexts = [];
 let sortBy = 'description';
 let sortAscending = true;
 let filterSearch = '';
 // let filterPrio = '';
-let filterComp = true;
+let filterComplete = true;
+let filterProjects = [];
+let filterContexts = [];
 
 // Fetch tasks from API
 async function fetchTasks() {
@@ -54,8 +62,8 @@ function parseTask(task) {
 	let taskDates = '';
 	if (task.created) taskDates += `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(new Date(task.created))}</small>`;
 	if (task.completed) taskDates += `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(new Date(task.completed))}</ins></small>`;
-	let taskDesc = task.raw_description.replace(projectRegex, (match) => task.projects.includes(match.slice(1)) ? `<a>${match}</a>` : match);
-	taskDesc = taskDesc.replace(contextRegex, (match) => task.contexts.includes(match.slice(1)) ? `<a class="contrast">${match}</a>` : match);
+	let taskDesc = task.raw_description.replace(projectRegex, (match) => task.projects.includes(match.slice(1)) ? `<a data-attribute="projects" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>` : match);
+	taskDesc = taskDesc.replace(contextRegex, (match) => task.contexts.includes(match.slice(1)) ? `<a class="contrast" data-attribute="contexts" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>` : match);
 	return `<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)"/>
 		<hgroup class="pointer flex-grow hover-background show-hover-parent" onclick="editTask(${task.id})">
 			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}"><span>${taskSub} ${taskDesc}</span><svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
@@ -64,13 +72,106 @@ function parseTask(task) {
 	`;
 }
 
+// Clear filter attributes
+function clearAttributeFilters() {
+	filterProjects = [];
+	filterContexts = [];
+	projectsBtn.classList.add('outline');
+	contextsBtn.classList.add('outline');
+}
+
+// Clear attribute inputs
+function clearAttributeInputs(event) {
+	if (event.target.dataset.attribute == 'projects')
+		projectsModal.querySelectorAll('input').forEach(i => i.checked = false);
+	if (event.target.dataset.attribute == 'contexts')
+		contextsModal.querySelectorAll('input').forEach(i => i.checked = false);
+}
+
+// Single attribute
+function selectAttribute(event) {
+	event.stopPropagation();
+	event.preventDefault();
+	const inputs = document.querySelectorAll('.attribute-filter');
+	inputs.forEach(i => i.checked = false);
+	inputs.forEach(input => {
+		if (event.target.dataset.attribute == input.dataset.attribute &&
+			event.target.dataset.name == input.name) input.checked = true;
+	});
+	filterAttribute(event);
+}
+
+// Filter attributes
+function filterAttribute(event) {
+	clearAttributeFilters();
+	document.querySelectorAll('.attribute-filter').forEach((input) => {
+		if (input.checked) {
+			if (input.dataset.attribute == 'projects') {
+				filterProjects.push(input.name);
+				projectsBtn.classList.remove('outline');
+			}
+			if (input.dataset.attribute == 'contexts') {
+				filterContexts.push(input.name);
+				contextsBtn.classList.remove('outline');
+			}
+		}
+	});
+	renderTasks();
+}
+
 // Render tasks with sorting & filtering
 function renderTasks() {
+	// Populate project & context dropdowns
+	projects = [];
+	contexts = [];
+	projectsModal.querySelector('ul').innerHTML = '';
+	contextsModal.querySelector('ul').innerHTML = '';
+	projectsBtn.setAttribute("disabled", "disabled");
+	projectsBtn.classList.add('secondary');
+	contextsBtn.setAttribute("disabled", "disabled");
+	contextsBtn.classList.add('secondary');
+	tasks.forEach((task) => {
+		task.projects.forEach((p) => {if (!projects.includes(p)) projects.push(p)});
+		task.contexts.forEach((c) => {if (!contexts.includes(c)) contexts.push(c)});
+	});
+	if (projects.length > 0) {
+		projectsBtn.removeAttribute('disabled');
+		projectsBtn.classList.remove('secondary');
+		projects.forEach((p) => {
+			const li = document.createElement('li');
+			li.innerHTML = `<label>
+				<input type="checkbox"
+					class="attribute-filter"
+					data-attribute="projects"
+					name="${p}"
+					${filterProjects.includes(p) ? 'checked' : ''}/>
+				${p}</label>`;
+			projectsModal.querySelector('ul').appendChild(li);
+		});
+	}
+	if (contexts.length > 0) {
+		contextsBtn.removeAttribute('disabled');
+		contextsBtn.classList.remove('secondary');
+		contexts.forEach((c) => {
+			const li = document.createElement('li');
+			li.innerHTML = `<label>
+				<input type="checkbox"
+					class="attribute-filter"
+					data-attribute="contexts"
+					name="${c}"
+					${filterContexts.includes(c) ? 'checked' : ''}/>
+				${c}</label>`;
+			contextsModal.querySelector('ul').appendChild(li);
+		});
+	}
+
 	// Filter tasks
 	let filteredTasks = tasks.filter(task => {
 		const matchesSearch = filterSearch ? task.raw_description.toLowerCase().includes(filterSearch.toLowerCase()) : true;
-		const matchesComp = filterComp ? task.complete === false : true;
-		return matchesSearch && matchesComp;
+		const matchesComplete = filterComplete ? task.complete === false : true;
+		const matchesProjects = filterProjects.length > 0 ? task.projects.some(t => filterProjects.includes(t)) : true;
+		const matchesContexts = filterContexts.length > 0 ? task.contexts.some(t => filterContexts.includes(t)) : true;
+		return matchesSearch && matchesComplete && matchesProjects && matchesContexts;
 	});
 
 	// Sort tasks by description first
@@ -131,9 +232,9 @@ if (search) {
 
 // Toggle complete filter
 function toggleComplete(setComplete) {
-	filterComp = setComplete;
+	filterComplete = setComplete;
 	newIcon = '#icon-eye';
-	if (filterComp) completeToggle.classList.add('outline');
+	if (filterComplete) completeToggle.classList.add('outline');
 	else {
 		newIcon += '-fill';
 		completeToggle.classList.remove('outline');

@@ -19,9 +19,21 @@
 	<section class="overflow-auto">
 		<div class="horizontal-scroll">
 			<!-- <button id="show-all" class="secondary hide" onclick="clearFilters()">Show All</button> -->
-			<button class="flex-inline align-center sort-btn" data-sort="description" onclick="sortTasks(event)">Description<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></button>
-			<button class="flex-inline align-center outline sort-btn" data-sort="priority" onclick="sortTasks(event)">Priority<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></button>
-			<button id="complete-toggle" class="flex-inline align-center outline" onclick="toggleComplete(!filterComp)">Completed<svg width="1em" height="1em"><use xlink:href="#icon-eye"/></svg></button>
+			<button class="flex-inline align-center sort-btn" data-sort="description" onclick="sortTasks(event)">
+				Description
+				<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></button>
+			<button class="flex-inline align-center outline sort-btn" data-sort="priority" onclick="sortTasks(event)">
+				Priority
+				<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></button>
+			<button id="complete-toggle" class="flex-inline align-center outline" onclick="toggleComplete(!filterComplete)">
+				Completed
+				<svg width="1em" height="1em"><use xlink:href="#icon-eye"/></svg></button>
+			<button id="projects-btn" class="flex-inline align-center outline" onclick="toggleModal(event)" data-target="projects-modal">
+				Projects
+				<svg width="1em" height="1em"><use xlink:href="#icon-rocket"/></svg></button>
+			<button id="contexts-btn" class="flex-inline align-center outline" onclick="toggleModal(event)" data-target="contexts-modal">
+				Contexts
+				<svg width="1em" height="1em"><use xlink:href="#icon-at"/></svg></button>
 		</div>
 	</section>
 	<section>
@@ -68,6 +80,32 @@
 			<button id="delete-task-btn" class="float-left" data-id="" onclick="deleteTask(event)"><svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg></button>
 			<button class="secondary" data-target="edit-task-modal" onclick="toggleModal(event)">Cancel</button>
 			<button form="edit-task-form">Save</button>
+		</footer>
+	</article>
+</dialog>
+<dialog id="projects-modal">
+	<article>
+		<header>
+			<button aria-label="Close" rel="prev" data-target="projects-modal" onclick="filterAttribute(event); toggleModal(event);"></button>
+			<h3>Projects</h3>
+		</header>
+		<ul></ul>
+		<footer>
+			<button class="secondary" data-target="projects-modal" data-attribute="projects" onclick="clearAttributeInputs(event); filterAttribute(event); toggleModal(event);">Clear</button>
+			<button data-target="projects-modal" onclick="filterAttribute(event); toggleModal(event);">Submit</button>
+		</footer>
+	</article>
+</dialog>
+<dialog id="contexts-modal">
+	<article>
+		<header>
+			<button aria-label="Close" rel="prev" data-target="contexts-modal" onclick="filterAttribute(event); toggleModal(event);"></button>
+			<h3>Contexts</h3>
+		</header>
+		<ul></ul>
+		<footer>
+			<button class="secondary" data-target="contexts-modal" data-attribute="contexts" onclick="clearAttributeInputs(event); filterAttribute(event); toggleModal(event);">Clear</button>
+			<button data-target="contexts-modal" onclick="filterAttribute(event); toggleModal(event);">Submit</button>
 		</footer>
 	</article>
 </dialog>
