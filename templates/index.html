@@ -5,36 +5,67 @@
 	<h1 class="flex align-center gap-xs">
 		<svg width="1.6em" height="1.6em"><use xlink:href="#icon-logo"/></svg>
 		<span>Groc.txt</span>
-		<a class="ml-xs" href="/logout"><svg width="1em" height="1em"><use xlink:href="#icon-logout"/></svg></a>
+		<a class="ml-xs" href="/logout"><svg width="1em" height="1em">
+			<use xlink:href="#icon-logout"/></svg></a>
 	</h1>
 	<div class="max-width-xs" role="search">
 		<input type="search" id="search" placeholder="Search">
 	</div>
 </header>
 <main class="container">
-	<section class="flex space-between align-center">
-		<h3>Shopping List</h3>
-		<button id="add-task-btn" onclick="toggleModal(event)" data-target="add-task-modal">Add Task</svg></button>
-	</section>
 	<section class="overflow-auto">
 		<div class="horizontal-scroll">
 			<!-- <button id="show-all" class="secondary hide" onclick="clearFilters()">Show All</button> -->
-			<button class="flex-inline align-center sort-btn" data-sort="description" onclick="sortTasks(event)">
+			<button class="flex-inline align-center sort-btn"
+				data-sort="description"
+				onclick="sortTasks(event)">
 				Description
-				<svg width="1em" height="1em"><use xlink:href="#icon-caret-down-fill"/></svg></button>
-			<button class="flex-inline align-center outline sort-btn" data-sort="priority" onclick="sortTasks(event)">
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-caret-down-fill"/>
+				</svg>
+			</button>
+			<button class="flex-inline align-center outline sort-btn"
+				data-sort="priority"
+				onclick="sortTasks(event)">
 				Priority
-				<svg width="1em" height="1em"><use xlink:href="#icon-caret-down"/></svg></button>
-			<button id="complete-toggle" class="flex-inline align-center outline" onclick="toggleComplete(!filterComplete)">
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-caret-down"/>
+				</svg>
+			</button>
+			<button id="complete-toggle"
+				class="flex-inline align-center outline"
+				onclick="toggleComplete(!filterComplete)">
 				Completed
-				<svg width="1em" height="1em"><use xlink:href="#icon-eye"/></svg></button>
-			<button id="projects-btn" class="flex-inline align-center outline" onclick="toggleModal(event)" data-target="projects-modal">
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-eye"/>
+				</svg>
+			</button>
+			<button id="projects-btn"
+				class="flex-inline align-center outline"
+				onclick="toggleModal(event)" data-target="projects-modal">
 				Projects
-				<svg width="1em" height="1em"><use xlink:href="#icon-rocket"/></svg></button>
-			<button id="contexts-btn" class="flex-inline align-center outline" onclick="toggleModal(event)" data-target="contexts-modal">
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-rocket"/>
+				</svg>
+			</button>
+			<button id="contexts-btn"
+				class="flex-inline align-center outline"
+				onclick="toggleModal(event)" data-target="contexts-modal">
 				Contexts
-				<svg width="1em" height="1em"><use xlink:href="#icon-at"/></svg></button>
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-at"/>
+				</svg>
+			</button>
 		</div>
+	</section>
+	<section class="flex align-center">
+		<h3 class="mb-0">Shopping List</h3>
+		<button id="add-task-btn"
+			class="border-round"
+			onclick="toggleModal(event)"
+			data-target="add-task-modal">
+			<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
+		</button>
 	</section>
 	<section>
 		<ul id="task-list"></ul>
@@ -43,14 +74,23 @@
 <dialog id="add-task-modal">
 	<article>
 		<header>
-			<button aria-label="Close" rel="prev" data-target="add-task-modal" onclick="toggleModal(event)"></button>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="add-task-modal"
+				onclick="toggleModal(event)">
+			</button>
 			<h3>Add Task</h3>
 		</header>
 		<form id="add-task-form">
 			<p id="add-error" class="error" style="dislay: none;"></p>
 			<fieldset>
 				<label class="position-relative">Task
-					<input class="modal-focus" type="text" id="add-description" placeholder="Task description (e.g., Milk)" required autocomplete="off">
+					<input class="modal-focus"
+						type="text"
+						id="add-description"
+						placeholder="Task description (e.g., Milk)"
+						autocomplete="off"
+						required />
 					<ul class="hide" id="autocomplete"></ul>
 				</label>
 				<label>Priority</label>
@@ -63,7 +103,11 @@
 			</fieldset>
 		</form>
 		<footer>
-			<button class="secondary" data-target="add-task-modal" onclick="toggleModal(event)">Cancel</button>
+			<button class="secondary"
+				data-target="add-task-modal"
+				onclick="toggleModal(event)">
+				Cancel
+			</button>
 			<button form="add-task-form">Add</button>
 		</footer>
 	</article>
@@ -71,14 +115,29 @@
 <dialog id="edit-task-modal">
 	<article>
 		<header>
-			<button aria-label="Close" rel="prev" data-target="edit-task-modal" onclick="toggleModal(event)"></button>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="edit-task-modal"
+				onclick="toggleModal(event)">
+			</button>
 			<h3>Task</h3>
 		</header>
 		<p id="edit-error" class="error" style="dislay: none;"></p>
 		<form id="edit-task-form"></form>
 		<footer>
-			<button id="delete-task-btn" class="float-left" data-id="" onclick="deleteTask(event)"><svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg></button>
-			<button class="secondary" data-target="edit-task-modal" onclick="toggleModal(event)">Cancel</button>
+			<button id="delete-task-btn"
+				class="float-left"
+				data-id=""
+				onclick="deleteTask(event)">
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-trash"/>
+				</svg>
+			</button>
+			<button class="secondary"
+				data-target="edit-task-modal"
+				onclick="toggleModal(event)">
+				Cancel
+			</button>
 			<button form="edit-task-form">Save</button>
 		</footer>
 	</article>
@@ -86,26 +145,54 @@
 <dialog id="projects-modal">
 	<article>
 		<header>
-			<button aria-label="Close" rel="prev" data-target="projects-modal" onclick="filterAttribute(event); toggleModal(event);"></button>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="projects-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+			</button>
 			<h3>Projects</h3>
 		</header>
 		<ul></ul>
 		<footer>
-			<button class="secondary" data-target="projects-modal" data-attribute="projects" onclick="clearAttributeInputs(event); filterAttribute(event); toggleModal(event);">Clear</button>
-			<button data-target="projects-modal" onclick="filterAttribute(event); toggleModal(event);">Close</button>
+			<button class="secondary"
+				data-target="projects-modal"
+				data-attribute="projects"
+				onclick="clearAttributeInputs(event);
+					filterAttribute(event);
+					toggleModal(event);">
+				Clear
+			</button>
+			<button data-target="projects-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+				Close
+			</button>
 		</footer>
 	</article>
 </dialog>
 <dialog id="contexts-modal">
 	<article>
 		<header>
-			<button aria-label="Close" rel="prev" data-target="contexts-modal" onclick="filterAttribute(event); toggleModal(event);"></button>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="contexts-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+			</button>
 			<h3>Contexts</h3>
 		</header>
 		<ul></ul>
 		<footer>
-			<button class="secondary" data-target="contexts-modal" data-attribute="contexts" onclick="clearAttributeInputs(event); filterAttribute(event); toggleModal(event);">Clear</button>
-			<button data-target="contexts-modal" onclick="filterAttribute(event); toggleModal(event);">Close</button>
+			<button class="secondary"
+				data-target="contexts-modal"
+				data-attribute="contexts"
+				onclick="clearAttributeInputs(event);
+					filterAttribute(event);
+					toggleModal(event);">
+				Clear
+			</button>
+			<button data-target="contexts-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+				Close
+			</button>
 		</footer>
 	</article>
 </dialog>

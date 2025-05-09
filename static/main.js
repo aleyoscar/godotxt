@@ -1,3 +1,6 @@
+
+// CONSTANTS ------------------------------------------------------------------
+
 const taskList = document.getElementById('task-list');
 const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
@@ -21,6 +24,8 @@ clearBtn.classList.add('secondary');
 clearBtn.addEventListener('click', clearSearch);
 clearBtn.textContent = 'Clear';
 
+// GLOBALS --------------------------------------------------------------------
+
 let tasks = [];
 let projects = [];
 let contexts = [];
@@ -31,6 +36,18 @@ let filterSearch = '';
 let filterComplete = true;
 let filterProjects = [];
 let filterContexts = [];
+
+// HELPERS --------------------------------------------------------------------
+
+// Get date in YYYY-MM-DD format
+function getDateString(date) {
+	const yyyy = date.getUTCFullYear();
+	const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+	const dd = String(date.getUTCDate()).padStart(2, '0');
+	return `${yyyy}-${mm}-${dd}`;
+}
+
+// LIST -----------------------------------------------------------------------
 
 // Fetch tasks from API
 async function fetchTasks() {
@@ -45,14 +62,6 @@ async function fetchTasks() {
 	}
 }
 
-// Get date in YYYY-MM-DD format
-function getDateString(date) {
-	const yyyy = date.getUTCFullYear();
-	const mm = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based, so +1
-	const dd = String(date.getUTCDate()).padStart(2, '0');
-	return `${yyyy}-${mm}-${dd}`;
-}
-
 // Parse task into html
 function parseTask(task) {
 	const projectRegex = /\+[A-Za-z0-9_-]+/g;
@@ -60,63 +69,54 @@ function parseTask(task) {
 	let taskSub = '';
 	if (task.priority) taskSub = `<a>(${task.priority})</a>`;
 	let taskDates = '';
-	if (task.created) taskDates += `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(new Date(task.created))}</small>`;
-	if (task.completed) taskDates += `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(new Date(task.completed))}</ins></small>`;
-	let taskDesc = task.raw_description.replace(projectRegex, (match) => task.projects.includes(match.slice(1)) ? `<a data-attribute="projects" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>` : match);
-	taskDesc = taskDesc.replace(contextRegex, (match) => task.contexts.includes(match.slice(1)) ? `<a class="contrast" data-attribute="contexts" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>` : match);
-	return `<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)"/>
-		<hgroup class="pointer flex-grow hover-background show-hover-parent" onclick="editTask(${task.id})">
-			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}"><span>${taskSub} ${taskDesc}</span><svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></h5>
+	if (task.created)
+		taskDates += `
+			<small>
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-calendar"/>
+				</svg>
+				${getDateString(new Date(task.created))}
+			</small>
+		`;
+	if (task.completed)
+		taskDates += `
+			<small><ins>
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-calendar-check"/>
+				</svg>
+				${getDateString(new Date(task.completed))}
+			</ins></small>
+		`;
+	let taskDesc = task.raw_description.replace(
+		projectRegex, (match) =>
+		task.projects.includes(match.slice(1)) ?
+			`<a data-attribute="projects" data-name="${match.slice(1)}"
+				onclick="selectAttribute(event)">${match}</a>` : match
+	);
+	taskDesc = taskDesc.replace(
+		contextRegex, (match) =>
+		task.contexts.includes(match.slice(1)) ?
+			`<a class="contrast" data-attribute="contexts"
+				data-name="${match.slice(1)}"
+				onclick="selectAttribute(event)">${match}</a>` : match
+	);
+	return `
+		<input
+			type="checkbox"
+			${task.complete ? 'checked' : ''}
+			data-id="${task.id}"
+			onclick="completeTask(event)" />
+		<hgroup class="pointer flex-grow hover-background show-hover-parent"
+			onclick="editTask(${task.id})">
+			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}">
+				<span>${taskSub} ${taskDesc}</span>
+				<svg class="show-hover" width="1em" height="1em">
+					<use xlink:href="#icon-edit"/>
+				</svg>
+			</h5>
 			<p class="flex gap-xs align-center">${taskDates}</p>
 		</hgroup>
 	`;
-}
-
-// Clear filter attributes
-function clearAttributeFilters() {
-	filterProjects = [];
-	filterContexts = [];
-	projectsBtn.classList.add('outline');
-	contextsBtn.classList.add('outline');
-}
-
-// Clear attribute inputs
-function clearAttributeInputs(event) {
-	if (event.target.dataset.attribute == 'projects')
-		projectsModal.querySelectorAll('input').forEach(i => i.checked = false);
-	if (event.target.dataset.attribute == 'contexts')
-		contextsModal.querySelectorAll('input').forEach(i => i.checked = false);
-}
-
-// Single attribute
-function selectAttribute(event) {
-	event.stopPropagation();
-	event.preventDefault();
-	const inputs = document.querySelectorAll('.attribute-filter');
-	inputs.forEach(i => i.checked = false);
-	inputs.forEach(input => {
-		if (event.target.dataset.attribute == input.dataset.attribute &&
-			event.target.dataset.name == input.name) input.checked = true;
-	});
-	filterAttribute(event);
-}
-
-// Filter attributes
-function filterAttribute(event) {
-	clearAttributeFilters();
-	document.querySelectorAll('.attribute-filter').forEach((input) => {
-		if (input.checked) {
-			if (input.dataset.attribute == 'projects') {
-				filterProjects.push(input.name);
-				projectsBtn.classList.remove('outline');
-			}
-			if (input.dataset.attribute == 'contexts') {
-				filterContexts.push(input.name);
-				contextsBtn.classList.remove('outline');
-			}
-		}
-	});
-	renderTasks();
 }
 
 // Render tasks with sorting & filtering
@@ -212,21 +212,63 @@ function renderTasks() {
 	}
 }
 
+// FILTER ---------------------------------------------------------------------
+
+// Clear filter attributes
+function clearAttributeFilters() {
+	filterProjects = [];
+	filterContexts = [];
+	projectsBtn.classList.add('outline');
+	contextsBtn.classList.add('outline');
+}
+
+// Clear attribute inputs
+function clearAttributeInputs(event) {
+	if (event.target.dataset.attribute == 'projects')
+		projectsModal.querySelectorAll('input').forEach(i => i.checked = false);
+	if (event.target.dataset.attribute == 'contexts')
+		contextsModal.querySelectorAll('input').forEach(i => i.checked = false);
+}
+
+// Single attribute
+function selectAttribute(event) {
+	event.stopPropagation();
+	event.preventDefault();
+	const inputs = document.querySelectorAll('.attribute-filter');
+	inputs.forEach(i => i.checked = false);
+	inputs.forEach(input => {
+		if (event.target.dataset.attribute == input.dataset.attribute &&
+			event.target.dataset.name == input.name) input.checked = true;
+	});
+	filterAttribute(event);
+}
+
+// Filter attributes
+function filterAttribute(event) {
+	clearAttributeFilters();
+	document.querySelectorAll('.attribute-filter').forEach((input) => {
+		if (input.checked) {
+			if (input.dataset.attribute == 'projects') {
+				filterProjects.push(input.name);
+				projectsBtn.classList.remove('outline');
+			}
+			if (input.dataset.attribute == 'contexts') {
+				filterContexts.push(input.name);
+				contextsBtn.classList.remove('outline');
+			}
+		}
+	});
+	renderTasks();
+}
+
 // Search filter
 if (search) {
 	search.addEventListener('input', async (e) => {
-		// e.preventDefault();
 		if (search.value) {
 			filterSearch = search.value.trim();
 			search.parentElement.appendChild(clearBtn);
 			renderTasks();
 		} else clearSearch();
-		// filterPrio = filterPriority.value.trim().toUpperCase();
-		// if (filterPrio && !/^[A-Z]$/.test(filterPrio)) {
-		// 	alert('Priority filter must be a single uppercase letter (A-Z).');
-		// 	filterPriority.value = '';
-		// 	filterPrio = '';
-		// }
 	});
 }
 
@@ -258,17 +300,22 @@ function clearFilters() {
 	clearSearch();
 }
 
+// SORTING --------------------------------------------------------------------
+
 // Toggle sort
 function sortTasks(event) {
 	if (sortBy === event.target.dataset.sort) sortAscending = !sortAscending;
 	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up';
 	sortBy = event.target.dataset.sort;
 	sortBtns.forEach((btn) => btn.classList.add('outline'));
-	sortIcons.forEach((icon) => icon.querySelector('use').setAttribute('xlink:href', newIcon));
+	sortIcons.forEach((icon) =>
+		icon.querySelector('use').setAttribute('xlink:href', newIcon));
 	event.target.querySelector('use').setAttribute('xlink:href', `${newIcon}-fill`);
 	event.target.classList.remove('outline');
 	renderTasks();
 }
+
+// ADD TASK -------------------------------------------------------------------
 
 // Add task
 if (addForm) {
@@ -284,7 +331,11 @@ if (addForm) {
 			const response = await fetch("/add", {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ description, priority: priority || null , complete})
+				body: JSON.stringify({
+					description,
+					priority: priority || null,
+					complete
+				})
 			});
 			if (!response.ok) {
 				const errorData = await response.json();
@@ -300,6 +351,8 @@ if (addForm) {
 	});
 }
 
+// EDIT TASK ------------------------------------------------------------------
+
 // Edit task
 function editTask(id) {
 	const task = tasks.find(t => t.id === parseInt(id));
@@ -311,14 +364,25 @@ function editTask(id) {
 
 	let options = '';
 	for (let letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-		options += `<option value="${letter}" ${letter == task.priority ? 'selected' : ''}>${letter}</option>`;
+		options += `
+			<option value="${letter}"
+				${letter == task.priority ? 'selected' : ''}>
+				${letter}
+			</option>
+		`;
 	}
 
 	modalForm.innerHTML = `
 		<fieldset>
 			<input type="hidden" id="edit-id" value="${task.id}" />
 			<label>Task
-				<input class="modal-focus" type="text" id="edit-description" placeholder="Task description (e.g., Milk)" value="${task.raw_description}" required>
+				<input class="modal-focus"
+					type="text"
+					id="edit-description"
+					placeholder="Task description (e.g., Milk)"
+					value="${task.raw_description}"
+					autocomplete="off"
+					required />
 			</label>
 			<label>Priority</label>
 			<select id="edit-priority" aria-label="Priority">
@@ -326,7 +390,8 @@ function editTask(id) {
 				${options}
 			</select>
 			<label>
-				<input type="checkbox" id="edit-complete" role="switch" ${task.complete ? 'checked' : ''} />
+				<input type="checkbox" id="edit-complete"
+					role="switch" ${task.complete ? 'checked' : ''} />
 				Completed
 			</label>
 		</fieldset>
@@ -423,6 +488,8 @@ async function deleteTask(event) {
 	}
 }
 
+// AUTOCOMPLETE ---------------------------------------------------------------
+
 if (addDescription) addDescription.addEventListener('input', (e) => {
 	const autocomplete = document.getElementById('autocomplete');
 	const query = e.target.value.toLowerCase().trim();
@@ -456,7 +523,9 @@ addDescription.addEventListener('keydown', (e) => {
 	const items = autocomplete.querySelectorAll('li');
 	if (items.length === 0) return;
 
-	let index = Array.from(items).findIndex(item => item.classList.contains('selected'));
+	let index = Array.from(items).findIndex(
+		item =>item.classList.contains('selected')
+	);
 
 	if (e.key === 'ArrowDown') {
 		e.preventDefault();
@@ -490,7 +559,9 @@ addDescription.addEventListener('keydown', (e) => {
 
 autocomplete.addEventListener('mouseover', (e) => {
 	if (e.target.tagName === 'LI') {
-		autocomplete.querySelectorAll('li').forEach(item => item.classList.remove('selected'));
+		autocomplete.querySelectorAll('li').forEach(
+			item => item.classList.remove('selected')
+		);
 		e.target.classList.add('selected');
 	}
 });
