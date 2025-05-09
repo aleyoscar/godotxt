@@ -3,6 +3,7 @@ ul { list-style-type: none; padding-left: 0; }
 ul li { list-style-type: none; }
 
 .align-center { align-items: center; }
+.border-round { border-radius: 50%; }
 .centered-card { margin: 0 auto; }
 .flex { display: flex; gap: var(--pico-spacing); }
 .flex-inline { display: inline-flex; gap: var(--pico-spacing); }
@@ -13,6 +14,7 @@ ul li { list-style-type: none; }
 .horizontal-scroll { display: flex; flex-wrap: nowrap; gap: calc(var(--pico-spacing) / 3); }
 .horizontal-scroll button { white-space: nowrap; flex: 0 0 auto; }
 .max-width-xs { max-width: 576px; }
+.mb-0 { margin-bottom: 0; }
 .mb-xs { margin-bottom: calc(var(--pico-spacing) / 3); }
 .ml-xs { margin-left: calc(var(--pico-spacing) / 3); }
 .muted-color { color: var(--pico-muted-color); }
