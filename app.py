@@ -16,6 +16,8 @@ SETTINGS_FILE = 'data/settings.json'
 if not all([SECRET_KEY, USERNAME, PASSWORD_HASH]):
 	raise ValueError('Missing required environment variables: SECRET_KEY, USERNAME or PASSWORD_HASH')
 
+if not os.path.exists(TODO_FILE):
+	with open(TODO_FILE, 'w'): pass
 
 if not os.path.exists(SETTINGS_FILE):
 	with open(SETTINGS_FILE, 'w') as f:
