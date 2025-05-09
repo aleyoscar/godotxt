@@ -40,6 +40,7 @@ const closeModal = (modal) => {
 		html.classList.remove(closingClass, isOpenClass);
 		html.style.removeProperty(scrollbarWidthCssVar);
 		modal.close();
+		if (modal.querySelector('form')) modal.querySelector('form').reset();
 	}, animationDuration);
 };
 
