@@ -207,7 +207,8 @@ function renderTasks() {
 
 	// Show 'Show All' button if filters in place
 	if (showAll) {
-		if (filteredTasks.length < tasks.length) showAll.classList.remove('hide');
+		if (filterSearch || filterProjects.length || filterContexts.length)
+			showAll.classList.remove('hide');
 		else showAll.classList.add('hide');
 	}
 }
@@ -295,9 +296,10 @@ function clearSearch() {
 
 // Clear filters
 function clearFilters() {
-	toggleComplete(false);
-	showAll.classList.add('hide');
 	clearSearch();
+	projectsModal.querySelectorAll('input').forEach(i => i.checked = false);
+	contextsModal.querySelectorAll('input').forEach(i => i.checked = false);
+	filterAttribute(null);
 }
 
 // SORTING --------------------------------------------------------------------

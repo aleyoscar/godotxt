@@ -15,7 +15,6 @@
 <main class="container">
 	<section class="overflow-auto">
 		<div class="horizontal-scroll">
-			<!-- <button id="show-all" class="secondary hide" onclick="clearFilters()">Show All</button> -->
 			<button class="flex-inline align-center sort-btn"
 				data-sort="description"
 				onclick="sortTasks(event)">
@@ -57,6 +56,13 @@
 				</svg>
 			</button>
 		</div>
+	</section>
+	<section>
+		<a id="show-all"
+			class="secondary hide pointer"
+			onclick="clearFilters()">
+			Show All
+		</a>
 	</section>
 	<section class="flex align-center">
 		<h3 class="mb-0">Shopping List</h3>
