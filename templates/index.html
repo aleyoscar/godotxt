@@ -2,11 +2,24 @@
 {% block title %}Groc.txt{% endblock %}
 {% block content %}
 <header class="container flex space-between align-center flex-column-lg">
-	<h1 class="flex align-center gap-xs">
-		<svg width="1.6em" height="1.6em"><use xlink:href="#icon-logo"/></svg>
+	<h1 class="flex align-center gap-xs {% if 'lists' in settings %}space-between-sm{% endif %}">
+		<a class="{% if 'lists' in settings %}hide-sm{% endif %} contrast"
+			href="/">
+			<svg width="1.6em" height="1.6em">
+				<use xlink:href="#icon-logo"/>
+			</svg>
+		</a>
+		{% if 'lists' in settings %}
+		<a class="show-sm contrast pointer" onclick="toggleAside()">
+			<svg width="1em" height="1em">
+				<use xlink:href="#icon-menu"/>
+			</svg>
+		</a>
+		{% endif %}
 		<span>Groc.txt</span>
 		<a class="ml-xs" href="/logout"><svg width="1em" height="1em">
-			<use xlink:href="#icon-logout"/></svg></a>
+			<use xlink:href="#icon-logout"/></svg>
+		</a>
 	</h1>
 	<div class="max-width-xs" role="search">
 		<input type="search" id="search" placeholder="Search">
@@ -64,18 +77,67 @@
 			Show All
 		</a>
 	</section>
-	<section class="flex align-center">
-		<h3 class="mb-0">Shopping List</h3>
-		<button id="add-task-btn"
-			class="border-round"
-			onclick="toggleModal(event)"
-			data-target="add-task-modal">
-			<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
-		</button>
-	</section>
-	<section>
-		<ul id="task-list"></ul>
-	</section>
+	<div class="content flex">
+		{% if 'lists' in settings %}
+		<aside class="width-xs">
+			<nav>
+				<a class="show-sm float-right pointer secondary"
+					onclick="toggleAside()">
+					<svg width="1em" height="1em">
+						<use xlink:href="#icon-x"/>
+					</svg>
+				</a>
+				<ul>
+					<li><a class="contrast"
+						href="#tasks"
+						onclick="openList('tasks'); toggleAside();">
+						Tasks</a>
+					</li>
+					{% for list in settings['lists'] %}
+					<li><a class="contrast"
+						href="#{{ list['project'] }}"
+						onclick="openList('{{ list['project'] }}'); toggleAside();">
+						{{ list['name'] }}</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</nav>
+		</aside>
+		{% endif %}
+		<div>
+			<div id="tasks">
+				<section class="flex align-center">
+					<h3 class="mb-0">Tasks</h3>
+					<button id="add-task-btn"
+						class="border-round"
+						onclick="toggleModal(event)"
+						data-target="add-task-modal">
+						<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
+					</button>
+				</section>
+				<section>
+					<ul></ul>
+				</section>
+			</div>
+			{% if 'lists' in settings %}{% for list in settings['lists'] %}
+			<div id="{{ list['project'] }}" class="list">
+				<section class="flex align-center">
+					<h3 class="mb-0">{{ list['name'] }}</h3>
+					<button id="add-task-btn"
+						class="border-round"
+						onclick="setProject('{{ list['project'] }}'); toggleModal(event);"
+						data-target="add-task-modal"
+						data-project="{{ list['name'] }}">
+						<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
+					</button>
+				</section>
+				<section>
+					<ul></ul>
+				</section>
+			</div>
+			{% endfor %}{% endif %}
+		</div>
+	</div>
 </main>
 <dialog id="add-task-modal">
 	<article>

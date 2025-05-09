@@ -1,6 +1,7 @@
 svg, use { pointer-events: none; }
 ul { list-style-type: none; padding-left: 0; }
 ul li { list-style-type: none; }
+aside { width: 220px; }
 
 .align-center { align-items: center; }
 .border-round { border-radius: 50%; }
@@ -9,6 +10,7 @@ ul li { list-style-type: none; }
 .flex-inline { display: inline-flex; gap: var(--pico-spacing); }
 .flex-grow { flex: 1; }
 .float-left { float: left; }
+.float-right { float: right; }
 .gap-xs { gap: calc(var(--pico-spacing) / 1.6); }
 .hide { display: none; }
 .horizontal-scroll { display: flex; flex-wrap: nowrap; gap: calc(var(--pico-spacing) / 3); }
@@ -24,6 +26,7 @@ ul li { list-style-type: none; }
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }
+.pointer { cursor: pointer; }
 .position-relative { position: relative; }
 .primary { color: var(--pico-primary); }
 .show-hover-parent .show-hover { display:none; }
@@ -31,7 +34,6 @@ ul li { list-style-type: none; }
 .space-between { justify-content: space-between; }
 .strike { text-decoration: line-through; }
 .text-center { text-align: center; }
-.pointer { cursor: pointer; }
 
 #task-list input[type='checkbox'] { margin-top: 0; }
 #autocomplete {
@@ -53,6 +55,43 @@ ul li { list-style-type: none; }
 }
 #autocomplete li.selected { background: var(--pico-dropdown-hover-background-color); }
 
+@media only screen and (min-width: 1025px) {
+	.show-sm { display: none; }
+}
+
 @media only screen and (max-width: 1024px) {
+	aside {
+		-webkit-backdrop-filter: var(--pico-modal-overlay-backdrop-filter);
+		backdrop-filter: var(--pico-modal-overlay-backdrop-filter);
+		background-color: var(--pico-modal-overlay-background-color);
+		width: 0;
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		z-index: 1000;
+		transition: backdrop-filter var(--pico-transition);
+	}
+
+	aside nav {
+		background-color: var(--pico-background-color);
+		padding: var(--pico-spacing);
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		top: 0;
+		transform: translateX(-220px);
+		transition: transform var(--pico-transition);
+		width: 220px;
+	}
+
+	aside nav ul { margin-top: calc(var(--pico-spacing) * 1.6); }
+	aside.open { width: 100%; }
+	aside.open nav { transform: translateX(0); }
+
 	.flex-column-lg { flex-direction: column; }
+	.hide-sm { display: none; }
+	.max-width-xs { max-width: 100%; }
+	.space-between-sm { justify-content: space-between; width: 100%; }
 }

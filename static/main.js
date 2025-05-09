@@ -1,7 +1,7 @@
 
 // CONSTANTS ------------------------------------------------------------------
 
-const taskList = document.getElementById('task-list');
+const taskList = document.getElementById('tasks');
 const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
 const addDescription = document.getElementById('add-description');
@@ -18,6 +18,8 @@ const projectsModal = document.getElementById('projects-modal');
 const projectsBtn = document.getElementById('projects-btn');
 const contextsModal = document.getElementById('contexts-modal');
 const contextsBtn = document.getElementById('contexts-btn');
+const aside = document.querySelector('aside');
+const lists = document.querySelectorAll('.list');
 
 const clearBtn = document.createElement('button');
 clearBtn.classList.add('secondary');
@@ -167,10 +169,14 @@ function renderTasks() {
 
 	// Filter tasks
 	let filteredTasks = tasks.filter(task => {
-		const matchesSearch = filterSearch ? task.raw_description.toLowerCase().includes(filterSearch.toLowerCase()) : true;
-		const matchesComplete = filterComplete ? task.complete === false : true;
-		const matchesProjects = filterProjects.length > 0 ? task.projects.some(t => filterProjects.includes(t)) : true;
-		const matchesContexts = filterContexts.length > 0 ? task.contexts.some(t => filterContexts.includes(t)) : true;
+		const matchesSearch = filterSearch ?
+			task.raw_description.toLowerCase().includes(filterSearch.toLowerCase()) : true;
+		const matchesComplete = filterComplete ?
+			task.complete === false : true;
+		const matchesProjects = filterProjects.length > 0 ?
+			task.projects.some(t => filterProjects.includes(t)) : true;
+		const matchesContexts = filterContexts.length > 0 ?
+			task.contexts.some(t => filterContexts.includes(t)) : true;
 		return matchesSearch && matchesComplete && matchesProjects && matchesContexts;
 	});
 
@@ -196,13 +202,22 @@ function renderTasks() {
 	}
 
 	// Render tasks
-	taskList.innerHTML = '';
+	taskList.querySelector('ul').innerHTML = '';
+	lists.forEach((list) => list.querySelector('ul').innerHTML = '');
 	filteredTasks.forEach(task => {
+		let addToList = taskList;
+		let found = false;
 		const row = document.createElement('li');
 		row.id = `task-${task.id}`;
 		row.classList.add('flex');
 		row.innerHTML = parseTask(task);
-		taskList.appendChild(row);
+		lists.forEach((list) => {
+			if (task.projects.includes(list.id) && !found) {
+				addToList = list;
+				found = true;
+			}
+		});
+		addToList.querySelector('ul').appendChild(row);
 	});
 
 	// Show 'Show All' button if filters in place
@@ -351,6 +366,10 @@ if (addForm) {
 			addError.style.display = 'block';
 		}
 	});
+}
+
+function setProject(project) {
+	addDescription.value = `+${project}`;
 }
 
 // EDIT TASK ------------------------------------------------------------------
@@ -574,4 +593,32 @@ document.addEventListener('click', (e) => {
 	}
 });
 
+// ASIDE MENU -----------------------------------------------------------------
+
+function toggleAside() {
+	if (!aside) return;
+	aside.classList.toggle('open');
+}
+
+// Close with a click outside
+if (aside) {
+	aside.addEventListener("click", (event) => {
+		if (aside.classList.contains('open') && event.target == aside)
+			toggleAside();
+	});
+}
+
+function closeLists() {
+	taskList.classList.add('hide');
+	lists.forEach(list => list.classList.add('hide'));
+}
+
+function openList(list) {
+	closeLists();
+	document.getElementById(list).classList.remove('hide');
+}
+
+// MAIN -----------------------------------------------------------------------
+
 if (addForm) fetchTasks();
+openList('tasks');

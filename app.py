@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, abort, render_template, session, redirect, url_for, flash
 from functools import wraps
 from dotenv import load_dotenv
-import pytodotxt, hashlib, os
+import pytodotxt, hashlib, os, json
 from datetime import date
 
 if os.getenv('FLASK_ENV') == 'development':
@@ -11,9 +11,15 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 USERNAME = os.getenv('USERNAME')
 PASSWORD_HASH = os.getenv('PASSWORD_HASH')
 TODO_FILE = 'data/todo.txt'
+SETTINGS_FILE = 'data/settings.json'
 
 if not all([SECRET_KEY, USERNAME, PASSWORD_HASH]):
 	raise ValueError('Missing required environment variables: SECRET_KEY, USERNAME or PASSWORD_HASH')
+
+
+if not os.path.exists(SETTINGS_FILE):
+	with open(SETTINGS_FILE, 'w') as f:
+		f.write('{}\n')
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -55,7 +61,9 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-	return render_template('index.html')
+	with open(SETTINGS_FILE, 'r') as file:
+		settings = json.load(file)
+	return render_template('index.html', settings=settings)
 
 @app.route('/list', methods=['GET'])
 @login_required
