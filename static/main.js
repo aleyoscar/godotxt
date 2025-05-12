@@ -201,6 +201,11 @@ function renderTasks() {
 		});
 	}
 
+	// Then move completed to bottom if setting is set
+	if (settings && settings["sort_complete"]) {
+		filteredTasks.sort((a, b) => a.complete && !b.complete ? 1 : -1);
+	}
+
 	// Render tasks
 	taskList.querySelector('ul').innerHTML = '';
 	lists.forEach((list) => list.querySelector('ul').innerHTML = '');
