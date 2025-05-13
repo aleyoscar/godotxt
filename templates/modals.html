@@ -1,3 +1,129 @@
+
+<dialog id="add-task-modal">
+	<article>
+		<header>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="add-task-modal"
+				onclick="toggleModal(event)">
+			</button>
+			<h3>Add Task</h3>
+		</header>
+		<form id="add-task-form">
+			<p id="add-error" class="error" style="dislay: none;"></p>
+			<fieldset>
+				<label class="position-relative">Task
+					<input class="modal-focus"
+						type="text"
+						id="add-description"
+						placeholder="Task description (e.g., Milk)"
+						autocomplete="off"
+						required />
+					<ul class="hide" id="autocomplete"></ul>
+				</label>
+				<label>Priority</label>
+				<select id="add-priority" aria-label="Priority">
+					<option selected value="--">--</option>
+					{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+					<option value="{{ letter }}">{{ letter }}</option>
+					{% endfor %}
+				</select>
+			</fieldset>
+		</form>
+		<footer>
+			<button class="secondary"
+				data-target="add-task-modal"
+				onclick="toggleModal(event)">
+				Cancel
+			</button>
+			<button form="add-task-form">Add</button>
+		</footer>
+	</article>
+</dialog>
+<dialog id="edit-task-modal">
+	<article>
+		<header>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="edit-task-modal"
+				onclick="toggleModal(event)">
+			</button>
+			<h3>Task</h3>
+		</header>
+		<p id="edit-error" class="error" style="dislay: none;"></p>
+		<form id="edit-task-form"></form>
+		<footer>
+			<button id="delete-task-btn"
+				class="float-left"
+				data-id=""
+				onclick="deleteTask(event)">
+				<svg width="1em" height="1em">
+					<use xlink:href="#icon-trash"/>
+				</svg>
+			</button>
+			<button class="secondary"
+				data-target="edit-task-modal"
+				onclick="toggleModal(event)">
+				Cancel
+			</button>
+			<button form="edit-task-form">Save</button>
+		</footer>
+	</article>
+</dialog>
+<dialog id="projects-modal">
+	<article>
+		<header>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="projects-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+			</button>
+			<h3>Projects</h3>
+		</header>
+		<ul></ul>
+		<footer>
+			<button class="secondary"
+				data-target="projects-modal"
+				data-attribute="projects"
+				onclick="clearAttributeInputs(event);
+					filterAttribute(event);
+					toggleModal(event);">
+				Clear
+			</button>
+			<button data-target="projects-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+				Close
+			</button>
+		</footer>
+	</article>
+</dialog>
+<dialog id="contexts-modal">
+	<article>
+		<header>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="contexts-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+			</button>
+			<h3>Contexts</h3>
+		</header>
+		<ul></ul>
+		<footer>
+			<button class="secondary"
+				data-target="contexts-modal"
+				data-attribute="contexts"
+				onclick="clearAttributeInputs(event);
+					filterAttribute(event);
+					toggleModal(event);">
+				Clear
+			</button>
+			<button data-target="contexts-modal"
+				onclick="filterAttribute(event); toggleModal(event);">
+				Close
+			</button>
+		</footer>
+	</article>
+</dialog>
 <dialog id="settings-modal">
 	<article>
 		<header>
