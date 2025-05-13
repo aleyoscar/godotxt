@@ -1,0 +1,36 @@
+<dialog id="settings-modal">
+	<article>
+		<header>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="settings-modal"
+				onclick="toggleModal(event)">
+			</button>
+			<h3>Settings</h3>
+		</header>
+		<form id="settings-form">
+			<p id="settings-error" class="error" style="dislay: none;"></p>
+			<h5>General Settings</h5>
+			<hr>
+			<fieldset>
+				<label>
+					<input type="checkbox" id="settings-sort-complete"
+						role="switch"/>
+					Show completed tasks at the bottom
+				</label>
+			</fieldset>
+			<h5>Custom Project Lists</h5>
+			<hr>
+			<div id="settings-lists"></div>
+			<button id="settings-lists-add" type="button" onclick="addSettingsList(event)">Add List</button>
+		</form>
+		<footer>
+			<button class="secondary"
+				data-target="settings-modal"
+				onclick="toggleModal(event)">
+				Cancel
+			</button>
+			<button form="settings-form">Save</button>
+		</footer>
+	</article>
+</dialog>

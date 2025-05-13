@@ -19,7 +19,11 @@ const projectsBtn = document.getElementById('projects-btn');
 const contextsModal = document.getElementById('contexts-modal');
 const contextsBtn = document.getElementById('contexts-btn');
 const aside = document.querySelector('aside');
-const lists = document.querySelectorAll('.list');
+const settingsForm = document.getElementById('settings-form');
+const settingsError = document.getElementById('settings-error');
+const settingsSortComplete = document.getElementById('settings-sort-complete');
+const settingsListsAdd = document.getElementById('settings-lists-add');
+const settingsLists = document.getElementById('settings-lists');
 
 const clearBtn = document.createElement('button');
 clearBtn.classList.add('secondary');
@@ -38,6 +42,7 @@ let filterSearch = '';
 let filterComplete = true;
 let filterProjects = [];
 let filterContexts = [];
+let settings = {};
 
 // HELPERS --------------------------------------------------------------------
 
@@ -108,21 +113,62 @@ function parseTask(task) {
 			${task.complete ? 'checked' : ''}
 			data-id="${task.id}"
 			onclick="completeTask(event)" />
-		<hgroup class="pointer flex-grow hover-background show-hover-parent"
+		<hgroup class="pointer flex-grow"
 			onclick="editTask(${task.id})">
 			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}">
 				<span>${taskSub} ${taskDesc}</span>
-				<svg class="show-hover" width="1em" height="1em">
-					<use xlink:href="#icon-edit"/>
-				</svg>
 			</h5>
 			<p class="flex gap-xs align-center">${taskDates}</p>
 		</hgroup>
+		<svg class="show-hover" width="1em" height="1em">
+			<use xlink:href="#icon-edit"/>
+		</svg>
 	`;
 }
 
 // Render tasks with sorting & filtering
 function renderTasks() {
+	// Update view with settings
+	const logo = document.getElementById("logo");
+	const listUl = aside.querySelector('ul');
+	logo.classList.remove('hide-sm');
+	logo.nextElementSibling.classList.add('hide');
+	aside.classList.add('hide');
+	while (listUl.children.length > 1) listUl.removeChild(listUl.lastElementChild);
+	if (settings["lists"] && settings["lists"].length > 0) {
+		logo.classList.add('hide-sm');
+		logo.nextElementSibling.classList.remove('hide');
+		aside.classList.remove('hide');
+		settings["lists"].forEach((list) => {
+			const li = document.createElement('li');
+			li.innerHTML = `
+				<a class="contrast"
+					href="#${list['project']}"
+					onclick="openList('${list['project']}'); toggleAside();">
+					${list['name']}
+				</a>`;
+			listUl.appendChild(li);
+
+			const div = document.createElement('div');
+			div.id = list['project'];
+			div.classList.add('list', 'hide');
+			div.innerHTML = `
+				<section class="flex align-center">
+					<h3 class="mb-0">${list['name']}</h3>
+					<button id="add-task-btn"
+						class="border-round"
+						onclick="setProject('${list['project']}'); toggleModal(event);"
+						data-target="add-task-modal">
+						<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
+					</button>
+				</section>
+				<section>
+					<ul></ul>
+				</section>`;
+			taskList.parentNode.appendChild(div);
+		});
+	}
+
 	// Populate project & context dropdowns
 	projects = [];
 	contexts = [];
@@ -208,6 +254,7 @@ function renderTasks() {
 
 	// Render tasks
 	taskList.querySelector('ul').innerHTML = '';
+	const lists = document.querySelectorAll('.list');
 	lists.forEach((list) => list.querySelector('ul').innerHTML = '');
 	filteredTasks.forEach(task => {
 		let addToList = taskList;
@@ -615,6 +662,7 @@ if (aside) {
 
 function closeLists() {
 	taskList.classList.add('hide');
+	const lists = document.querySelectorAll('.list');
 	lists.forEach(list => list.classList.add('hide'));
 }
 
@@ -623,7 +671,122 @@ function openList(list) {
 	document.getElementById(list).classList.remove('hide');
 }
 
+// SETTINGS -------------------------------------------------------------------
+
+function openSettings() {
+	settingsSortComplete.checked = settings["sort_complete"];
+	settingsLists.innerHTML = '';
+	if (settings["lists"]) for (let i = 0; i < settings["lists"].length; i++) {
+		settingsLists.appendChild(
+			createFieldset(
+				i + 1,
+				settings["lists"][i]["name"],
+				settings["lists"][i]["project"]
+			)
+		);
+	}
+	openModal(document.getElementById('settings-modal'));
+}
+
+// Fetch settings
+async function fetchSettings() {
+	try {
+		const response = await fetch("/settings");
+		if (!response.ok) throw new Error('Failed to fetch settings');
+		settings = await response.json();
+		fetchTasks();
+	} catch (error) {
+		console.error('Error loading settings:', error);
+	}
+}
+
+// Update settings
+if (settingsForm) {
+	settingsForm.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		let lists = [];
+		const sortComplete = settingsSortComplete.checked;
+		settingsForm.querySelectorAll('.settings-list').forEach((fieldset) => {
+			lists.push({
+				name: fieldset.querySelector('.settings-list-name').value,
+				project: fieldset.querySelector('.settings-list-project').value
+			});
+		});
+		settingsError.style.display = 'none';
+
+		try {
+			const response = await fetch("/settings", {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					lists: lists,
+					sort_complete: sortComplete
+				})
+			});
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.description || 'Failed to update settings');
+			}
+			settings = await response.json();
+			renderTasks();
+			openList('tasks');
+			if (visibleModal) closeModal(visibleModal);
+		} catch (error) {
+			settingsError.textContent = error.message;
+			settingsError.style.display = 'block';
+		}
+	});
+}
+
+function createFieldset(fieldsetId, fieldsetName='', fieldsetProject='') {
+	const fieldset = document.createElement('fieldset');
+	fieldset.id = `settings-list-${fieldsetId}`;
+	fieldset.classList.add('grid', 'settings-list');
+	fieldset.innerHTML = `
+		<input class="settings-list-name"
+			name="settings-list-${fieldsetId}-name"
+			placeholder="List Name"
+			value="${fieldsetName}"
+			required />
+		<input class="settings-list-project"
+			name="settings-list-${fieldsetId}-project"
+			placeholder="Project"
+			value="${fieldsetProject}"
+			required />
+		<button class="contrast"
+			data-id="${fieldsetId}"
+			type="button"
+			onclick="deleteSettingsList(event)">
+			<svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg>
+		</button>
+	`;
+	return fieldset;
+}
+
+function addSettingsList(event) {
+	event.preventDefault();
+	settingsLists.appendChild(createFieldset(settingsLists.children.length + 1));
+}
+
+function deleteSettingsList(event) {
+	event.preventDefault();
+	const fieldset =
+		document.getElementById(`settings-list-${event.target.dataset.id}`);
+	fieldset.classList.add('hide');
+	setTimeout(() => {
+		fieldset.remove();
+		const fieldsets = document.querySelectorAll('settings-list');
+		for (let i = 0; i < fieldsets.length; i++) {
+			fieldsets[i].id = `settings-list-${i + 1}`;
+			fieldsets[i].querySelector('settings-list-name').id = `settings-list-${i + 1}-name`;
+			fieldsets[i].querySelector('settings-list-project').id = `settings-list-${i + 1}-project`;
+		}
+	}, 100);
+}
+
 // MAIN -----------------------------------------------------------------------
 
-if (addForm) fetchTasks();
-openList('tasks');
+if (taskList) {
+	fetchSettings();
+	openList('tasks');
+}

@@ -235,5 +235,22 @@ def delete_item(id):
 		}
 	})
 
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def getset_settings():
+	if request.method == 'POST':
+		data = request.get_json()
+		if not data:
+			abort(400, description="Missing settings")
+
+		settings = data
+		with open(SETTINGS_FILE, 'w') as f:
+			json.dump(settings, f, indent=4)
+	else:
+		with open(SETTINGS_FILE, 'r') as file:
+			settings = json.load(file)
+	# print(jsonify(settings))
+	return jsonify(settings)
+
 if __name__ == '__main__':
 	app.run(debug=True)

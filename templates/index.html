@@ -1,28 +1,48 @@
 {% extends 'base.html' %}
 {% block title %}Groc.txt{% endblock %}
 {% block content %}
-<header class="container flex space-between align-center flex-column-lg">
-	<h1 class="flex align-center gap-xs {% if 'lists' in settings %}space-between-sm{% endif %}">
-		<a class="{% if 'lists' in settings %}hide-sm{% endif %} contrast"
+<header class="container flex space-between align-center align-left-sm flex-column-lg">
+	<h1 id="title" class="flex align-center gap-xs">
+		<a id="logo" class="contrast"
 			href="/">
 			<svg width="1.6em" height="1.6em">
 				<use xlink:href="#icon-logo"/>
 			</svg>
 		</a>
-		{% if 'lists' in settings %}
-		<a class="show-sm contrast pointer" onclick="toggleAside()">
+		<a class="show-sm contrast pointer hide" onclick="toggleAside()">
 			<svg width="1em" height="1em">
 				<use xlink:href="#icon-menu"/>
 			</svg>
 		</a>
-		{% endif %}
 		<span>Groc.txt</span>
 		<a class="ml-xs" href="/logout"><svg width="1em" height="1em">
 			<use xlink:href="#icon-logout"/></svg>
 		</a>
 	</h1>
-	<div class="max-width-xs" role="search">
-		<input type="search" id="search" placeholder="Search">
+	<div class="flex align-center width-100-sm">
+		<div class="max-width-xs" role="search">
+			<input type="search" id="search" placeholder="Search">
+		</div>
+		<details id="dot-menu" class="dropdown">
+			<summary><svg width="1.6em" height="1.6em"><use xlink:href="#icon-menu-dot"/></svg></summary>
+			<ul dir="rtl">
+				<li class="min-width-xxs">
+					<a class="pointer flex align-center space-between"
+						onclick="openSettings()"
+						dir="ltr">
+						<span>Settings</span><svg width="1em" height="1em"><use xlink:href="#icon-gear"/></svg>
+					</a>
+				</li>
+				<li class="min-width-xxs">
+					<a class="pointer flex align-center space-between gap-xs"
+						dir="ltr">
+						<!-- data-target="settings-modal" -->
+						<!-- onclick="toggleModal(event)"> -->
+						Delete All<svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg>
+					</a>
+				</li>
+			</ul>
+		</details>
 	</div>
 </header>
 <main class="container">
@@ -78,33 +98,29 @@
 		</a>
 	</section>
 	<div class="content flex">
-		{% if 'lists' in settings %}
 		<aside class="width-xs">
-			<nav>
-				<a class="show-sm float-right pointer secondary"
-					onclick="toggleAside()">
-					<svg width="1em" height="1em">
-						<use xlink:href="#icon-x"/>
-					</svg>
-				</a>
-				<ul>
-					<li><a class="contrast"
-						href="#tasks"
-						onclick="openList('tasks'); toggleAside();">
-						Tasks</a>
-					</li>
-					{% for list in settings['lists'] %}
-					<li><a class="contrast"
-						href="#{{ list['project'] }}"
-						onclick="openList('{{ list['project'] }}'); toggleAside();">
-						{{ list['name'] }}</a>
-					</li>
-					{% endfor %}
-				</ul>
-			</nav>
+			<article>
+				<nav>
+					<a id="menu-close"
+						class="show-sm float-right pointer secondary"
+						onclick="toggleAside()">
+						<svg width="1em" height="1em">
+							<use xlink:href="#icon-x"/>
+						</svg>
+					</a>
+					<h6>Lists</h6>
+					<hr>
+					<ul>
+						<li><a class="contrast"
+							href="#tasks"
+							onclick="openList('tasks'); toggleAside();">
+							Tasks</a>
+						</li>
+					</ul>
+				</nav>
+			</article>
 		</aside>
-		{% endif %}
-		<div>
+		<div class="flex-1">
 			<div id="tasks">
 				<section class="flex align-center">
 					<h3 class="mb-0">Tasks</h3>
@@ -119,23 +135,6 @@
 					<ul></ul>
 				</section>
 			</div>
-			{% if 'lists' in settings %}{% for list in settings['lists'] %}
-			<div id="{{ list['project'] }}" class="list">
-				<section class="flex align-center">
-					<h3 class="mb-0">{{ list['name'] }}</h3>
-					<button id="add-task-btn"
-						class="border-round"
-						onclick="setProject('{{ list['project'] }}'); toggleModal(event);"
-						data-target="add-task-modal"
-						data-project="{{ list['name'] }}">
-						<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
-					</button>
-				</section>
-				<section>
-					<ul></ul>
-				</section>
-			</div>
-			{% endfor %}{% endif %}
 		</div>
 	</div>
 </main>
