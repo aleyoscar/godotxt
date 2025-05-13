@@ -20,6 +20,7 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .hide { display: none; }
 .horizontal-scroll { display: flex; flex-wrap: nowrap; gap: calc(var(--pico-spacing) / 3); }
 .horizontal-scroll button { white-space: nowrap; flex: 0 0 auto; }
+.hover-background:hover { background: var(--pico-table-row-stripped-background-color); }
 .max-width-xs { max-width: 576px; }
 .min-width-xxs { min-width: 220px; }
 .mb-0 { margin-bottom: 0; }

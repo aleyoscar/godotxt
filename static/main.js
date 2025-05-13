@@ -261,7 +261,7 @@ function renderTasks() {
 		let found = false;
 		const row = document.createElement('li');
 		row.id = `task-${task.id}`;
-		row.classList.add('flex');
+		row.classList.add('flex', 'align-center', 'hover-background', 'padding-xs', 'show-hover-parent');
 		row.innerHTML = parseTask(task);
 		lists.forEach((list) => {
 			if (task.projects.includes(list.id) && !found) {
