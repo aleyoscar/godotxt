@@ -235,6 +235,40 @@ def delete_item(id):
 		}
 	})
 
+@app.route('/delete-multiple', methods=['POST'])
+@login_required
+def delete_items():
+	ids = request.get_json()
+	if not ids or len(ids) < 1:
+		abort(400, description="Empty id list")
+
+	todotxt = get_todotxt()
+	deleted = []
+	for id in ids:
+		if id < 1 or id > len(todotxt.tasks):
+			abort(404, description="Task not found")
+		task = todotxt.tasks[id - 1]
+		deleted.append(task)
+
+	todotxt.tasks = list(set(todotxt.tasks) - set(deleted))
+	todotxt.save()
+
+	deletedTasks = [
+		{
+			'id': i + 1,
+			'priority': task.priority,
+			'description': task.bare_description(),
+			'raw_description': task.description,
+			'complete': task.is_completed,
+			'projects': task.projects,
+			'contexts': task.contexts,
+			'created': task.creation_date,
+			'completed': task.completion_date
+		}
+		for i, task in enumerate(deleted)
+	]
+	return jsonify({'tasks': deletedTasks})
+
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def getset_settings():

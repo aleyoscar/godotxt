@@ -44,6 +44,16 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .strike { text-decoration: line-through; }
 .text-center { text-align: center; }
 
+button.danger {
+	background-color: var(--pico-form-element-invalid-border-color);
+	border-color: var(--pico-form-element-invalid-border-color);
+}
+
+button.danger:hover {
+	background-color: var(--pico-form-element-invalid-active-border-color);
+	border-color: var(--pico-form-element-invalid-active-border-color);
+}
+
 #task-list input[type='checkbox'] { margin-top: 0; }
 #autocomplete {
 	background: var(--pico-form-element-background-color);

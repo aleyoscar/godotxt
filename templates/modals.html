@@ -160,3 +160,30 @@
 		</footer>
 	</article>
 </dialog>
+<dialog id="delete-modal">
+	<article>
+		<header>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="delete-modal"
+				onclick="toggleModal(event)">
+			</button>
+			<h3>Delete Done</h3>
+		</header>
+		<form id="delete-form">
+			<p id="delete-error" class="error" style="dislay: none;"></p>
+			<fieldset id="delete-lists"></fieldset>
+		</form>
+		<footer>
+			<button class="secondary"
+				data-target="delete-modal"
+				onclick="toggleModal(event)">
+				Cancel
+			</button>
+			<button class="danger"
+				form="delete-form">
+				Delete
+			</button>
+		</footer>
+	</article>
+</dialog>

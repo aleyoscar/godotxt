@@ -24,6 +24,9 @@ const settingsError = document.getElementById('settings-error');
 const settingsSortComplete = document.getElementById('settings-sort-complete');
 const settingsListsAdd = document.getElementById('settings-lists-add');
 const settingsLists = document.getElementById('settings-lists');
+const deleteForm = document.getElementById('delete-form');
+const deleteError = document.getElementById('delete-error');
+const deleteLists = document.getElementById('delete-lists');
 
 const clearBtn = document.createElement('button');
 clearBtn.classList.add('secondary');
@@ -783,6 +786,67 @@ function deleteSettingsList(event) {
 		}
 	}, 100);
 }
+
+// DELETE DONE ----------------------------------------------------------------
+
+function createLabel(inputName, inputProject) {
+	const label = document.createElement('label');
+	label.innerHTML = `
+		<input class="delete-switch"
+			type="checkbox"
+			role="switch"
+			data-project="${inputProject}" />
+		${inputName}
+	`;
+	return label;
+}
+
+function openDelete() {
+	deleteLists.innerHTML = '';
+	if (settings["lists"] && settings["lists"].length > 0) {
+		deleteLists.appendChild(createLabel("Tasks", "tasks"));
+		for (let i = 0; i < settings["lists"].length; i++) {
+			deleteLists.appendChild(createLabel(
+				settings["lists"][i]['name'],
+				settings["lists"][i]['project']
+			));
+		}
+	}
+	openModal(document.getElementById('delete-modal'));
+}
+
+if (deleteForm) deleteForm.addEventListener('submit', async (e) => {
+	e.preventDefault();
+	let deleteList = [];
+	const deleteSwitches = deleteForm.querySelectorAll('.delete-switch');
+	if (deleteSwitches.length > 0) deleteSwitches.forEach((input) => {
+		if (input.checked) tasks.forEach((task) => {
+			if (task.projects.includes(input.dataset.project) && task.complete)
+				deleteList.push(task.id);
+		});
+	});
+	else tasks.forEach((task) => task.complete && deleteList.push(task.id));
+	deleteError.style.display = 'none';
+
+	if (deleteList.length < 1) return;
+
+	try {
+		const response = await fetch("/delete-multiple", {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(deleteList)
+		});
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.description || 'Failed to delete tasks');
+		}
+		await fetchTasks();
+		if (visibleModal) closeModal(visibleModal);
+	} catch (error) {
+		deleteError.textContent = error.message;
+		deleteError.style.display = 'block';
+	}
+});
 
 // MAIN -----------------------------------------------------------------------
 
