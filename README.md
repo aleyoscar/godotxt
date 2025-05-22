@@ -29,7 +29,7 @@ A self-hosted, responsive and mobile-friendly web application to manage a [todo.
 ## Installation
 
 1. Install [docker and docker-compose](https://docs.docker.com/compose/install/)
-2. Clone/download this repository into a folder
+2. Clone this repository into a folder or download from [releases](https://github.com/aleyoscar/groctxt/releases)
 
 ```
 git clone https://github.com/aleyoscar/groctxt
