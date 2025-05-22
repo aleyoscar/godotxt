@@ -59,7 +59,7 @@ print(hashlib.sha256('PASSWORD'.encode()).hexdigest())
 ```
 
 5. (Optional) Change the `APP_PORT` to your desired port
-6. (Optional) Change the volume to point to your own todo.txt folder
+6. (Optional) Change the volume in `compose.yml` to point to your own todo.txt folder
 
 ```
 volumes:
@@ -101,15 +101,15 @@ Settings are configurable within the app, but there is also a `settings.json` fi
 | Setting Key	| Description						| Default/Example		|
 | ---			| ---								| ---					|
 | sort_complete	| Sort completed tasks to bottom	| false					|
-| lists			| Array of custom lists				| empty array			|
-|	name		| Name of the list displayed		| EX: Shopping List		|
-|	project		| Project to be added automatically	| EX: shopping			|
+| lists			| Object array of custom lists		| empty array []		|
+|   - name		| Name of the list displayed		| EX: "Shopping List"	|
+|   - project	| Project to be added automatically	| EX: "shopping"		|
 
 An example settings file is included in the repository as `settings.json`.
 
 ## Sources
 
-References and sources used for the project
+References and sources used in the project
 
 - [Todo.txt](http://todotxt.org/)
 - [Flask](https://flask.palletsprojects.com/)
