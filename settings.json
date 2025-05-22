@@ -1,0 +1,13 @@
+{
+    "lists": [
+        {
+            "name": "Shopping List",
+            "project": "shopping"
+        },
+        {
+            "name": "Home",
+            "project": "home"
+        }
+    ],
+    "sort_complete": true
+}
