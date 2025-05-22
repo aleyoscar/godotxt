@@ -7,22 +7,16 @@ options:
   commits:
     filters:
       Type:
-        - core
-        - docs
         - feat
         - fix
         - perf
         - refactor
-        - web
   commit_groups:
     title_maps:
-      core: Core Project
-      docs: Documentation
       feat: Features
       fix: Bug Fixes
       perf: Performance Improvements
       refactor: Code Refactoring
-      web: Web App
   header:
     pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
     pattern_maps:
