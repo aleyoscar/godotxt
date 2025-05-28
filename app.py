@@ -26,6 +26,18 @@ if not os.path.exists(SETTINGS_FILE):
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
+def load_settings():
+	with open(SETTINGS_FILE, 'r') as file:
+		try:
+			return json.load(file)
+		except json.JSONDecodeError:
+			print("Invalid settings file")
+			return {}
+
+def save_settings(settings):
+	with open(SETTINGS_FILE, 'w') as file:
+		json.dump(settings, file, indent=4)
+
 def save_tokens(tokens):
 	settings = load_settings()
 	settings["tokens"] = tokens
@@ -117,8 +129,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-	with open(SETTINGS_FILE, 'r') as file:
-		settings = json.load(file)
+	settings = load_settings()
 	return render_template('index.html', settings=settings)
 
 @app.route('/list', methods=['GET'])
@@ -332,12 +343,10 @@ def getset_settings():
 			abort(400, description="Missing settings")
 
 		settings = data
-		with open(SETTINGS_FILE, 'w') as f:
-			json.dump(settings, f, indent=4)
 		settings["tokens"] = token_store
+		save_settings(settings)
 	else:
-		with open(SETTINGS_FILE, 'r') as file:
-			settings = json.load(file)
+		settings = load_settings()
 	# print(jsonify(settings))
 	return jsonify(settings)
 
