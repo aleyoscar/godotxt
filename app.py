@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request, abort, render_template, session, redirect, url_for, flash
 from functools import wraps
 from dotenv import load_dotenv
-import pytodotxt, hashlib, os, json
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
+import pytodotxt, hashlib, os, json, secrets
 
 if os.getenv('FLASK_ENV') == 'development':
 	load_dotenv()
@@ -26,6 +26,43 @@ if not os.path.exists(SETTINGS_FILE):
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
+def save_tokens(tokens):
+	settings = load_settings()
+	settings["tokens"] = tokens
+	save_settings(settings)
+
+def load_tokens():
+	with open(SETTINGS_FILE, 'r') as f:
+		try:
+			settings = load_settings()
+			if 'tokens' in settings:
+				current_time = datetime.now(timezone.utc)
+				return {k: v for k, v in settings["tokens"].items() if datetime.fromisoformat(v[1]).replace(tzinfo=timezone.utc) > current_time}
+			else:
+				return {}
+		except json.JSONDecodeError:
+			return {}
+
+def gen_token():
+	return secrets.token_hex(16)
+
+def get_token_hash(token):
+	return hashlib.sha256((token + SECRET_KEY).encode()).hexdigest()
+
+def val_token(token):
+	token_hash = get_token_hash(token)
+	if token_hash in token_store:
+		stored_hash, expiry = token_store[token_hash]
+		expiry_dt = datetime.fromisoformat(expiry).replace(tzinfo=timezone.utc)
+		if datetime.now(timezone.utc) < expiry_dt:
+			return True
+		else:
+			del token_store[token_hash]
+			save_tokens(token_store)
+	return False
+
+token_store = load_tokens()
+
 def login_required(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
@@ -44,11 +81,20 @@ def login():
 	if request.method == 'POST':
 		username = request.form.get('username')
 		password = request.form.get('password')
+		remember = 'remember' in request.form
 		password_hash = hashlib.sha256(password.encode()).hexdigest()
 		if username == USERNAME and password_hash == PASSWORD_HASH:
 			session['logged_in'] = True
-			next_url = request.form.get('next') or url_for('index')
-			return redirect(next_url)
+			if remember:
+				token = secrets.token_hex(16)
+				token_hash = get_token_hash(token)
+				expiry = datetime.now(timezone.utc) + timedelta(days=30)
+				token_store[token_hash] = (token_hash, expiry.isoformat())
+				save_tokens(token_store)
+				resp = redirect(url_for('index'))
+				resp.set_cookie('auth_token', token, max_age=30*24*3600, httponly=True, secure=True, samesite='Lax')
+				return resp
+			return redirect(url_for('index'))
 		else:
 			flash('Invalid username or password', 'error')
 	next_url = request.args.get('next') or url_for('index')
@@ -58,7 +104,15 @@ def login():
 @login_required
 def logout():
 	session.pop('logged_in', None)
-	return redirect(url_for('login'))
+	token = request.cookies.get('auth_token')
+	if token:
+		token_hash = get_token_hash(token)
+		if token_hash in token_store:
+			del token_store[token_hash]
+			save_tokens(token_store)
+	resp = redirect(url_for('login'))
+	resp.set_cookie('auth_token', '', expires=0)
+	return resp
 
 @app.route('/')
 @login_required
@@ -280,6 +334,7 @@ def getset_settings():
 		settings = data
 		with open(SETTINGS_FILE, 'w') as f:
 			json.dump(settings, f, indent=4)
+		settings["tokens"] = token_store
 	else:
 		with open(SETTINGS_FILE, 'r') as file:
 			settings = json.load(file)
