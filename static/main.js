@@ -57,18 +57,29 @@ function getDateString(date) {
 	return `${yyyy}-${mm}-${dd}`;
 }
 
+function showLoading() {
+	document.querySelectorAll('.loading').forEach((load) => load.classList.remove('hide'));
+}
+
+function hideLoading(name) {
+	document.querySelectorAll('.loading').forEach((load) => load.classList.add('hide'));
+}
+
 // LIST -----------------------------------------------------------------------
 
 // Fetch tasks from API
 async function fetchTasks() {
+	showLoading();
 	try {
 		const response = await fetch("/list");
 		if (!response.ok) throw new Error('Failed to fetch tasks');
 		const data = await response.json();
 		tasks = data.tasks;
 		renderTasks();
+		hideLoading();
 	} catch (error) {
 		console.error('Error loading tasks:', error);
+		hideLoading();
 	}
 }
 
@@ -166,6 +177,7 @@ function renderTasks() {
 					</button>
 				</section>
 				<section>
+					<div class="loading" aria-busy="true"></div>
 					<ul></ul>
 				</section>`;
 			taskList.parentNode.appendChild(div);
