@@ -27,6 +27,7 @@ const settingsLists = document.getElementById('settings-lists');
 const deleteForm = document.getElementById('delete-form');
 const deleteError = document.getElementById('delete-error');
 const deleteLists = document.getElementById('delete-lists');
+const noList = document.getElementById('no-list');
 
 const clearBtn = document.createElement('button');
 clearBtn.classList.add('secondary');
@@ -158,7 +159,7 @@ function renderTasks() {
 			li.innerHTML = `
 				<a class="contrast"
 					href="#${list['project']}"
-					onclick="openList('${list['project']}'); toggleAside();">
+					onclick="toggleAside()">
 					${list['name']}
 				</a>`;
 			listUl.appendChild(li);
@@ -183,6 +184,8 @@ function renderTasks() {
 			taskList.parentNode.appendChild(div);
 		});
 	}
+
+	openList();
 
 	// Populate project & context dropdowns
 	projects = [];
@@ -675,15 +678,30 @@ if (aside) {
 	});
 }
 
+window.addEventListener('hashchange', openList);
+
 function closeLists() {
 	taskList.classList.add('hide');
 	const lists = document.querySelectorAll('.list');
 	lists.forEach(list => list.classList.add('hide'));
 }
 
-function openList(list) {
+function openList() {
+	const hash = location.hash;
 	closeLists();
-	document.getElementById(list).classList.remove('hide');
+	if (hash && hash.substr(1)) {
+		const list = document.getElementById(hash.substr(1));
+		if (list) {
+			noList.classList.add('hide');
+			list.classList.remove('hide');
+		} else {
+			noList.querySelector('span').textContent = `'${hash.substr(1)}'`;
+			noList.classList.remove('hide');
+		}
+	} else {
+		taskList.classList.remove('hide');
+		noList.classList.add('hide');
+	}
 }
 
 // SETTINGS -------------------------------------------------------------------
@@ -744,7 +762,6 @@ if (settingsForm) {
 			}
 			settings = await response.json();
 			renderTasks();
-			openList('tasks');
 			if (visibleModal) closeModal(visibleModal);
 		} catch (error) {
 			settingsError.textContent = error.message;
@@ -864,5 +881,4 @@ if (deleteForm) deleteForm.addEventListener('submit', async (e) => {
 
 if (taskList) {
 	fetchSettings();
-	openList('tasks');
 }
