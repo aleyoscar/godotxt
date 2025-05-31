@@ -171,7 +171,7 @@ function renderTasks() {
 				<section class="flex align-center">
 					<h3 class="mb-0">${list['name']}</h3>
 					<button id="add-task-btn"
-						class="border-round"
+						class="border-round flex-inline align-center padding-xs"
 						onclick="setProject('${list['project']}'); toggleModal(event);"
 						data-target="add-task-modal">
 						<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
