@@ -2,11 +2,16 @@
 // CONSTANTS ------------------------------------------------------------------
 
 const taskList = document.getElementById('tasks');
-const addForm = document.getElementById('add-task-form');
-const addError = document.getElementById('add-error');
-const addDescription = document.getElementById('add-description');
 const editForm = document.getElementById('edit-form');
 const editError = document.getElementById('edit-error');
+const editTitle = document.getElementById('edit-title');
+const editId = document.getElementById('edit-id');
+const editDescription = document.getElementById('edit-description');
+const editPriority = document.getElementById('edit-priority');
+const editPriorityDefault = document.getElementById('edit-priority-default');
+const editComplete = document.getElementById('edit-complete');
+const editSubmit = document.getElementById('edit-submit');
+const editDelete = document.getElementById('edit-delete');
 const search = document.getElementById('search');
 const searchBtn = document.getElementById('search-btn');
 const filterPriority = document.getElementById('filter-priority');
@@ -129,8 +134,8 @@ function parseTask(task) {
 			${task.complete ? 'checked' : ''}
 			data-id="${task.id}"
 			onclick="completeTask(event)" />
-		<hgroup class="pointer flex-grow"
-			onclick="editTask(${task.id})">
+		<hgroup class="pointer flex-grow" data-target="edit-modal"
+			onclick="editTask(${task.id}); toggleModal(event);">
 			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}">
 				<span>${taskSub} ${taskDesc}</span>
 			</h5>
@@ -378,131 +383,80 @@ function sortTasks(event) {
 	renderTasks();
 }
 
-// ADD TASK -------------------------------------------------------------------
+// ADD/EDIT TASK ------------------------------------------------------------------
 
 // Add task
-if (addForm) {
-	addForm.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		const description = document.getElementById('add-description').value.trim();
-		let priority = document.getElementById('add-priority').value;
-		if (priority === '--') priority = null;
-		const complete = false;
-		addError.style.display = 'none';
-
-		try {
-			const response = await fetch("/add", {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					description,
-					priority: priority || null,
-					complete
-				})
-			});
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.description || 'Failed to add task');
-			}
-			addForm.reset();
-			await fetchTasks();
-			if (visibleModal) closeModal(visibleModal);
-		} catch (error) {
-			addError.textContent = error.message;
-			addError.style.display = 'block';
-		}
-	});
+function addTask() {
+	editForm.reset();
+	editTitle.textContent = `Add task`;
+	editId.value = '';
+	editDelete.classList.add('hide');
+	editSubmit.textContent = "Add";
 }
-
-function setProject(project) {
-	addDescription.value = `+${project}`;
-}
-
-// EDIT TASK ------------------------------------------------------------------
 
 // Edit task
 function editTask(id) {
 	const task = tasks.find(t => t.id === parseInt(id));
 	if (!task) return;
-
-	const modal = document.getElementById(`edit-modal`);
-	const modalForm = document.getElementById('edit-form');
-	const deleteBtn = document.getElementById('delete-task-btn');
-
-	let options = '';
-	for (let letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-		options += `
-			<option value="${letter}"
-				${letter == task.priority ? 'selected' : ''}>
-				${letter}
-			</option>
-		`;
-	}
-
-	modalForm.innerHTML = `
-		<fieldset>
-			<input type="hidden" id="edit-id" value="${task.id}" />
-			<label>Task
-				<input class="modal-focus"
-					type="text"
-					id="edit-description"
-					placeholder="Task description (e.g., Milk)"
-					value="${task.raw_description}"
-					autocomplete="off"
-					required />
-			</label>
-			<label>Priority</label>
-			<select id="edit-priority" aria-label="Priority">
-				<option ${!task.priority ? 'selected' : ''} value="--">--</option>
-				${options}
-			</select>
-			<label>
-				<input type="checkbox" id="edit-complete"
-					role="switch" ${task.complete ? 'checked' : ''} />
-				Completed
-			</label>
-		</fieldset>
-	`;
-	deleteBtn.dataset.id = task.id;
-	openModal(modal);
+	editForm.reset();
+	editTitle.textContent = `Edit task #${task.id}`;
+	editId.value = task.id;
+	editDescription.value = task.raw_description;
+	if (task.priority) editPriorityDefault.selected = false;
+	editPriority.querySelectorAll('option').forEach((o) =>
+		o.value == task.priority ? o.selected = true : o.selected = false
+	);
+	editComplete.checked = task.complete;
+	editDelete.dataset.id = task.id;
+	editDelete.classList.remove('hide');
+	editSubmit.textContent = "Save";
 }
 
 // Save edited task
 if (editForm) {
 	editForm.addEventListener('submit', async (e) => {
 		e.preventDefault();
-		const id = parseInt(document.getElementById('edit-id').value);
-		const task = tasks.find(t => t.id === id);
-		if (!task) return;
-
-		const description = document.getElementById('edit-description').value.trim();
-		let priority = document.getElementById('edit-priority').value;
-		if (priority === '--') priority = null;
-		const complete = document.getElementById('edit-complete').checked;
-		editError.style.display = 'none';
-
+		editError.classList.add('hide');
+		const id = parseInt(editId.value ? editId.value : 0);
 		try {
-			const response = await fetch(`/edit/${id}`, {
-				method: 'PUT',
+			let task = null;
+			if (id) {
+				task = tasks.find(t => t.id === id);
+				if (!task) throw new Error(`Task #${id} does not exist`);
+			}
+
+			const description = editDescription.value.trim();
+			let priority = editPriority.value;
+			if (priority === '--') priority = null;
+			const complete = editComplete.checked;
+
+			const body = JSON.stringify({ description, priority, complete });
+			let endpoint = '';
+			let method = '';
+			if (task) {
+				endpoint = `/edit/${id}`;
+				method = 'PUT';
+			} else {
+				endpoint = '/add';
+				method = 'POST';
+			}
+			const response = await fetch(endpoint, {
+				method: method,
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ description, priority: priority || null, complete })
+				body: body
 			});
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.description || 'Failed to edit task');
+				throw new Error(errorData.description || 'Failed to update task');
 			}
 			// Update the local tasks array with the response data
 			const data = await response.json();
-			const updatedTask = data.task;
-			const taskIndex = tasks.findIndex(t => t.id === id);
-			if (taskIndex !== -1) {
-				tasks[taskIndex] = updatedTask;
-			}
+			await fetchTasks();
 			if (visibleModal) closeModal(visibleModal);
 			renderTasks();
 		} catch (error) {
 			editError.textContent = error.message;
-			editError.style.display = 'block';
+			editError.classList.remove('hide');
 		}
 	});
 }
@@ -557,7 +511,7 @@ async function deleteTask(event) {
 
 // AUTOCOMPLETE ---------------------------------------------------------------
 
-if (addDescription) addDescription.addEventListener('input', (e) => {
+if (editDescription) editDescription.addEventListener('input', (e) => {
 	const autocomplete = document.getElementById('autocomplete');
 	const query = e.target.value.toLowerCase().trim();
 	if (query) {
@@ -572,12 +526,12 @@ if (addDescription) addDescription.addEventListener('input', (e) => {
 				li.textContent = task.raw_description;
 				li.dataset.id = task.id;
 				li.addEventListener('click', (e) => {
-					closeModal(visibleModal);
-					autocomplete.classList.add('hide');
-					autocomplete.innerHTML = '';
+					e.preventDefault();
 					setTimeout(() => {
+						autocomplete.classList.add('hide');
+						autocomplete.innerHTML = '';
 						editTask(e.target.dataset.id);
-					}, animationDuration);
+					}, 100);
 				});
 				autocomplete.appendChild(li);
 			});
@@ -585,7 +539,7 @@ if (addDescription) addDescription.addEventListener('input', (e) => {
 		} else autocomplete.classList.add('hide');
 	} else autocomplete.classList.add('hide');
 
-	addDescription.addEventListener('keydown', (e) => {
+	editDescription.addEventListener('keydown', (e) => {
 		const items = autocomplete.querySelectorAll('li');
 		if (items.length === 0) return;
 
@@ -609,15 +563,12 @@ if (addDescription) addDescription.addEventListener('input', (e) => {
 			}
 		} else if (e.key === 'Enter' && index >= 0) {
 			e.preventDefault();
-			closeModal(visibleModal);
 			autocomplete.classList.add('hide');
 			autocomplete.innerHTML = '';
-			setTimeout(() => {
-				editTask(items[index].dataset.id);
-			}, animationDuration);
+			editTask(items[index].dataset.id);
 		} else if (e.key === 'Tab' && index >= 0) {
 			e.preventDefault();
-			addDescription.value = items[index].textContent;
+			editDescription.value = items[index].textContent;
 			autocomplete.classList.add('hide');
 			autocomplete.innerHTML = '';
 		}
@@ -633,7 +584,7 @@ if (addDescription) addDescription.addEventListener('input', (e) => {
 	});
 
 	document.addEventListener('click', (e) => {
-		if (!addDescription.contains(e.target) && !autocomplete.contains(e.target)) {
+		if (!editDescription.contains(e.target) && !autocomplete.contains(e.target)) {
 			autocomplete.classList.add('hide');
 		}
 	});

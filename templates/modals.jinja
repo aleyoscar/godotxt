@@ -1,45 +1,4 @@
 
-<dialog id="add-task-modal">
-	<article>
-		<header>
-			<button aria-label="Close"
-				rel="prev"
-				data-target="add-task-modal"
-				onclick="toggleModal(event)">
-			</button>
-			<h3>Add Task</h3>
-		</header>
-		<form id="add-task-form">
-			<p id="add-error" class="error" style="dislay: none;"></p>
-			<fieldset>
-				<label class="position-relative">Task
-					<input class="modal-focus"
-						type="text"
-						id="add-description"
-						placeholder="Task description (e.g., Milk)"
-						autocomplete="off"
-						required />
-					<ul class="hide" id="autocomplete"></ul>
-				</label>
-				<label>Priority</label>
-				<select id="add-priority" aria-label="Priority">
-					<option selected value="--">--</option>
-					{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
-					<option value="{{ letter }}">{{ letter }}</option>
-					{% endfor %}
-				</select>
-			</fieldset>
-		</form>
-		<footer>
-			<button class="secondary"
-				data-target="add-task-modal"
-				onclick="toggleModal(event)">
-				Cancel
-			</button>
-			<button form="add-task-form">Add</button>
-		</footer>
-	</article>
-</dialog>
 <dialog id="edit-modal">
 	<article>
 		<header>
@@ -48,12 +7,37 @@
 				data-target="edit-modal"
 				onclick="toggleModal(event)">
 			</button>
-			<h3>Edit Task</h3>
+			<h3 id="edit-title">Edit Task</h3>
 		</header>
-		<p id="edit-error" class="error" style="dislay: none;"></p>
-		<form id="edit-form"></form>
+		<p id="edit-error" class="error hide">There was an error updating the task.</p>
+		<form id="edit-form">
+			<fieldset>
+				<input type="hidden" id="edit-id" value="" />
+				<label class="position-relative">Task
+					<input class="modal-focus"
+						type="text"
+						id="edit-description"
+						placeholder="Task description (e.g., Milk)"
+						autocomplete="off"
+						required />
+					<ul class="hide" id="autocomplete"></ul>
+				</label>
+				<label>Priority</label>
+				<select id="edit-priority" aria-label="Priority">
+					<option id="edit-priority-default" selected value="--">--</option>
+					{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+					<option value="{{ letter }}">{{ letter }}</option>
+					{% endfor %}
+				</select>
+				<label>
+					<input type="checkbox" id="edit-complete"
+						role="switch" />
+					Completed
+				</label>
+			</fieldset>
+		</form>
 		<footer>
-			<button id="delete-task-btn"
+			<button id="edit-delete"
 				class="float-left"
 				data-id=""
 				onclick="deleteTask(event)">
@@ -66,7 +50,7 @@
 				onclick="toggleModal(event)">
 				Cancel
 			</button>
-			<button form="edit-form">Save</button>
+			<button id="edit-submit" form="edit-form">Save</button>
 		</footer>
 	</article>
 </dialog>
