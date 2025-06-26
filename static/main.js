@@ -28,6 +28,7 @@ const deleteForm = document.getElementById('delete-form');
 const deleteError = document.getElementById('delete-error');
 const deleteLists = document.getElementById('delete-lists');
 const noList = document.getElementById('no-list');
+const listTitle = document.getElementById('list-title');
 
 const clearBtn = document.createElement('button');
 clearBtn.classList.add('secondary');
@@ -157,35 +158,16 @@ function renderTasks() {
 		settings["lists"].forEach((list) => {
 			const li = document.createElement('li');
 			li.innerHTML = `
-				<a class="contrast"
+				<a id="list-${list['project']}"
+					class="contrast"
 					href="#${list['project']}"
-					onclick="toggleAside()">
+					onclick="toggleAside()"
+					data-title="${list['name']}">
 					${list['name']}
 				</a>`;
 			listUl.appendChild(li);
-
-			const div = document.createElement('div');
-			div.id = list['project'];
-			div.classList.add('list', 'hide');
-			div.innerHTML = `
-				<section class="flex align-center">
-					<h3 class="mb-0">${list['name']}</h3>
-					<button id="add-task-btn"
-						class="border-round flex-inline align-center padding-xs"
-						onclick="setProject('${list['project']}'); toggleModal(event);"
-						data-target="add-task-modal">
-						<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
-					</button>
-				</section>
-				<section>
-					<div class="loading" aria-busy="true"></div>
-					<ul></ul>
-				</section>`;
-			taskList.parentNode.appendChild(div);
 		});
 	}
-
-	openList();
 
 	// Populate project & context dropdowns
 	projects = [];
@@ -272,22 +254,14 @@ function renderTasks() {
 
 	// Render tasks
 	taskList.querySelector('ul').innerHTML = '';
-	const lists = document.querySelectorAll('.list');
-	lists.forEach((list) => list.querySelector('ul').innerHTML = '');
 	filteredTasks.forEach(task => {
-		let addToList = taskList;
-		let found = false;
 		const row = document.createElement('li');
 		row.id = `task-${task.id}`;
 		row.classList.add('flex', 'align-center', 'hover-background', 'padding-xs', 'show-hover-parent');
+		task.projects.forEach((p) => row.classList.add(`project-${p}`));
+		task.contexts.forEach((c) => row.classList.add(`context-${c}`));
 		row.innerHTML = parseTask(task);
-		lists.forEach((list) => {
-			if (task.projects.includes(list.id) && !found) {
-				addToList = list;
-				found = true;
-			}
-		});
-		addToList.querySelector('ul').appendChild(row);
+		taskList.querySelector('ul').appendChild(row);
 	});
 
 	// Show 'Show All' button if filters in place
@@ -296,6 +270,8 @@ function renderTasks() {
 			showAll.classList.remove('hide');
 		else showAll.classList.add('hide');
 	}
+
+	openList();
 }
 
 // FILTER ---------------------------------------------------------------------
@@ -680,27 +656,17 @@ if (aside) {
 
 window.addEventListener('hashchange', openList);
 
-function closeLists() {
-	taskList.classList.add('hide');
-	const lists = document.querySelectorAll('.list');
-	lists.forEach(list => list.classList.add('hide'));
-}
-
 function openList() {
-	const hash = location.hash;
-	closeLists();
-	if (hash && hash.substr(1)) {
-		const list = document.getElementById(hash.substr(1));
-		if (list) {
-			noList.classList.add('hide');
-			list.classList.remove('hide');
-		} else {
-			noList.querySelector('span').textContent = `'${hash.substr(1)}'`;
-			noList.classList.remove('hide');
-		}
+	const hash = location.hash ? location.hash.slice(1) : '';
+	taskList.querySelectorAll('li').forEach((t) => t.classList.remove('hide'));
+	if (hash && document.getElementById(`list-${hash}`)) {
+		console.log("")
+		listTitle.textContent = document.getElementById(`list-${hash}`).dataset.title;
+		taskList.querySelectorAll('li').forEach((t) => {
+			if (!t.classList.contains(`project-${hash}`)) t.classList.add('hide');
+		});
 	} else {
-		taskList.classList.remove('hide');
-		noList.classList.add('hide');
+		listTitle.textContent = "Tasks";
 	}
 }
 
