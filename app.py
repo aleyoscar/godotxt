@@ -7,6 +7,7 @@ import pytodotxt, hashlib, os, json, secrets
 if os.getenv('FLASK_ENV') == 'development':
 	load_dotenv()
 
+VERSION = 'v0.1.0'
 SECRET_KEY = os.getenv('SECRET_KEY')
 USERNAME = os.getenv('USERNAME')
 PASSWORD_HASH = os.getenv('PASSWORD_HASH')
@@ -110,7 +111,7 @@ def login():
 		else:
 			flash('Invalid username or password', 'error')
 	next_url = request.args.get('next') or url_for('index')
-	return render_template('login.html', next=next_url)
+	return render_template('login.html', next=next_url, version=VERSION)
 
 @app.route('/logout')
 @login_required
@@ -130,7 +131,7 @@ def logout():
 @login_required
 def index():
 	settings = load_settings()
-	return render_template('index.html', settings=settings)
+	return render_template('index.html', settings=settings, version=VERSION)
 
 @app.route('/list', methods=['GET'])
 @login_required

@@ -11,10 +11,10 @@
 	<meta name="apple-mobile-web-app-title" content="Groc.txt" />
 	<link rel="manifest" href="/static/images/site.webmanifest" />
 	<title>{% block title %}{% endblock %}</title>
-	<link rel="stylesheet" href="/static/pico.min.css">
-	<link rel="stylesheet" href="/static/styles.css">
-	<script src="/static/modal.js" defer></script>
-	<script src="/static/main.js" defer></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='pico.min.css', v=version) }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v=version) }}">
+	<script src="{{ url_for('static', filename='modal.js', v=version) }}" defer></script>
+	<script src="{{ url_for('static', filename='main.js', v=version) }}" defer></script>
 </head>
 <body>
 	{% include 'icons.html' %}
