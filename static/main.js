@@ -5,7 +5,7 @@ const taskList = document.getElementById('tasks');
 const addForm = document.getElementById('add-task-form');
 const addError = document.getElementById('add-error');
 const addDescription = document.getElementById('add-description');
-const editForm = document.getElementById('edit-task-form');
+const editForm = document.getElementById('edit-form');
 const editError = document.getElementById('edit-error');
 const search = document.getElementById('search');
 const searchBtn = document.getElementById('search-btn');
@@ -449,8 +449,8 @@ function editTask(id) {
 	const task = tasks.find(t => t.id === parseInt(id));
 	if (!task) return;
 
-	const modal = document.getElementById(`edit-task-modal`);
-	const modalForm = document.getElementById('edit-task-form');
+	const modal = document.getElementById(`edit-modal`);
+	const modalForm = document.getElementById('edit-form');
 	const deleteBtn = document.getElementById('delete-task-btn');
 
 	let options = '';

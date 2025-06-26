@@ -40,18 +40,18 @@
 		</footer>
 	</article>
 </dialog>
-<dialog id="edit-task-modal">
+<dialog id="edit-modal">
 	<article>
 		<header>
 			<button aria-label="Close"
 				rel="prev"
-				data-target="edit-task-modal"
+				data-target="edit-modal"
 				onclick="toggleModal(event)">
 			</button>
 			<h3>Edit Task</h3>
 		</header>
 		<p id="edit-error" class="error" style="dislay: none;"></p>
-		<form id="edit-task-form"></form>
+		<form id="edit-form"></form>
 		<footer>
 			<button id="delete-task-btn"
 				class="float-left"
@@ -62,11 +62,11 @@
 				</svg>
 			</button>
 			<button class="secondary"
-				data-target="edit-task-modal"
+				data-target="edit-modal"
 				onclick="toggleModal(event)">
 				Cancel
 			</button>
-			<button form="edit-task-form">Save</button>
+			<button form="edit-form">Save</button>
 		</footer>
 	</article>
 </dialog>
