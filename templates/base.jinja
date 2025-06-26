@@ -17,7 +17,7 @@
 	<script src="{{ url_for('static', filename='main.js', v=version) }}" defer></script>
 </head>
 <body>
-	{% include 'icons.html' %}
+	{% include 'icons.jinja' %}
 	{% block content %}{% endblock %}
 </body>
 </html>
