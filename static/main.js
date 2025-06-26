@@ -609,13 +609,17 @@ window.addEventListener('hashchange', openList);
 
 function openList() {
 	const hash = location.hash ? location.hash.slice(1) : '';
+	noList.classList.add('hide');
 	taskList.querySelectorAll('li').forEach((t) => t.classList.remove('hide'));
 	if (hash && document.getElementById(`list-${hash}`)) {
-		console.log("")
 		listTitle.textContent = document.getElementById(`list-${hash}`).dataset.title;
 		taskList.querySelectorAll('li').forEach((t) => {
 			if (!t.classList.contains(`project-${hash}`)) t.classList.add('hide');
 		});
+	} else if (hash && hash != 'tasks') {
+		noList.querySelector('span').textContent = hash;
+		noList.classList.remove('hide');
+		listTitle.textContent = "Tasks";
 	} else {
 		listTitle.textContent = "Tasks";
 	}
