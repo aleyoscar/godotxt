@@ -7,7 +7,7 @@ import pytodotxt, hashlib, os, json, secrets
 if os.getenv('FLASK_ENV') == 'development':
 	load_dotenv()
 
-VERSION = 'v0.2.0'
+VERSION = 'v0.3.0'
 SECRET_KEY = os.getenv('SECRET_KEY')
 USERNAME = os.getenv('USERNAME')
 PASSWORD_HASH = os.getenv('PASSWORD_HASH')
