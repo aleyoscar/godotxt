@@ -391,7 +391,8 @@ if (DOM.editDescription) {
 			...filterTags(e.currentTarget.value, '+', regex.projectSingle, projects),
 			...filterTags(e.currentTarget.value, '@', regex.contextSingle, contexts),
 		].sort((a, b) => a.tag.localeCompare(b.tag));
-		const filteredTasks = query ? tasks.filter(task => task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
+		const currentTaskId = parseInt(DOM.editId.value) || 0;
+		const filteredTasks = query ? tasks.filter(task => task.id !== currentTaskId && task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
 
 		DOM.autocomplete.innerHTML = (filteredTags.length || filteredTasks.length)
 			? [...filteredTags.map(t => `<li class="auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
