@@ -395,7 +395,7 @@ if (DOM.editDescription) {
 
 		DOM.autocomplete.innerHTML = (filteredTags.length || filteredTasks.length)
 			? [...filteredTags.map(t => `<li class="auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
-				 ...filteredTasks.map(t => `<li class="auto-tag" data-id="${t.id}">${t.raw_description}</li>`)].join('')
+				 ...filteredTasks.map(t => `<li class="auto-tag flex space-between" data-id="${t.id}">${t.raw_description}<b onclick="editTask(${t.id})"><svg width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></b></li>`)].join('')
 			: '';
 		DOM.autocomplete.classList.toggle('hide', !filteredTags.length && !filteredTasks.length);
 	});
@@ -435,12 +435,12 @@ if (DOM.editDescription) {
 		DOM.autocomplete.classList.add('hide');
 		DOM.autocomplete.innerHTML = '';
 		if (e.target.dataset.id) {
-			editTask(e.target.dataset.id);
+			DOM.editDescription.value = e.target.textContent;
 		} else {
 			DOM.editDescription.value = DOM.editDescription.value.slice(0, e.target.dataset.start) + e.target.dataset.tag + DOM.editDescription.value.slice(e.target.dataset.end);
 			DOM.editDescription.setSelectionRange(parseInt(e.target.dataset.start) + e.target.dataset.tag.length, parseInt(e.target.dataset.start) + e.target.dataset.tag.length);
-			populateTags();
 		}
+		populateTags();
 	});
 
 	document.addEventListener('click', e => {
