@@ -1,71 +1,58 @@
-// Config
-const isOpenClass = "modal-is-open";
-const openingClass = "modal-is-opening";
-const closingClass = "modal-is-closing";
-const scrollbarWidthCssVar = "--pico-scrollbar-width";
-const animationDuration = 400; // ms
+// CONFIG ---------------------------------------------------------------------
+
+const CONFIG = {
+	isOpenClass: 'modal-is-open',
+	openingClass: 'modal-is-opening',
+	closingClass: 'modal-is-closing',
+	scrollbarWidthCssVar: '--pico-scrollbar-width',
+	animationDuration: 400, // ms
+};
+
 let visibleModal = null;
 
-// Toggle modal
-const toggleModal = (event) => {
+// HELPERS --------------------------------------------------------------------
+
+const getScrollbarWidth = () => window.innerWidth - document.documentElement.clientWidth;
+
+// MODAL HANDLING -------------------------------------------------------------
+
+function toggleModal(event) {
 	event.preventDefault();
 	const modal = document.getElementById(event.currentTarget.dataset.target);
-	if (!modal) return;
-	modal && (modal.open ? closeModal(modal) : openModal(modal));
-};
+	if (modal) modal.open ? closeModal(modal) : openModal(modal);
+}
 
-// Open modal
-const openModal = (modal) => {
-	const { documentElement: html } = document;
+function openModal(modal) {
 	const scrollbarWidth = getScrollbarWidth();
-	if (scrollbarWidth) {
-		html.style.setProperty(scrollbarWidthCssVar, `${scrollbarWidth}px`);
-	}
-	html.classList.add(isOpenClass, openingClass);
+	if (scrollbarWidth) document.documentElement.style.setProperty(CONFIG.scrollbarWidthCssVar, `${scrollbarWidth}px`);
+	document.documentElement.classList.add(CONFIG.isOpenClass, CONFIG.openingClass);
+	modal.showModal();
 	setTimeout(() => {
 		visibleModal = modal;
-		html.classList.remove(openingClass);
-	}, animationDuration);
-	modal.showModal();
-	const modalInput = modal.querySelector('.modal-focus');
-	if (modalInput) modalInput.focus();
-};
+		document.documentElement.classList.remove(CONFIG.openingClass);
+		modal.querySelector('.modal-focus')?.focus();
+	}, CONFIG.animationDuration);
+}
 
-// Close modal
-const closeModal = (modal) => {
+function closeModal(modal) {
 	visibleModal = null;
-	const { documentElement: html } = document;
-	html.classList.add(closingClass);
+	document.documentElement.classList.add(CONFIG.closingClass);
 	setTimeout(() => {
-		html.classList.remove(closingClass, isOpenClass);
-		html.style.removeProperty(scrollbarWidthCssVar);
+		document.documentElement.classList.remove(CONFIG.closingClass, CONFIG.isOpenClass);
+		document.documentElement.style.removeProperty(CONFIG.scrollbarWidthCssVar);
 		modal.close();
-		if (modal.querySelector('form')) modal.querySelector('form').reset();
-	}, animationDuration);
-};
+		modal.querySelector('form')?.reset();
+	}, CONFIG.animationDuration);
+}
 
-// Close with a click outside
-document.addEventListener("click", (event) => {
-	if (visibleModal === null) return;
-	const modalContent = visibleModal.querySelector("article");
-	const isClickInside = modalContent.contains(event.target);
-	!isClickInside && closeModal(visibleModal);
+// EVENT LISTENERS ------------------------------------------------------------
+
+document.addEventListener('click', (event) => {
+	if (!visibleModal) return;
+	const isClickInside = event.target.closest('article, #autocomplete, [data-target], kbd b, .auto-tag');
+	if (!isClickInside) closeModal(visibleModal);
 });
 
-// Close with Esc key
-document.addEventListener("keydown", (event) => {
-	if (event.key === "Escape" && visibleModal) {
-		closeModal(visibleModal);
-	}
+document.addEventListener('keydown', (event) => {
+	if (event.key === 'Escape' && visibleModal) closeModal(visibleModal);
 });
-
-// Get scrollbar width
-const getScrollbarWidth = () => {
-	const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-	return scrollbarWidth;
-};
-
-// Is scrollbar visible
-const isScrollbarVisible = () => {
-	return document.body.scrollHeight > screen.height;
-};

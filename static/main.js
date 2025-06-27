@@ -1,53 +1,56 @@
-
 // CONSTANTS ------------------------------------------------------------------
 
-const taskList = document.getElementById('tasks');
-const editForm = document.getElementById('edit-form');
-const editError = document.getElementById('edit-error');
-const editTitle = document.getElementById('edit-title');
-const editId = document.getElementById('edit-id');
-const editDescription = document.getElementById('edit-description');
-const editProjects = document.getElementById('edit-projects');
-const editContexts = document.getElementById('edit-contexts');
-const editPriority = document.getElementById('edit-priority');
-const editPriorityDefault = document.getElementById('edit-priority-default');
-const editComplete = document.getElementById('edit-complete');
-const editSubmit = document.getElementById('edit-submit');
-const editDelete = document.getElementById('edit-delete');
-const search = document.getElementById('search');
-const searchBtn = document.getElementById('search-btn');
-const filterPriority = document.getElementById('filter-priority');
-const sortBtns = document.querySelectorAll('.sort-btn');
-const sortIcons = document.querySelectorAll('.sort-btn svg');
-const completeToggle = document.getElementById('complete-toggle');
-const showAll = document.getElementById('show-all');
-const projectsModal = document.getElementById('projects-modal');
-const projectsBtn = document.getElementById('projects-btn');
-const contextsModal = document.getElementById('contexts-modal');
-const contextsBtn = document.getElementById('contexts-btn');
-const aside = document.querySelector('aside');
-const settingsForm = document.getElementById('settings-form');
-const settingsError = document.getElementById('settings-error');
-const settingsSortComplete = document.getElementById('settings-sort-complete');
-const settingsListsAdd = document.getElementById('settings-lists-add');
-const settingsLists = document.getElementById('settings-lists');
-const deleteForm = document.getElementById('delete-form');
-const deleteError = document.getElementById('delete-error');
-const deleteLists = document.getElementById('delete-lists');
-const noList = document.getElementById('no-list');
-const listTitle = document.getElementById('list-title');
+const DOM = {
+	taskList: document.getElementById('tasks'),
+	editForm: document.getElementById('edit-form'),
+	editError: document.getElementById('edit-error'),
+	editTitle: document.getElementById('edit-title'),
+	editId: document.getElementById('edit-id'),
+	editDescription: document.getElementById('edit-description'),
+	editProjects: document.getElementById('edit-projects'),
+	editContexts: document.getElementById('edit-contexts'),
+	editPriority: document.getElementById('edit-priority'),
+	editPriorityDefault: document.getElementById('edit-priority-default'),
+	editComplete: document.getElementById('edit-complete'),
+	editSubmit: document.getElementById('edit-submit'),
+	editDelete: document.getElementById('edit-delete'),
+	search: document.getElementById('search'),
+	searchBtn: document.getElementById('search-btn'),
+	completeToggle: document.getElementById('complete-toggle'),
+	showAll: document.getElementById('show-all'),
+	projectsModal: document.getElementById('projects-modal'),
+	projectsBtn: document.getElementById('projects-btn'),
+	contextsModal: document.getElementById('contexts-modal'),
+	contextsBtn: document.getElementById('contexts-btn'),
+	aside: document.querySelector('aside'),
+	settingsForm: document.getElementById('settings-form'),
+	settingsError: document.getElementById('settings-error'),
+	settingsSortComplete: document.getElementById('settings-sort-complete'),
+	settingsListsAdd: document.getElementById('settings-lists-add'),
+	settingsLists: document.getElementById('settings-lists'),
+	deleteForm: document.getElementById('delete-form'),
+	deleteError: document.getElementById('delete-error'),
+	deleteLists: document.getElementById('delete-lists'),
+	noList: document.getElementById('no-list'),
+	listTitle: document.getElementById('list-title'),
+	logo: document.getElementById('logo'),
+	autocomplete: document.getElementById('autocomplete'),
+};
 
-const clearBtn = document.createElement('button');
-clearBtn.classList.add('secondary');
-clearBtn.addEventListener('click', clearSearch);
-clearBtn.textContent = 'Clear';
+const clearBtn = Object.assign(document.createElement('button'), {
+	className: 'secondary',
+	textContent: 'Clear',
+	onclick: clearSearch,
+});
 
 // GLOBALS --------------------------------------------------------------------
 
-const projectRegex = /\+[A-Za-z0-9_-]+/g;
-const contextRegex = /@[A-Za-z0-9_-]+/g;
-const projectRegexSingle = /^\+[A-Za-z0-9_-]+$/;
-const contextRegexSingle = /^@[A-Za-z0-9_-]+$/;
+const regex = {
+	project: /\+[A-Za-z0-9_-]+/g,
+	context: /@[A-Za-z0-9_-]+/g,
+	projectSingle: /^\+[A-Za-z0-9_-]+$/,
+	contextSingle: /^@[A-Za-z0-9_-]+$/,
+};
 
 let tasks = [];
 let projects = [];
@@ -55,7 +58,6 @@ let contexts = [];
 let sortBy = 'description';
 let sortAscending = true;
 let filterSearch = '';
-// let filterPrio = '';
 let filterComplete = true;
 let filterProjects = [];
 let filterContexts = [];
@@ -63,226 +65,120 @@ let settings = {};
 
 // HELPERS --------------------------------------------------------------------
 
-// Get date in YYYY-MM-DD format
-function getDateString(date) {
-	const yyyy = date.getUTCFullYear();
-	const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
-	const dd = String(date.getUTCDate()).padStart(2, '0');
-	return `${yyyy}-${mm}-${dd}`;
-}
+const getDateString = (date) => {
+	const d = new Date(date);
+	return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+};
 
-function showLoading() {
-	document.querySelectorAll('.loading').forEach((load) => load.classList.remove('hide'));
-}
+const toggleLoading = (show) => {
+	document.querySelectorAll('.loading').forEach(el => el.classList.toggle('hide', !show));
+};
 
-function hideLoading(name) {
-	document.querySelectorAll('.loading').forEach((load) => load.classList.add('hide'));
-}
-
-function cleanString(text) {
-	return text.trim().replace(/\s+/g, " ");
-}
+const cleanString = (text) => text.trim().replace(/\s+/g, ' ');
 
 // LIST -----------------------------------------------------------------------
 
-// Fetch tasks from API
 async function fetchTasks() {
-	showLoading();
+	toggleLoading(true);
 	try {
-		const response = await fetch("/list");
+		const response = await fetch('/list');
 		if (!response.ok) throw new Error('Failed to fetch tasks');
-		const data = await response.json();
-		tasks = data.tasks;
+		tasks = (await response.json()).tasks;
 		renderTasks();
-		hideLoading();
 	} catch (error) {
 		console.error('Error loading tasks:', error);
-		hideLoading();
+	} finally {
+		toggleLoading(false);
 	}
 }
 
-// Parse task into html
 function parseTask(task) {
-	let taskSub = '';
-	if (task.priority) taskSub = `<a>(${task.priority})</a>`;
-	let taskDates = '';
-	if (task.created)
-		taskDates += `
-			<small>
-				<svg width="1em" height="1em">
-					<use xlink:href="#icon-calendar"/>
-				</svg>
-				${getDateString(new Date(task.created))}
-			</small>
-		`;
-	if (task.completed)
-		taskDates += `
-			<small><ins>
-				<svg width="1em" height="1em">
-					<use xlink:href="#icon-calendar-check"/>
-				</svg>
-				${getDateString(new Date(task.completed))}
-			</ins></small>
-		`;
-	let taskDesc = task.raw_description.replace(
-		projectRegex, (match) =>
-		task.projects.includes(match.slice(1)) ?
-			`<a data-attribute="projects" data-name="${match.slice(1)}"
-				onclick="selectAttribute(event)">${match}</a>` : match
+	const taskSub = task.priority ? `<a>(${task.priority})</a>` : '';
+	const taskDates = [
+		task.created ? `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(task.created)}</small>` : '',
+		task.completed ? `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(task.completed)}</ins></small>` : '',
+	].join('');
+
+	let taskDesc = task.raw_description.replace(regex.project, match =>
+		task.projects.includes(match.slice(1))
+			? `<a data-attribute="projects" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>`
+			: match
+	).replace(regex.context, match =>
+		task.contexts.includes(match.slice(1))
+			? `<a class="contrast" data-attribute="contexts" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>`
+			: match
 	);
-	taskDesc = taskDesc.replace(
-		contextRegex, (match) =>
-		task.contexts.includes(match.slice(1)) ?
-			`<a class="contrast" data-attribute="contexts"
-				data-name="${match.slice(1)}"
-				onclick="selectAttribute(event)">${match}</a>` : match
-	);
+
 	return `
-		<input
-			type="checkbox"
-			${task.complete ? 'checked' : ''}
-			data-id="${task.id}"
-			onclick="completeTask(event)" />
-		<hgroup class="pointer flex-grow" data-target="edit-modal"
-			onclick="editTask(${task.id}); toggleModal(event);">
+		<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)" />
+		<hgroup class="pointer flex-grow" data-target="edit-modal" onclick="editTask(${task.id}); toggleModal(event);">
 			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}">
 				<span>${taskSub} ${taskDesc}</span>
 			</h5>
 			<p class="flex gap-xs align-center">${taskDates}</p>
 		</hgroup>
-		<svg class="show-hover" width="1em" height="1em">
-			<use xlink:href="#icon-edit"/>
-		</svg>
+		<svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg>
 	`;
 }
 
-// Render tasks with sorting & filtering
 function renderTasks() {
-	// Update view with settings
-	const logo = document.getElementById("logo");
-	const listUl = aside.querySelector('ul');
-	logo.classList.remove('hide-sm');
-	logo.nextElementSibling.classList.add('hide');
-	aside.classList.add('hide');
-	while (listUl.children.length > 1) listUl.removeChild(listUl.lastElementChild);
-	if (settings["lists"] && settings["lists"].length > 0) {
-		logo.classList.add('hide-sm');
-		logo.nextElementSibling.classList.remove('hide');
-		aside.classList.remove('hide');
-		settings["lists"].forEach((list) => {
-			const li = document.createElement('li');
-			li.innerHTML = `
-				<a id="list-${list['project']}"
-					class="contrast"
-					href="#${list['project']}"
-					onclick="toggleAside()"
-					data-title="${list['name']}">
-					${list['name']}
-				</a>`;
-			listUl.appendChild(li);
+	// Update aside menu
+	const listUl = DOM.aside?.querySelector('ul');
+	if (listUl) {
+		DOM.logo.classList.toggle('hide-sm', settings.lists?.length > 0);
+		DOM.logo.nextElementSibling.classList.toggle('hide', settings.lists?.length > 0);
+		DOM.aside.classList.toggle('hide', !settings.lists?.length);
+		while (listUl.children.length > 1) listUl.lastElementChild.remove();
+		settings.lists?.forEach(list => {
+			listUl.insertAdjacentHTML('beforeend', `
+				<li><a id="list-${list.project}" class="contrast" href="#${list.project}" onclick="toggleAside()" data-title="${list.name}">${list.name}</a></li>
+			`);
 		});
 	}
 
 	// Populate project & context dropdowns
-	projects = [];
-	contexts = [];
-	projectsModal.querySelector('ul').innerHTML = '';
-	contextsModal.querySelector('ul').innerHTML = '';
-	projectsBtn.setAttribute("disabled", "disabled");
-	projectsBtn.classList.add('secondary');
-	contextsBtn.setAttribute("disabled", "disabled");
-	contextsBtn.classList.add('secondary');
-	tasks.forEach((task) => {
-		task.projects.forEach((p) => {if (!projects.includes(p)) projects.push(p)});
-		task.contexts.forEach((c) => {if (!contexts.includes(c)) contexts.push(c)});
-	});
-	if (projects.length > 0) {
-		projectsBtn.removeAttribute('disabled');
-		projectsBtn.classList.remove('secondary');
-		projects.forEach((p) => {
-			const li = document.createElement('li');
-			li.innerHTML = `<label>
-				<input type="checkbox"
-					class="attribute-filter"
-					data-attribute="projects"
-					name="${p}"
-					${filterProjects.includes(p) ? 'checked' : ''}/>
-				${p}</label>`;
-			projectsModal.querySelector('ul').appendChild(li);
-		});
-	}
-	if (contexts.length > 0) {
-		contextsBtn.removeAttribute('disabled');
-		contextsBtn.classList.remove('secondary');
-		contexts.forEach((c) => {
-			const li = document.createElement('li');
-			li.innerHTML = `<label>
-				<input type="checkbox"
-					class="attribute-filter"
-					data-attribute="contexts"
-					name="${c}"
-					${filterContexts.includes(c) ? 'checked' : ''}/>
-				${c}</label>`;
-			contextsModal.querySelector('ul').appendChild(li);
-		});
-	}
+	projects = [...new Set(tasks.flatMap(task => task.projects))];
+	contexts = [...new Set(tasks.flatMap(task => task.contexts))];
+	const updateModal = (modal, btn, items, attribute, checkedItems) => {
+		modal.querySelector('ul').innerHTML = items.length
+			? items.map(item => `
+				<li><label>
+					<input type="checkbox" class="attribute-filter" data-attribute="${attribute}" name="${item}" ${checkedItems.includes(item) ? 'checked' : ''}/>
+					${item}
+				</label></li>
+			`).join('')
+			: '';
+		btn.toggleAttribute('disabled', !items.length);
+		btn.classList.toggle('secondary', !items.length);
+	};
+	updateModal(DOM.projectsModal, DOM.projectsBtn, projects, 'projects', filterProjects);
+	updateModal(DOM.contextsModal, DOM.contextsBtn, contexts, 'contexts', filterContexts);
 
-	// Filter tasks
-	let filteredTasks = tasks.filter(task => {
-		const matchesSearch = filterSearch ?
-			task.raw_description.toLowerCase().includes(filterSearch.toLowerCase()) : true;
-		const matchesComplete = filterComplete ?
-			task.complete === false : true;
-		const matchesProjects = filterProjects.length > 0 ?
-			task.projects.some(t => filterProjects.includes(t)) : true;
-		const matchesContexts = filterContexts.length > 0 ?
-			task.contexts.some(t => filterContexts.includes(t)) : true;
-		return matchesSearch && matchesComplete && matchesProjects && matchesContexts;
-	});
-
-	// Sort tasks by description first
-	filteredTasks.sort((a, b) => {
-		if (a.description < b.description) return sortAscending ? -1 : 1;
-		if (a.description > b.description) return sortAscending ? 1 : -1;
-	});
-
-	// Then by sortBy if not description
-	if (sortBy !== 'description') {
-		filteredTasks.sort((a, b) => {
-			let valA = a[sortBy] || '';
-			let valB = b[sortBy] || '';
-			if (sortBy === 'priority' && (!valA || !valB)) {
-				valA = valA || 'ZZ'; // Null priorities sort last
-				valB = valB || 'ZZ';
-			}
-			if (valA < valB) return sortAscending ? -1 : 1;
-			if (valA > valB) return sortAscending ? 1 : -1;
-			return 0;
-		});
-	}
-
-	// Then move completed to bottom if setting is set
-	if (settings && settings["sort_complete"]) {
-		filteredTasks.sort((a, b) => a.complete && !b.complete ? 1 : -1);
-	}
+	// Filter and sort tasks
+	const filteredTasks = tasks
+		.filter(task => (
+			(!filterSearch || task.raw_description.toLowerCase().includes(filterSearch.toLowerCase())) &&
+			(filterComplete ? !task.complete : true) &&
+			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
+			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c)))
+		))
+		.sort((a, b) => {
+			const valA = sortBy === 'description' ? a.description : a[sortBy] || (sortBy === 'priority' ? 'ZZ' : '');
+			const valB = sortBy === 'description' ? b.description : b[sortBy] || (sortBy === 'priority' ? 'ZZ' : '');
+			return sortAscending ? (valA < valB ? -1 : valA > valB ? 1 : 0) : (valA > valB ? -1 : valA < valB ? 1 : 0);
+		})
+		.sort((a, b) => settings.sort_complete ? (a.complete && !b.complete ? 1 : -1) : 0);
 
 	// Render tasks
-	taskList.querySelector('ul').innerHTML = '';
-	filteredTasks.forEach(task => {
-		const row = document.createElement('li');
-		row.id = `task-${task.id}`;
-		row.classList.add('flex', 'align-center', 'hover-background', 'padding-xs', 'show-hover-parent');
-		task.projects.forEach((p) => row.classList.add(`project-${p}`));
-		task.contexts.forEach((c) => row.classList.add(`context-${c}`));
-		row.innerHTML = parseTask(task);
-		taskList.querySelector('ul').appendChild(row);
-	});
+	DOM.taskList.querySelector('ul').innerHTML = filteredTasks.map(task => `
+		<li id="task-${task.id}" class="flex align-center hover-background padding-xs show-hover-parent ${task.projects.map(p => `project-${p}`).join(' ')} ${task.contexts.map(c => `context-${c}`).join(' ')}">
+			${parseTask(task)}
+		</li>
+	`).join('');
 
-	// Show 'Show All' button if filters in place
-	if (showAll) {
-		if (filterSearch || filterProjects.length || filterContexts.length)
-			showAll.classList.remove('hide');
-		else showAll.classList.add('hide');
+	// Update showAll button visibility
+	if (DOM.showAll) {
+		DOM.showAll.classList.toggle('hide', !(filterSearch || filterProjects.length || filterContexts.length));
 	}
 
 	openList();
@@ -290,255 +186,173 @@ function renderTasks() {
 
 // FILTER ---------------------------------------------------------------------
 
-// Clear filter attributes
 function clearAttributeFilters() {
 	filterProjects = [];
 	filterContexts = [];
-	projectsBtn.classList.add('outline');
-	contextsBtn.classList.add('outline');
+	DOM.projectsBtn.classList.add('outline');
+	DOM.contextsBtn.classList.add('outline');
 }
 
-// Clear attribute inputs
-function clearAttributeInputs(event) {
-	if (event.target.dataset.attribute == 'projects')
-		projectsModal.querySelectorAll('input').forEach(i => i.checked = false);
-	if (event.target.dataset.attribute == 'contexts')
-		contextsModal.querySelectorAll('input').forEach(i => i.checked = false);
-}
-
-// Single attribute
 function selectAttribute(event) {
 	event.stopPropagation();
 	event.preventDefault();
-	const inputs = document.querySelectorAll('.attribute-filter');
-	inputs.forEach(i => i.checked = false);
-	inputs.forEach(input => {
-		if (event.target.dataset.attribute == input.dataset.attribute &&
-			event.target.dataset.name == input.name) input.checked = true;
+	const { attribute, name } = event.target.dataset;
+	document.querySelectorAll('.attribute-filter').forEach(input => {
+		input.checked = input.dataset.attribute === attribute && input.name === name;
 	});
-	filterAttribute(event);
+	filterAttribute();
 }
 
-// Filter attributes
-function filterAttribute(event) {
+function filterAttribute() {
 	clearAttributeFilters();
-	document.querySelectorAll('.attribute-filter').forEach((input) => {
+	document.querySelectorAll('.attribute-filter').forEach(input => {
 		if (input.checked) {
-			if (input.dataset.attribute == 'projects') {
-				filterProjects.push(input.name);
-				projectsBtn.classList.remove('outline');
-			}
-			if (input.dataset.attribute == 'contexts') {
-				filterContexts.push(input.name);
-				contextsBtn.classList.remove('outline');
-			}
+			const target = input.dataset.attribute === 'projects' ? filterProjects : filterContexts;
+			target.push(input.name);
+			DOM[input.dataset.attribute === 'projects' ? 'projectsBtn' : 'contextsBtn'].classList.remove('outline');
 		}
 	});
 	renderTasks();
 }
 
-// Search filter
-if (search) {
-	search.addEventListener('input', async (e) => {
-		if (search.value) {
-			filterSearch = search.value.trim();
-			search.parentElement.appendChild(clearBtn);
-			renderTasks();
-		} else clearSearch();
-	});
-}
-
-// Toggle complete filter
-function toggleComplete(setComplete) {
-	filterComplete = setComplete;
-	newIcon = '#icon-eye';
-	if (filterComplete) completeToggle.classList.add('outline');
-	else {
-		newIcon += '-fill';
-		completeToggle.classList.remove('outline');
-	}
-	completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
-	renderTasks();
-}
-
-// Clear search only
 function clearSearch() {
-	search.value = '';
+	DOM.search.value = '';
 	filterSearch = '';
 	clearBtn.remove();
 	renderTasks();
 }
 
-// Clear filters
 function clearFilters() {
 	clearSearch();
-	projectsModal.querySelectorAll('input').forEach(i => i.checked = false);
-	contextsModal.querySelectorAll('input').forEach(i => i.checked = false);
-	filterAttribute(null);
+	[DOM.projectsModal, DOM.contextsModal].forEach(modal => modal.querySelectorAll('input').forEach(i => i.checked = false));
+	filterAttribute();
+}
+
+function toggleComplete(setComplete) {
+	filterComplete = setComplete;
+	const newIcon = filterComplete ? '#icon-eye' : '#icon-eye-fill';
+	DOM.completeToggle.classList.toggle('outline', filterComplete);
+	DOM.completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+	renderTasks();
+}
+
+if (DOM.search) {
+	DOM.search.addEventListener('input', e => {
+		filterSearch = e.target.value.trim();
+		if (filterSearch) DOM.search.parentElement.appendChild(clearBtn);
+		else clearSearch();
+		renderTasks();
+	});
 }
 
 // SORTING --------------------------------------------------------------------
 
-// Toggle sort
 function sortTasks(event) {
-	if (sortBy === event.target.dataset.sort) sortAscending = !sortAscending;
-	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up';
+	sortAscending = sortBy === event.target.dataset.sort ? !sortAscending : true;
 	sortBy = event.target.dataset.sort;
-	sortBtns.forEach((btn) => btn.classList.add('outline'));
-	sortIcons.forEach((icon) =>
-		icon.querySelector('use').setAttribute('xlink:href', newIcon));
-	event.target.querySelector('use').setAttribute('xlink:href', `${newIcon}-fill`);
+	const newIcon = sortAscending ? '#icon-caret-down-fill' : '#icon-caret-up-fill';
+	document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.add('outline'));
+	document.querySelectorAll('.sort-btn use').forEach(icon => icon.setAttribute('xlink:href', newIcon.replace('-fill', '')));
 	event.target.classList.remove('outline');
+	event.target.querySelector('use').setAttribute('xlink:href', newIcon);
 	renderTasks();
 }
 
-// ADD/EDIT TASK ------------------------------------------------------------------
+// ADD/EDIT TASK --------------------------------------------------------------
 
-// Populate tags in edit task form
 function populateTags() {
-	let tags = {
-		projects: { regex: projectRegex, list: [], classes: 'background-primary mr-xs mb-xs' },
-		contexts: { regex: contextRegex, list: [], classes: 'mr-xs mb-xs' }
+	const tags = {
+		projects: { regex: regex.project, container: DOM.editProjects, classes: 'background-primary mr-xs mb-xs' },
+		contexts: { regex: regex.context, container: DOM.editContexts, classes: 'mr-xs mb-xs' },
 	};
-	for (const tag in tags) {
-		const tagParent = document.getElementById(`edit-${tag}`);
-		tagParent.querySelector('span').innerHTML = '';
-		tagParent.querySelector('i').classList.remove('hide');
-		tags[tag].list = editDescription.value.match(tags[tag].regex);
-		if (tags[tag].list && tags[tag].list.length) {
-			tagParent.querySelector('i').classList.add('hide');
-			tags[tag].list.forEach((t) => {
-				const badge = document.createElement('kbd');
-				badge.className = tags[tag].classes;
-				badge.innerHTML = `${t}
-					<b class="pointer" onclick="deleteTag(event)">
-						<svg width="1em" height="1em">
-							<use xlink:href="#icon-x"/>
-						</svg>
-					</b>`;
-				tagParent.querySelector('span').appendChild(badge);
-			});
-		}
-	}
+
+	Object.values(tags).forEach(({ regex, container, classes }) => {
+		const span = container.querySelector('span');
+		const icon = container.querySelector('i');
+		span.innerHTML = '';
+		icon.classList.toggle('hide', !!DOM.editDescription.value.match(regex));
+		(DOM.editDescription.value.match(regex) || []).forEach(tag => {
+			span.insertAdjacentHTML('beforeend', `
+				<kbd class="${classes}">${tag}<b class="pointer" onclick="deleteTag(event)">
+					<svg width="1em" height="1em"><use xlink:href="#icon-x"/></svg>
+				</b></kbd>
+			`);
+		});
+	});
 }
 
-// Delete tags in edit task form
 function deleteTag(event) {
-	event.preventDefault();
 	const target = event.currentTarget.parentNode;
-	setTimeout(() => {
-		editDescription.value = cleanString(editDescription.value.replace(target.textContent.trim(), ''));
-		populateTags();
-		target.remove();
-	}, 100);
+	DOM.editDescription.value = cleanString(DOM.editDescription.value.replace(target.textContent.trim(), ''));
+	populateTags();
+	target.remove();
 }
 
-// Add task
 function addTask() {
-	const hash = location.hash ? location.hash.slice(1) : '';
-	editForm.reset();
-	editTitle.textContent = `Add task`;
-	editId.value = '';
-	editDescription.value = hash && hash != 'tasks' ? ` +${hash}` : '';
-	editDescription.setSelectionRange(0, 0);
-	editDelete.classList.add('hide');
-	editSubmit.textContent = "Add";
+	const hash = location.hash.slice(1) || '';
+	DOM.editForm.reset();
+	DOM.editTitle.textContent = 'Add task';
+	DOM.editId.value = '';
+	DOM.editDescription.value = hash && hash !== 'tasks' ? ` +${hash}` : '';
+	DOM.editDescription.setSelectionRange(0, 0);
+	DOM.editDelete.classList.add('hide');
+	DOM.editSubmit.textContent = 'Add';
 	populateTags();
 }
 
-// Edit task
 function editTask(id) {
 	const task = tasks.find(t => t.id === parseInt(id));
-	if (!task) return;
-	editForm.reset();
-	editTitle.textContent = `Edit task #${task.id}`;
-	editId.value = task.id;
-	editDescription.value = task.raw_description;
-	if (task.priority) editPriorityDefault.selected = false;
-	editPriority.querySelectorAll('option').forEach((o) =>
-		o.value == task.priority ? o.selected = true : o.selected = false
-	);
-	editComplete.checked = task.complete;
-	editDelete.dataset.id = task.id;
-	editDelete.classList.remove('hide');
-	editSubmit.textContent = "Save";
+ if (!task) return;
+	DOM.editForm.reset();
+	DOM.editTitle.textContent = `Edit task #${task.id}`;
+	DOM.editId.value = task.id;
+	DOM.editDescription.value = task.raw_description;
+	DOM.editPriority.value = task.priority || '--';
+	DOM.editComplete.checked = task.complete;
+	DOM.editDelete.dataset.id = task.id;
+	DOM.editDelete.classList.remove('hide');
+	DOM.editSubmit.textContent = 'Save';
 	populateTags();
 }
 
-// Save edited task
-if (editForm) {
-	editForm.addEventListener('submit', async (e) => {
+if (DOM.editForm) {
+	DOM.editForm.addEventListener('submit', async e => {
 		e.preventDefault();
-		editError.classList.add('hide');
-		const id = parseInt(editId.value ? editId.value : 0);
+		DOM.editError.classList.add('hide');
+		const id = parseInt(DOM.editId.value || 0);
 		try {
-			let task = null;
-			if (id) {
-				task = tasks.find(t => t.id === id);
-				if (!task) throw new Error(`Task #${id} does not exist`);
-			}
-
-			const description = editDescription.value.trim();
-			let priority = editPriority.value;
-			if (priority === '--') priority = null;
-			const complete = editComplete.checked;
-
-			const body = JSON.stringify({ description, priority, complete });
-			let endpoint = '';
-			let method = '';
-			if (task) {
-				endpoint = `/edit/${id}`;
-				method = 'PUT';
-			} else {
-				endpoint = '/add';
-				method = 'POST';
-			}
+			const description = DOM.editDescription.value.trim();
+			const priority = DOM.editPriority.value === '--' ? null : DOM.editPriority.value;
+			const complete = DOM.editComplete.checked;
+			const endpoint = id ? `/edit/${id}` : '/add';
+			const method = id ? 'PUT' : 'POST';
 			const response = await fetch(endpoint, {
-				method: method,
+				method,
 				headers: { 'Content-Type': 'application/json' },
-				body: body
+				body: JSON.stringify({ description, priority, complete }),
 			});
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.description || 'Failed to update task');
-			}
-			// Update the local tasks array with the response data
-			const data = await response.json();
+			if (!response.ok) throw new Error((await response.json()).description || `Failed to ${id ? 'update' : 'add'} task`);
 			await fetchTasks();
 			if (visibleModal) closeModal(visibleModal);
-			renderTasks();
 		} catch (error) {
-			editError.textContent = error.message;
-			editError.classList.remove('hide');
+			DOM.editError.textContent = error.message;
+			DOM.editError.classList.remove('hide');
 		}
 	});
 }
 
-// Complete task
 async function completeTask(event) {
 	const id = parseInt(event.target.dataset.id);
 	const task = tasks.find(t => t.id === id);
 	if (!task) return;
-
-	const complete = event.target.checked;
-
 	try {
 		const response = await fetch(`/complete/${id}`, {
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ complete })
+			body: JSON.stringify({ complete: event.target.checked }),
 		});
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.description || 'Failed to complete task');
-		}
-		// Update the local tasks array with the response data
-		const data = await response.json();
-		const updatedTask = data.task;
-		const taskIndex = tasks.findIndex(t => t.id === id);
-		if (taskIndex !== -1) {
-			tasks[taskIndex] = updatedTask;
-		}
+		if (!response.ok) throw new Error((await response.json()).description || 'Failed to complete task');
+		tasks[tasks.findIndex(t => t.id === id)] = (await response.json()).task;
 		renderTasks();
 	} catch (error) {
 		alert('Error: ' + error.message);
@@ -546,14 +360,10 @@ async function completeTask(event) {
 	}
 }
 
-// Delete task
 async function deleteTask(event) {
-	const id = event.target.dataset.id;
 	if (!confirm('Are you sure you want to delete this task?')) return;
 	try {
-		const response = await fetch(`/delete/${id}`, {
-			method: 'DELETE'
-		});
+		const response = await fetch(`/delete/${event.target.dataset.id}`, { method: 'DELETE' });
 		if (!response.ok) throw new Error('Failed to delete task');
 		await fetchTasks();
 		if (visibleModal) closeModal(visibleModal);
@@ -564,164 +374,76 @@ async function deleteTask(event) {
 
 // AUTOCOMPLETE ---------------------------------------------------------------
 
-function filterTags(text, tag, char, reg, tags) {
-	const cursori = editDescription.selectionStart;
-	const cursorText = text.slice(0, cursori);
+function filterTags(text, char, reg, tags) {
+	const cursor = DOM.editDescription.selectionStart;
+	const cursorText = text.slice(0, cursor);
 	const index = cursorText.lastIndexOf(char);
-	const lastTag = index > 0 ? cursorText.slice(index) : '';
-	let fTags = [];
-	if (reg.test(lastTag)) {
-		const filtered = tags.filter(t =>
-			t.toLowerCase().startsWith(lastTag.slice(1).toLowerCase()));
-		filtered.forEach(f => fTags.push({
-			tag: `${char}${f}`,
-			start: index,
-			end: cursori,
-			char: char
-		}));
-	} else if (lastTag === char)
-		tags.forEach(t => fTags.push({
-			tag: `${char}${t}`,
-			start: index,
-			end: cursori,
-			char: char
-		}));
-	return fTags;
+	const lastTag = index >= 0 ? cursorText.slice(index) : '';
+	return (reg.test(lastTag) ? tags.filter(t => t.toLowerCase().startsWith(lastTag.slice(1).toLowerCase())) : lastTag === char ? tags : [])
+		.map(t => ({ tag: `${char}${t}`, start: index, end: cursor }));
 }
 
-if (editDescription) {
-	editDescription.addEventListener('input', (e) => {
+if (DOM.editDescription) {
+	DOM.editDescription.addEventListener('input', e => {
 		populateTags();
-		const autocomplete = document.getElementById('autocomplete');
-		const rawQuery = e.currentTarget.value;
-		const query = rawQuery.toLowerCase().trim();
-		if (query) {
-			const filteredProjects = filterTags(rawQuery, 'project', '+', projectRegexSingle, projects);
-			const filteredContexts = filterTags(rawQuery, 'context', '@', contextRegexSingle, contexts);
-			let filteredTags = [];
-			if (filteredProjects.length)
-				filteredProjects.forEach(p => filteredTags.push(p));
-			else if (filteredContexts.length)
-				filteredContexts.forEach(c => filteredTags.push(c));
-			const filteredTasks = tasks.filter(task =>
-				task.description.toLowerCase().includes(query)
-			);
-			if (filteredTags.length) {
-				autocomplete.innerHTML = '';
-				filteredTags.sort((a, b) => a.tag < b.tag ? -1 : 1);
-				filteredTags.forEach(t => {
-					const li = document.createElement('li');
-					li.textContent = t.tag;
-					li.dataset.tag = t.tag;
-					li.dataset.start = t.start;
-					li.dataset.end = t.end;
-					li.addEventListener('click', (e) => {
-						e.preventDefault();
-						setTimeout(() => {
-							autocomplete.classList.add('hide');
-							autocomplete.innerHTML = '';
-							editDescription.value =
-								editDescription.value.slice(0, t.start) +
-								t.tag + editDescription.value.slice(t.end);
-							const cursor = t.start + t.tag.length;
-							editDescription.setSelectionRange(cursor, cursor);
-							populateTags();
-						}, 100);
-					});
-					autocomplete.appendChild(li);
-				});
-				autocomplete.classList.remove('hide');
-			} else if (filteredTasks.length) {
-				autocomplete.innerHTML = '';
-				filteredTasks.sort((a, b) => a.description < b.description ? -1 : 1);
-				filteredTasks.forEach(task => {
-					const li = document.createElement('li');
-					li.textContent = task.raw_description;
-					li.dataset.id = task.id;
-					li.addEventListener('click', (e) => {
-						e.preventDefault();
-						setTimeout(() => {
-							autocomplete.classList.add('hide');
-							autocomplete.innerHTML = '';
-							editTask(e.target.dataset.id);
-						}, 100);
-					});
-					autocomplete.appendChild(li);
-				});
-				autocomplete.classList.remove('hide');
-			} else autocomplete.classList.add('hide');
-		} else autocomplete.classList.add('hide');
+		const query = e.currentTarget.value.toLowerCase().trim();
+		const filteredTags = [
+			...filterTags(e.currentTarget.value, '+', regex.projectSingle, projects),
+			...filterTags(e.currentTarget.value, '@', regex.contextSingle, contexts),
+		].sort((a, b) => a.tag.localeCompare(b.tag));
+		const filteredTasks = query ? tasks.filter(task => task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
+
+		DOM.autocomplete.innerHTML = (filteredTags.length || filteredTasks.length)
+			? [...filteredTags.map(t => `<li class="auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
+				 ...filteredTasks.map(t => `<li class="auto-tag" data-id="${t.id}">${t.raw_description}</li>`)].join('')
+			: '';
+		DOM.autocomplete.classList.toggle('hide', !filteredTags.length && !filteredTasks.length);
 	});
 
-	editDescription.addEventListener('keydown', (e) => {
-		const items = autocomplete.querySelectorAll('li');
-		if (items.length === 0) return;
-
-		let index = Array.from(items).findIndex(
-			item => item.classList.contains('selected')
-		);
-
-		if (e.key === 'ArrowDown') {
-			e.preventDefault();
-			if (index < items.length - 1) {
-				items[index]?.classList.remove('selected');
-				items[index + 1].classList.add('selected');
-				items[index + 1].scrollIntoView({ block: 'nearest' });
-			}
-		} else if (e.key === 'ArrowUp') {
-			e.preventDefault();
-			if (index > 0) {
-				items[index].classList.remove('selected');
-				items[index - 1].classList.add('selected');
-				items[index - 1].scrollIntoView({ block: 'nearest' });
-			}
-		} else if (e.key === 'Enter' && index >= 0) {
-			e.preventDefault();
-			autocomplete.classList.add('hide');
-			autocomplete.innerHTML = '';
-			if (items[index].dataset.id)
-				editTask(items[index].dataset.id);
-			else if (items[index].dataset.tag) {
-				editDescription.value =
-					editDescription.value.slice(0, items[index].dataset.start) +
-					items[index].dataset.tag +
-					editDescription.value.slice(items[index].dataset.end);
-				const cursor = parseInt(items[index].dataset.start) +
-					items[index].dataset.tag.length;
-				editDescription.setSelectionRange(cursor, cursor);
-				populateTags();
-			}
-		} else if (e.key === 'Tab' && index >= 0) {
-			e.preventDefault();
-			autocomplete.classList.add('hide');
-			autocomplete.innerHTML = '';
-			if (items[index].dataset.id)
-				editDescription.value = items[index].textContent;
-			else if (items[index].dataset.tag) {
-				editDescription.value =
-					editDescription.value.slice(0, items[index].dataset.start) +
-					items[index].dataset.tag +
-					editDescription.value.slice(items[index].dataset.end);
-				const cursor = parseInt(items[index].dataset.start) +
-					items[index].dataset.tag.length;
-				editDescription.setSelectionRange(cursor, cursor);
+	DOM.editDescription.addEventListener('keydown', e => {
+		e.preventDefault();
+		const items = DOM.autocomplete.querySelectorAll('li');
+		if (!items.length) return;
+		const index = Array.from(items).findIndex(item => item.classList.contains('selected'));
+		if (e.key === 'ArrowDown' && index < items.length - 1) {
+			items[index]?.classList.remove('selected');
+			items[index + 1].classList.add('selected');
+			items[index + 1].scrollIntoView({ block: 'nearest' });
+		} else if (e.key === 'ArrowUp' && index > 0) {
+			items[index].classList.remove('selected');
+			items[index - 1].classList.add('selected');
+			items[index - 1].scrollIntoView({ block: 'nearest' });
+		} else if ((e.key === 'Enter' || e.key === 'Tab') && index >= 0) {
+			const item = items[index];
+			DOM.autocomplete.classList.add('hide');
+			DOM.autocomplete.innerHTML = '';
+			if (item.dataset.id) {
+				if (e.key === 'Enter') editTask(item.dataset.id);
+				else DOM.editDescription.value = items[index].textContent;
+			} else {
+				DOM.editDescription.value = DOM.editDescription.value.slice(0, item.dataset.start) + item.dataset.tag + DOM.editDescription.value.slice(item.dataset.end);
+				DOM.editDescription.setSelectionRange(parseInt(item.dataset.start) + item.dataset.tag.length, parseInt(item.dataset.start) + item.dataset.tag.length);
 			}
 			populateTags();
 		}
 	});
 
-	autocomplete.addEventListener('mouseover', (e) => {
-		if (e.target.tagName === 'LI') {
-			autocomplete.querySelectorAll('li').forEach(
-				item => item.classList.remove('selected')
-			);
-			e.target.classList.add('selected');
+	DOM.autocomplete.addEventListener('click', e => {
+		if (e.target.tagName !== 'LI') return;
+		DOM.autocomplete.classList.add('hide');
+		DOM.autocomplete.innerHTML = '';
+		if (e.target.dataset.id) {
+			editTask(e.target.dataset.id);
+		} else {
+			DOM.editDescription.value = DOM.editDescription.value.slice(0, e.target.dataset.start) + e.target.dataset.tag + DOM.editDescription.value.slice(e.target.dataset.end);
+			DOM.editDescription.setSelectionRange(parseInt(e.target.dataset.start) + e.target.dataset.tag.length, parseInt(e.target.dataset.start) + e.target.dataset.tag.length);
+			populateTags();
 		}
 	});
 
-	document.addEventListener('click', (e) => {
-		if (!editDescription.contains(e.target) && !autocomplete.contains(e.target)) {
-			autocomplete.classList.add('hide');
+	document.addEventListener('click', e => {
+		if (!DOM.editDescription.contains(e.target) && !DOM.autocomplete.contains(e.target)) {
+			DOM.autocomplete.classList.add('hide');
 		}
 	});
 }
@@ -729,213 +451,150 @@ if (editDescription) {
 // ASIDE MENU -----------------------------------------------------------------
 
 function toggleAside() {
-	if (!aside) return;
-	aside.classList.toggle('open');
+	DOM.aside?.classList.toggle('open');
 }
 
-// Close with a click outside
-if (aside) {
-	aside.addEventListener("click", (event) => {
-		if (aside.classList.contains('open') && event.target == aside)
-			toggleAside();
+if (DOM.aside) {
+	DOM.aside.addEventListener('click', e => {
+		if (DOM.aside.classList.contains('open') && e.target === DOM.aside) toggleAside();
 	});
+}
+
+function openList() {
+	const hash = location.hash.slice(1) || '';
+	DOM.noList.classList.toggle('hide', !hash || document.getElementById(`list-${hash}`));
+	DOM.taskList.querySelectorAll('li').forEach(t => t.classList.remove('hide'));
+	DOM.listTitle.textContent = hash && document.getElementById(`list-${hash}`)
+		? document.getElementById(`list-${hash}`).dataset.title
+		: 'Tasks';
+	if (hash && hash !== 'tasks' && !document.getElementById(`list-${hash}`)) {
+		DOM.noList.querySelector('span').textContent = hash;
+		DOM.noList.classList.remove('hide');
+	} else if (hash) {
+		DOM.taskList.querySelectorAll('li').forEach(t => {
+			if (!t.classList.contains(`project-${hash}`)) t.classList.add('hide');
+		});
+	}
 }
 
 window.addEventListener('hashchange', openList);
 
-function openList() {
-	const hash = location.hash ? location.hash.slice(1) : '';
-	noList.classList.add('hide');
-	taskList.querySelectorAll('li').forEach((t) => t.classList.remove('hide'));
-	if (hash && document.getElementById(`list-${hash}`)) {
-		listTitle.textContent = document.getElementById(`list-${hash}`).dataset.title;
-		taskList.querySelectorAll('li').forEach((t) => {
-			if (!t.classList.contains(`project-${hash}`)) t.classList.add('hide');
-		});
-	} else if (hash && hash != 'tasks') {
-		noList.querySelector('span').textContent = hash;
-		noList.classList.remove('hide');
-		listTitle.textContent = "Tasks";
-	} else {
-		listTitle.textContent = "Tasks";
-	}
-}
-
 // SETTINGS -------------------------------------------------------------------
 
-function openSettings() {
-	settingsSortComplete.checked = settings["sort_complete"];
-	settingsLists.innerHTML = '';
-	if (settings["lists"]) for (let i = 0; i < settings["lists"].length; i++) {
-		settingsLists.appendChild(
-			createFieldset(
-				i + 1,
-				settings["lists"][i]["name"],
-				settings["lists"][i]["project"]
-			)
-		);
-	}
-	openModal(document.getElementById('settings-modal'));
-}
-
-// Fetch settings
 async function fetchSettings() {
 	try {
-		const response = await fetch("/settings");
+		const response = await fetch('/settings');
 		if (!response.ok) throw new Error('Failed to fetch settings');
 		settings = await response.json();
-		fetchTasks();
+		await fetchTasks();
 	} catch (error) {
 		console.error('Error loading settings:', error);
 	}
 }
 
-// Update settings
-if (settingsForm) {
-	settingsForm.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		let lists = [];
-		const sortComplete = settingsSortComplete.checked;
-		settingsForm.querySelectorAll('.settings-list').forEach((fieldset) => {
-			lists.push({
-				name: fieldset.querySelector('.settings-list-name').value,
-				project: fieldset.querySelector('.settings-list-project').value
-			});
-		});
-		settingsError.style.display = 'none';
+function openSettings() {
+	DOM.settingsSortComplete.checked = settings.sort_complete || false;
+	DOM.settingsLists.innerHTML = settings.lists?.map((list, i) => `
+		<fieldset id="settings-list-${i + 1}" class="grid settings-list">
+			<input class="settings-list-name" name="settings-list-${i + 1}-name" placeholder="List Name" value="${list.name}" required />
+			<input class="settings-list-project" name="settings-list-${i + 1}-project" placeholder="Project" value="${list.project}" required />
+			<button class="contrast" data-id="${i + 1}" type="button" onclick="deleteSettingsList(event)">
+				<svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg>
+			</button>
+		</fieldset>
+	`).join('') || '';
+	openModal(DOM.settingsModal);
+}
 
+if (DOM.settingsForm) {
+	DOM.settingsForm.addEventListener('submit', async e => {
+		e.preventDefault();
+		const lists = Array.from(DOM.settingsForm.querySelectorAll('.settings-list')).map(fieldset => ({
+			name: fieldset.querySelector('.settings-list-name').value,
+			project: fieldset.querySelector('.settings-list-project').value,
+		}));
+		DOM.settingsError.style.display = 'none';
 		try {
-			const response = await fetch("/settings", {
+			const response = await fetch('/settings', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					lists: lists,
-					sort_complete: sortComplete
-				})
+				body: JSON.stringify({ lists, sort_complete: DOM.settingsSortComplete.checked }),
 			});
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.description || 'Failed to update settings');
-			}
+			if (!response.ok) throw new Error((await response.json()).description || 'Failed to update settings');
 			settings = await response.json();
 			renderTasks();
 			if (visibleModal) closeModal(visibleModal);
 		} catch (error) {
-			settingsError.textContent = error.message;
-			settingsError.style.display = 'block';
+			DOM.settingsError.textContent = error.message;
+			DOM.settingsError.style.display = 'block';
 		}
 	});
 }
 
-function createFieldset(fieldsetId, fieldsetName='', fieldsetProject='') {
-	const fieldset = document.createElement('fieldset');
-	fieldset.id = `settings-list-${fieldsetId}`;
-	fieldset.classList.add('grid', 'settings-list');
-	fieldset.innerHTML = `
-		<input class="settings-list-name"
-			name="settings-list-${fieldsetId}-name"
-			placeholder="List Name"
-			value="${fieldsetName}"
-			required />
-		<input class="settings-list-project"
-			name="settings-list-${fieldsetId}-project"
-			placeholder="Project"
-			value="${fieldsetProject}"
-			required />
-		<button class="contrast"
-			data-id="${fieldsetId}"
-			type="button"
-			onclick="deleteSettingsList(event)">
-			<svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg>
-		</button>
-	`;
-	return fieldset;
-}
-
 function addSettingsList(event) {
 	event.preventDefault();
-	settingsLists.appendChild(createFieldset(settingsLists.children.length + 1));
+	DOM.settingsLists.insertAdjacentHTML('beforeend', `
+		<fieldset id="settings-list-${DOM.settingsLists.children.length + 1}" class="grid settings-list">
+			<input class="settings-list-name" name="settings-list-${DOM.settingsLists.children.length + 1}-name" placeholder="List Name" required />
+			<input class="settings-list-project" name="settings-list-${DOM.settingsLists.children.length + 1}-project" placeholder="Project" required />
+			<button class="contrast" data-id="${DOM.settingsLists.children.length + 1}" type="button" onclick="deleteSettingsList(event)">
+				<svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg>
+			</button>
+		</fieldset>
+	`);
 }
 
 function deleteSettingsList(event) {
 	event.preventDefault();
-	const fieldset =
-		document.getElementById(`settings-list-${event.target.dataset.id}`);
+	const fieldset = document.getElementById(`settings-list-${event.target.dataset.id}`);
 	fieldset.classList.add('hide');
 	setTimeout(() => {
 		fieldset.remove();
-		const fieldsets = document.querySelectorAll('settings-list');
-		for (let i = 0; i < fieldsets.length; i++) {
-			fieldsets[i].id = `settings-list-${i + 1}`;
-			fieldsets[i].querySelector('settings-list-name').id = `settings-list-${i + 1}-name`;
-			fieldsets[i].querySelector('settings-list-project').id = `settings-list-${i + 1}-project`;
-		}
+		Array.from(document.querySelectorAll('.settings-list')).forEach((fs, i) => {
+			fs.id = `settings-list-${i + 1}`;
+			fs.querySelector('.settings-list-name').name = `settings-list-${i + 1}-name`;
+			fs.querySelector('.settings-list-project').name = `settings-list-${i + 1}-project`;
+			fs.querySelector('button').dataset.id = i + 1;
+		});
 	}, 100);
 }
 
 // DELETE DONE ----------------------------------------------------------------
 
-function createLabel(inputName, inputProject) {
-	const label = document.createElement('label');
-	label.innerHTML = `
-		<input class="delete-switch"
-			type="checkbox"
-			role="switch"
-			data-project="${inputProject}" />
-		${inputName}
-	`;
-	return label;
-}
-
 function openDelete() {
-	deleteLists.innerHTML = '';
-	if (settings["lists"] && settings["lists"].length > 0) {
-		deleteLists.appendChild(createLabel("Tasks", "tasks"));
-		for (let i = 0; i < settings["lists"].length; i++) {
-			deleteLists.appendChild(createLabel(
-				settings["lists"][i]['name'],
-				settings["lists"][i]['project']
-			));
-		}
-	}
-	openModal(document.getElementById('delete-modal'));
+	DOM.deleteLists.innerHTML = (settings.lists?.length ? [{ name: 'Tasks', project: 'tasks' }, ...settings.lists] : [])
+		.map(list => `
+			<label>
+				<input class="delete-switch" type="checkbox" role="switch" data-project="${list.project}" />
+				${list.name}
+			</label>
+		`).join('');
+	openModal(DOM.deleteModal);
 }
 
-if (deleteForm) deleteForm.addEventListener('submit', async (e) => {
-	e.preventDefault();
-	let deleteList = [];
-	const deleteSwitches = deleteForm.querySelectorAll('.delete-switch');
-	if (deleteSwitches.length > 0) deleteSwitches.forEach((input) => {
-		if (input.checked) tasks.forEach((task) => {
-			if (task.projects.includes(input.dataset.project) && task.complete)
-				deleteList.push(task.id);
-		});
-	});
-	else tasks.forEach((task) => task.complete && deleteList.push(task.id));
-	deleteError.style.display = 'none';
-
-	if (deleteList.length < 1) return;
-
-	try {
-		const response = await fetch("/delete-multiple", {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(deleteList)
-		});
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.description || 'Failed to delete tasks');
+if (DOM.deleteForm) {
+	DOM.deleteForm.addEventListener('submit', async e => {
+		e.preventDefault();
+		const deleteList = Array.from(DOM.deleteForm.querySelectorAll('.delete-switch:checked'))
+			.flatMap(input => tasks.filter(task => task.complete && task.projects.includes(input.dataset.project)).map(task => task.id));
+		if (!deleteList.length) return;
+		DOM.deleteError.style.display = 'none';
+		try {
+			const response = await fetch('/delete-multiple', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(deleteList),
+			});
+			if (!response.ok) throw new Error((await response.json()).description || 'Failed to delete tasks');
+			await fetchTasks();
+			if (visibleModal) closeModal(visibleModal);
+		} catch (error) {
+			DOM.deleteError.textContent = error.message;
+			DOM.deleteError.style.display = 'block';
 		}
-		await fetchTasks();
-		if (visibleModal) closeModal(visibleModal);
-	} catch (error) {
-		deleteError.textContent = error.message;
-		deleteError.style.display = 'block';
-	}
-});
+	});
+}
 
 // MAIN -----------------------------------------------------------------------
 
-if (taskList) {
-	fetchSettings();
-}
+if (DOM.taskList) fetchSettings();
