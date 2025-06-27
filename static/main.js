@@ -386,7 +386,7 @@ function filterTags(text, char, reg, tags) {
 if (DOM.editDescription) {
 	DOM.editDescription.addEventListener('input', e => {
 		populateTags();
-		const query = e.currentTarget.value.toLowerCase().trim();
+		const query = cleanString(e.currentTarget.value.toLowerCase()).replace(regex.project, '').replace(regex.context, '').trim();
 		const filteredTags = [
 			...filterTags(e.currentTarget.value, '+', regex.projectSingle, projects),
 			...filterTags(e.currentTarget.value, '@', regex.contextSingle, contexts),
