@@ -464,7 +464,7 @@ if (DOM.aside) {
 
 function openList() {
 	const hash = location.hash.slice(1) || '';
-	DOM.noList.classList.toggle('hide', !hash || document.getElementById(`list-${hash}`));
+	DOM.noList.classList.toggle('hide', !hash || document.getElementById(`list-${hash}`) || hash === 'tasks');
 	DOM.taskList.querySelectorAll('li').forEach(t => t.classList.remove('hide'));
 	DOM.listTitle.textContent = hash && document.getElementById(`list-${hash}`)
 		? document.getElementById(`list-${hash}`).dataset.title
@@ -472,7 +472,7 @@ function openList() {
 	if (hash && hash !== 'tasks' && !document.getElementById(`list-${hash}`)) {
 		DOM.noList.querySelector('span').textContent = hash;
 		DOM.noList.classList.remove('hide');
-	} else if (hash) {
+	} else if (hash && hash !== 'tasks') {
 		DOM.taskList.querySelectorAll('li').forEach(t => {
 			if (!t.classList.contains(`project-${hash}`)) t.classList.add('hide');
 		});
