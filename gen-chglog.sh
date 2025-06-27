@@ -8,7 +8,6 @@ else
 	TAG_FILE=.chglog/current-tag.md
 
 	echo "Updating version info in README.md and app.py to $1"
-	# sed -i "1s/.*/const version = '$1';/" sw.js
 	sed -i "10s/.*/VERSION = '$1'/" app.py
 	sed -i "3s/.*/> $1/" README.md
 
