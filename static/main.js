@@ -565,15 +565,27 @@ async function deleteTask(event) {
 // AUTOCOMPLETE ---------------------------------------------------------------
 
 function filterTags(text, tag, char, reg, tags) {
-	const index = text.lastIndexOf(char);
-	const lastTag = index > 0 ? text.slice(index) : '';
+	const cursori = editDescription.selectionStart;
+	const cursorText = text.slice(0, cursori);
+	const index = cursorText.lastIndexOf(char);
+	const lastTag = index > 0 ? cursorText.slice(index) : '';
 	let fTags = [];
 	if (reg.test(lastTag)) {
 		const filtered = tags.filter(t =>
 			t.toLowerCase().startsWith(lastTag.slice(1).toLowerCase()));
-		filtered.forEach(f => fTags.push({tag: `${char}${f}`, endi: index, char: char}));
+		filtered.forEach(f => fTags.push({
+			tag: `${char}${f}`,
+			start: index,
+			end: cursori,
+			char: char
+		}));
 	} else if (lastTag === char)
-		tags.forEach(t => fTags.push({tag: `${char}${t}`, endi: index, char: char}));
+		tags.forEach(t => fTags.push({
+			tag: `${char}${t}`,
+			start: index,
+			end: cursori,
+			char: char
+		}));
 	return fTags;
 }
 
@@ -600,15 +612,19 @@ if (editDescription) {
 				filteredTags.forEach(t => {
 					const li = document.createElement('li');
 					li.textContent = t.tag;
-					li.dataset.index = t.endi;
 					li.dataset.tag = t.tag;
+					li.dataset.start = t.start;
+					li.dataset.end = t.end;
 					li.addEventListener('click', (e) => {
 						e.preventDefault();
 						setTimeout(() => {
 							autocomplete.classList.add('hide');
 							autocomplete.innerHTML = '';
 							editDescription.value =
-								editDescription.value.slice(0, t.endi) + t.tag;
+								editDescription.value.slice(0, t.start) +
+								t.tag + editDescription.value.slice(t.end);
+							const cursor = t.start + t.tag.length;
+							editDescription.setSelectionRange(cursor, cursor);
 							populateTags();
 						}, 100);
 					});
@@ -665,10 +681,14 @@ if (editDescription) {
 			autocomplete.innerHTML = '';
 			if (items[index].dataset.id)
 				editTask(items[index].dataset.id);
-			else if (items[index].dataset.index) {
+			else if (items[index].dataset.tag) {
 				editDescription.value =
-					editDescription.value.slice(0, items[index].dataset.index) +
-						items[index].dataset.tag;
+					editDescription.value.slice(0, items[index].dataset.start) +
+					items[index].dataset.tag +
+					editDescription.value.slice(items[index].dataset.end);
+				const cursor = parseInt(items[index].dataset.start) +
+					items[index].dataset.tag.length;
+				editDescription.setSelectionRange(cursor, cursor);
 				populateTags();
 			}
 		} else if (e.key === 'Tab' && index >= 0) {
@@ -677,10 +697,15 @@ if (editDescription) {
 			autocomplete.innerHTML = '';
 			if (items[index].dataset.id)
 				editDescription.value = items[index].textContent;
-			else if (items[index].dataset.index)
+			else if (items[index].dataset.tag) {
 				editDescription.value =
-					editDescription.value.slice(0, items[index].dataset.index) +
-						items[index].dataset.tag;
+					editDescription.value.slice(0, items[index].dataset.start) +
+					items[index].dataset.tag +
+					editDescription.value.slice(items[index].dataset.end);
+				const cursor = parseInt(items[index].dataset.start) +
+					items[index].dataset.tag.length;
+				editDescription.setSelectionRange(cursor, cursor);
+			}
 			populateTags();
 		}
 	});
