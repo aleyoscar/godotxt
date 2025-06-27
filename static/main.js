@@ -401,19 +401,21 @@ if (DOM.editDescription) {
 	});
 
 	DOM.editDescription.addEventListener('keydown', e => {
-		e.preventDefault();
 		const items = DOM.autocomplete.querySelectorAll('li');
 		if (!items.length) return;
 		const index = Array.from(items).findIndex(item => item.classList.contains('selected'));
 		if (e.key === 'ArrowDown' && index < items.length - 1) {
+			e.preventDefault();
 			items[index]?.classList.remove('selected');
 			items[index + 1].classList.add('selected');
 			items[index + 1].scrollIntoView({ block: 'nearest' });
 		} else if (e.key === 'ArrowUp' && index > 0) {
+			e.preventDefault();
 			items[index].classList.remove('selected');
 			items[index - 1].classList.add('selected');
 			items[index - 1].scrollIntoView({ block: 'nearest' });
 		} else if ((e.key === 'Enter' || e.key === 'Tab') && index >= 0) {
+			e.preventDefault();
 			const item = items[index];
 			DOM.autocomplete.classList.add('hide');
 			DOM.autocomplete.innerHTML = '';
