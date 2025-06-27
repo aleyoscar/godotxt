@@ -1,6 +1,6 @@
 # Groc.txt
 
-> v0.1.0
+> v0.2.0
 
 Self-hosted web app for todo.txt lists
 
