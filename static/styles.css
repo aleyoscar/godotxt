@@ -7,8 +7,10 @@ ul { list-style-type: none; padding-left: 0; }
 ul li { list-style-type: none; }
 
 .align-center { align-items: center; }
+.background-primary { background-color: var(--pico-primary); }
 .border-round { border-radius: 50%; }
 .centered-card { margin: 0 auto; }
+.color-secondary { color: var(--pico-secondary); }
 .flex { display: flex; gap: var(--pico-spacing); }
 details.dropdown > summary + ul li a.flex { display: flex; }
 .flex-1 { flex: 1; }
@@ -24,8 +26,10 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .max-width-xs { max-width: 576px; }
 .min-width-xxs { min-width: 220px; }
 .mb-0 { margin-bottom: 0; }
+.mb-md { margin-bottom: var(--pico-spacing); }
 .mb-xs { margin-bottom: calc(var(--pico-spacing) / 3); }
 .ml-xs { margin-left: calc(var(--pico-spacing) / 3); }
+.mr-xs { margin-right: calc(var(--pico-spacing) / 3); }
 .muted-color { color: var(--pico-muted-color); }
 .overflow-auto {
 	-webkit-overflow-scrolling: touch;

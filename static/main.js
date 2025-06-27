@@ -7,6 +7,8 @@ const editError = document.getElementById('edit-error');
 const editTitle = document.getElementById('edit-title');
 const editId = document.getElementById('edit-id');
 const editDescription = document.getElementById('edit-description');
+const editProjects = document.getElementById('edit-projects');
+const editContexts = document.getElementById('edit-contexts');
 const editPriority = document.getElementById('edit-priority');
 const editPriorityDefault = document.getElementById('edit-priority-default');
 const editComplete = document.getElementById('edit-complete');
@@ -42,6 +44,9 @@ clearBtn.textContent = 'Clear';
 
 // GLOBALS --------------------------------------------------------------------
 
+const projectRegex = /\+[A-Za-z0-9_-]+/g;
+const contextRegex = /@[A-Za-z0-9_-]+/g;
+
 let tasks = [];
 let projects = [];
 let contexts = [];
@@ -72,6 +77,10 @@ function hideLoading(name) {
 	document.querySelectorAll('.loading').forEach((load) => load.classList.add('hide'));
 }
 
+function cleanString(text) {
+	return text.trim().replace(/\s+/g, " ");
+}
+
 // LIST -----------------------------------------------------------------------
 
 // Fetch tasks from API
@@ -92,8 +101,6 @@ async function fetchTasks() {
 
 // Parse task into html
 function parseTask(task) {
-	const projectRegex = /\+[A-Za-z0-9_-]+/g;
-	const contextRegex = /@[A-Za-z0-9_-]+/g;
 	let taskSub = '';
 	if (task.priority) taskSub = `<a>(${task.priority})</a>`;
 	let taskDates = '';
@@ -385,6 +392,45 @@ function sortTasks(event) {
 
 // ADD/EDIT TASK ------------------------------------------------------------------
 
+// Populate tags in edit task form
+function populateTags() {
+	let tags = {
+		projects: { regex: projectRegex, list: [], classes: 'background-primary mr-xs mb-xs' },
+		contexts: { regex: contextRegex, list: [], classes: 'mr-xs mb-xs' }
+	};
+	for (const tag in tags) {
+		const tagParent = document.getElementById(`edit-${tag}`);
+		tagParent.querySelector('span').innerHTML = '';
+		tagParent.querySelector('i').classList.remove('hide');
+		tags[tag].list = editDescription.value.match(tags[tag].regex);
+		if (tags[tag].list && tags[tag].list.length) {
+			tagParent.querySelector('i').classList.add('hide');
+			tags[tag].list.forEach((t) => {
+				const badge = document.createElement('kbd');
+				badge.className = tags[tag].classes;
+				badge.innerHTML = `${t}
+					<b class="pointer" onclick="deleteTag(event)">
+						<svg width="0.6em" height="0.6em">
+							<use xlink:href="#icon-x"/>
+						</svg>
+					</b>`;
+				tagParent.querySelector('span').appendChild(badge);
+			});
+		}
+	}
+}
+
+// Delete tags in edit task form
+function deleteTag(event) {
+	event.preventDefault();
+	const target = event.currentTarget.parentNode;
+	setTimeout(() => {
+		editDescription.value = cleanString(editDescription.value.replace(target.textContent.trim(), ''));
+		populateTags();
+		target.remove();
+	}, 100);
+}
+
 // Add task
 function addTask() {
 	editForm.reset();
@@ -410,6 +456,7 @@ function editTask(id) {
 	editDelete.dataset.id = task.id;
 	editDelete.classList.remove('hide');
 	editSubmit.textContent = "Save";
+	populateTags();
 }
 
 // Save edited task
@@ -512,6 +559,7 @@ async function deleteTask(event) {
 // AUTOCOMPLETE ---------------------------------------------------------------
 
 if (editDescription) editDescription.addEventListener('input', (e) => {
+	populateTags();
 	const autocomplete = document.getElementById('autocomplete');
 	const query = e.target.value.toLowerCase().trim();
 	if (query) {
