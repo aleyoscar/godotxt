@@ -46,6 +46,8 @@ clearBtn.textContent = 'Clear';
 
 const projectRegex = /\+[A-Za-z0-9_-]+/g;
 const contextRegex = /@[A-Za-z0-9_-]+/g;
+const projectRegexSingle = /^\+[A-Za-z0-9_-]+$/;
+const contextRegexSingle = /^@[A-Za-z0-9_-]+$/;
 
 let tasks = [];
 let projects = [];
@@ -410,7 +412,7 @@ function populateTags() {
 				badge.className = tags[tag].classes;
 				badge.innerHTML = `${t}
 					<b class="pointer" onclick="deleteTag(event)">
-						<svg width="0.6em" height="0.6em">
+						<svg width="1em" height="1em">
 							<use xlink:href="#icon-x"/>
 						</svg>
 					</b>`;
@@ -433,11 +435,15 @@ function deleteTag(event) {
 
 // Add task
 function addTask() {
+	const hash = location.hash ? location.hash.slice(1) : '';
 	editForm.reset();
 	editTitle.textContent = `Add task`;
 	editId.value = '';
+	editDescription.value = hash && hash != 'tasks' ? ` +${hash}` : '';
+	editDescription.setSelectionRange(0, 0);
 	editDelete.classList.add('hide');
 	editSubmit.textContent = "Add";
+	populateTags();
 }
 
 // Edit task
@@ -558,41 +564,85 @@ async function deleteTask(event) {
 
 // AUTOCOMPLETE ---------------------------------------------------------------
 
-if (editDescription) editDescription.addEventListener('input', (e) => {
-	populateTags();
-	const autocomplete = document.getElementById('autocomplete');
-	const query = e.target.value.toLowerCase().trim();
-	if (query) {
-		const filteredTasks = tasks.filter(task =>
-			task.raw_description.toLowerCase().includes(query)
-		);
-		if (filteredTasks.length) {
-			autocomplete.innerHTML = '';
-			filteredTasks.sort((a, b) => a.description < b.description ? -1 : 1);
-			filteredTasks.forEach(task => {
-				const li = document.createElement('li');
-				li.textContent = task.raw_description;
-				li.dataset.id = task.id;
-				li.addEventListener('click', (e) => {
-					e.preventDefault();
-					setTimeout(() => {
-						autocomplete.classList.add('hide');
-						autocomplete.innerHTML = '';
-						editTask(e.target.dataset.id);
-					}, 100);
+function filterTags(text, tag, char, reg, tags) {
+	const index = text.lastIndexOf(char);
+	const lastTag = index > 0 ? text.slice(index) : '';
+	let fTags = [];
+	if (reg.test(lastTag)) {
+		const filtered = tags.filter(t =>
+			t.toLowerCase().startsWith(lastTag.slice(1).toLowerCase()));
+		filtered.forEach(f => fTags.push({tag: `${char}${f}`, endi: index, char: char}));
+	} else if (lastTag === char)
+		tags.forEach(t => fTags.push({tag: `${char}${t}`, endi: index, char: char}));
+	return fTags;
+}
+
+if (editDescription) {
+	editDescription.addEventListener('input', (e) => {
+		populateTags();
+		const autocomplete = document.getElementById('autocomplete');
+		const rawQuery = e.currentTarget.value;
+		const query = rawQuery.toLowerCase().trim();
+		if (query) {
+			const filteredProjects = filterTags(rawQuery, 'project', '+', projectRegexSingle, projects);
+			const filteredContexts = filterTags(rawQuery, 'context', '@', contextRegexSingle, contexts);
+			let filteredTags = [];
+			if (filteredProjects.length)
+				filteredProjects.forEach(p => filteredTags.push(p));
+			else if (filteredContexts.length)
+				filteredContexts.forEach(c => filteredTags.push(c));
+			const filteredTasks = tasks.filter(task =>
+				task.description.toLowerCase().includes(query)
+			);
+			if (filteredTags.length) {
+				autocomplete.innerHTML = '';
+				filteredTags.sort((a, b) => a.tag < b.tag ? -1 : 1);
+				filteredTags.forEach(t => {
+					const li = document.createElement('li');
+					li.textContent = t.tag;
+					li.dataset.index = t.endi;
+					li.dataset.tag = t.tag;
+					li.addEventListener('click', (e) => {
+						e.preventDefault();
+						setTimeout(() => {
+							autocomplete.classList.add('hide');
+							autocomplete.innerHTML = '';
+							editDescription.value =
+								editDescription.value.slice(0, t.endi) + t.tag;
+							populateTags();
+						}, 100);
+					});
+					autocomplete.appendChild(li);
 				});
-				autocomplete.appendChild(li);
-			});
-			autocomplete.classList.remove('hide');
+				autocomplete.classList.remove('hide');
+			} else if (filteredTasks.length) {
+				autocomplete.innerHTML = '';
+				filteredTasks.sort((a, b) => a.description < b.description ? -1 : 1);
+				filteredTasks.forEach(task => {
+					const li = document.createElement('li');
+					li.textContent = task.raw_description;
+					li.dataset.id = task.id;
+					li.addEventListener('click', (e) => {
+						e.preventDefault();
+						setTimeout(() => {
+							autocomplete.classList.add('hide');
+							autocomplete.innerHTML = '';
+							editTask(e.target.dataset.id);
+						}, 100);
+					});
+					autocomplete.appendChild(li);
+				});
+				autocomplete.classList.remove('hide');
+			} else autocomplete.classList.add('hide');
 		} else autocomplete.classList.add('hide');
-	} else autocomplete.classList.add('hide');
+	});
 
 	editDescription.addEventListener('keydown', (e) => {
 		const items = autocomplete.querySelectorAll('li');
 		if (items.length === 0) return;
 
 		let index = Array.from(items).findIndex(
-			item =>item.classList.contains('selected')
+			item => item.classList.contains('selected')
 		);
 
 		if (e.key === 'ArrowDown') {
@@ -613,12 +663,25 @@ if (editDescription) editDescription.addEventListener('input', (e) => {
 			e.preventDefault();
 			autocomplete.classList.add('hide');
 			autocomplete.innerHTML = '';
-			editTask(items[index].dataset.id);
+			if (items[index].dataset.id)
+				editTask(items[index].dataset.id);
+			else if (items[index].dataset.index) {
+				editDescription.value =
+					editDescription.value.slice(0, items[index].dataset.index) +
+						items[index].dataset.tag;
+				populateTags();
+			}
 		} else if (e.key === 'Tab' && index >= 0) {
 			e.preventDefault();
-			editDescription.value = items[index].textContent;
 			autocomplete.classList.add('hide');
 			autocomplete.innerHTML = '';
+			if (items[index].dataset.id)
+				editDescription.value = items[index].textContent;
+			else if (items[index].dataset.index)
+				editDescription.value =
+					editDescription.value.slice(0, items[index].dataset.index) +
+						items[index].dataset.tag;
+			populateTags();
 		}
 	});
 
@@ -636,7 +699,7 @@ if (editDescription) editDescription.addEventListener('input', (e) => {
 			autocomplete.classList.add('hide');
 		}
 	});
-});
+}
 
 // ASIDE MENU -----------------------------------------------------------------
 
