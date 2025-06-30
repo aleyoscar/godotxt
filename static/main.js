@@ -28,6 +28,7 @@ const DOM = {
 	settingsSortComplete: document.getElementById('settings-sort-complete'),
 	settingsListsAdd: document.getElementById('settings-lists-add'),
 	settingsLists: document.getElementById('settings-lists'),
+	settingsModal: document.getElementById('settings-modal'),
 	deleteForm: document.getElementById('delete-form'),
 	deleteError: document.getElementById('delete-error'),
 	deleteLists: document.getElementById('delete-lists'),
