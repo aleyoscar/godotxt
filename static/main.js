@@ -303,7 +303,8 @@ function addTask() {
 
 function editTask(id) {
 	const task = tasks.find(t => t.id === parseInt(id));
- if (!task) return;
+	if (!task) return;
+	DOM.autocomplete.classList.add('hide');
 	DOM.editForm.reset();
 	DOM.editTitle.textContent = `Edit task #${task.id}`;
 	DOM.editId.value = task.id;
