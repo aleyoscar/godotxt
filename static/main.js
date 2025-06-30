@@ -194,6 +194,11 @@ function clearAttributeFilters() {
 	DOM.contextsBtn.classList.add('outline');
 }
 
+function clearAttributeInputs(event) {
+	event.currentTarget.parentNode.parentNode.querySelectorAll('input')
+		.forEach(i => i.checked = false);
+}
+
 function selectAttribute(event) {
 	event.stopPropagation();
 	event.preventDefault();
