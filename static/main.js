@@ -313,6 +313,8 @@ function editTask(id) {
 	DOM.editDelete.dataset.id = task.id;
 	DOM.editDelete.classList.remove('hide');
 	DOM.editSubmit.textContent = 'Save';
+	DOM.editDescription.focus();
+	DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 	populateTags();
 }
 
@@ -424,6 +426,8 @@ if (DOM.editDescription) {
 			if (item.dataset.id) {
 				if (e.key === 'Enter') editTask(item.dataset.id);
 				else DOM.editDescription.value = items[index].textContent;
+				DOM.editDescription.focus();
+				DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 			} else {
 				DOM.editDescription.value = DOM.editDescription.value.slice(0, item.dataset.start) + item.dataset.tag + DOM.editDescription.value.slice(item.dataset.end);
 				DOM.editDescription.setSelectionRange(parseInt(item.dataset.start) + item.dataset.tag.length, parseInt(item.dataset.start) + item.dataset.tag.length);
@@ -438,6 +442,8 @@ if (DOM.editDescription) {
 		DOM.autocomplete.innerHTML = '';
 		if (e.target.dataset.id) {
 			DOM.editDescription.value = e.target.textContent;
+			DOM.editDescription.focus();
+			DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 		} else {
 			DOM.editDescription.value = DOM.editDescription.value.slice(0, e.target.dataset.start) + e.target.dataset.tag + DOM.editDescription.value.slice(e.target.dataset.end);
 			DOM.editDescription.setSelectionRange(parseInt(e.target.dataset.start) + e.target.dataset.tag.length, parseInt(e.target.dataset.start) + e.target.dataset.tag.length);
