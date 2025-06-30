@@ -125,8 +125,8 @@ function renderTasks() {
 	// Update aside menu
 	const listUl = DOM.aside?.querySelector('ul');
 	if (listUl) {
-		DOM.logo.classList.toggle('hide-sm', settings.lists?.length > 0);
-		DOM.logo.nextElementSibling.classList.toggle('hide', settings.lists?.length > 0);
+		DOM.logo.classList.toggle('hide-sm', settings.lists?.length);
+		DOM.logo.nextElementSibling.classList.toggle('hide', !settings.lists?.length);
 		DOM.aside.classList.toggle('hide', !settings.lists?.length);
 		while (listUl.children.length > 1) listUl.lastElementChild.remove();
 		settings.lists?.forEach(list => {
