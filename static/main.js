@@ -57,8 +57,7 @@ const regex = {
 };
 
 let tasks = [];
-let projects = [];
-let contexts = [];
+let tags = { projects: [], contexts: [] };
 let sortBy = 'description';
 let sortAscending = true;
 let filterSearch = '';
@@ -141,8 +140,8 @@ function renderTasks() {
 	}
 
 	// Populate project & context dropdowns
-	projects = [...new Set(tasks.flatMap(task => task.projects))];
-	contexts = [...new Set(tasks.flatMap(task => task.contexts))];
+	tags.projects = [...new Set(tasks.flatMap(task => task.projects))];
+	tags.contexts = [...new Set(tasks.flatMap(task => task.contexts))];
 	const updateModal = (modal, btn, items, attribute, checkedItems) => {
 		modal.querySelector('ul').innerHTML = items.length
 			? items.map(item => `
@@ -155,8 +154,8 @@ function renderTasks() {
 		btn.toggleAttribute('disabled', !items.length);
 		btn.classList.toggle('secondary', !items.length);
 	};
-	updateModal(DOM.projectsModal, DOM.projectsBtn, projects, 'projects', filterProjects);
-	updateModal(DOM.contextsModal, DOM.contextsBtn, contexts, 'contexts', filterContexts);
+	updateModal(DOM.projectsModal, DOM.projectsBtn, tags.projects, 'projects', filterProjects);
+	updateModal(DOM.contextsModal, DOM.contextsBtn, tags.contexts, 'contexts', filterContexts);
 
 	// Filter and sort tasks
 	const filteredTasks = tasks
@@ -270,12 +269,12 @@ function sortTasks(event) {
 // ADD/EDIT TASK --------------------------------------------------------------
 
 function populateTags() {
-	const tags = {
+	const taskTags = {
 		projects: { regex: regex.project, container: DOM.editProjects, classes: 'background-primary mr-xs mb-xs' },
 		contexts: { regex: regex.context, container: DOM.editContexts, classes: 'mr-xs mb-xs' },
 	};
 
-	Object.values(tags).forEach(({ regex, container, classes }) => {
+	Object.values(taskTags).forEach(({ regex, container, classes }) => {
 		const span = container.querySelector('span');
 		const icon = container.querySelector('i');
 		span.innerHTML = '';
@@ -386,12 +385,12 @@ async function deleteTask(event) {
 
 // AUTOCOMPLETE ---------------------------------------------------------------
 
-function filterTags(text, char, reg, tags) {
+function filterTags(text, char, reg, taskTags) {
 	const cursor = DOM.editDescription.selectionStart;
 	const cursorText = text.slice(0, cursor);
 	const index = cursorText.lastIndexOf(char);
 	const lastTag = index >= 0 ? cursorText.slice(index) : '';
-	return (reg.test(lastTag) ? tags.filter(t => t.toLowerCase().startsWith(lastTag.slice(1).toLowerCase())) : lastTag === char ? tags : [])
+	return (reg.test(lastTag) ? taskTags.filter(t => t.toLowerCase().startsWith(lastTag.slice(1).toLowerCase())) : lastTag === char ? taskTags : [])
 		.map(t => ({ tag: `${char}${t}`, start: index, end: cursor }));
 }
 
@@ -400,8 +399,8 @@ if (DOM.editDescription) {
 		populateTags();
 		const query = cleanString(e.currentTarget.value.toLowerCase()).replace(regex.project, '').replace(regex.context, '').trim();
 		const filteredTags = [
-			...filterTags(e.currentTarget.value, '+', regex.projectSingle, projects),
-			...filterTags(e.currentTarget.value, '@', regex.contextSingle, contexts),
+			...filterTags(e.currentTarget.value, '+', regex.projectSingle, tags.projects),
+			...filterTags(e.currentTarget.value, '@', regex.contextSingle, tags.contexts),
 		].sort((a, b) => a.tag.localeCompare(b.tag));
 		const currentTaskId = parseInt(DOM.editId.value) || 0;
 		const filteredTasks = query ? tasks.filter(task => task.id !== currentTaskId && task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
