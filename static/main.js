@@ -58,12 +58,14 @@ const regex = {
 
 let tasks = [];
 let tags = { projects: [], contexts: [] };
+let priorities = [];
 let sortBy = 'description';
 let sortAscending = true;
 let filterSearch = '';
 let filterComplete = true;
 let filterProjects = [];
 let filterContexts = [];
+let group = 'none';
 let settings = {};
 
 // HELPERS --------------------------------------------------------------------
@@ -140,8 +142,9 @@ function renderTasks() {
 	}
 
 	// Populate project & context dropdowns
-	tags.projects = [...new Set(tasks.flatMap(task => task.projects))];
-	tags.contexts = [...new Set(tasks.flatMap(task => task.contexts))];
+	tags.projects = [...new Set(tasks.flatMap(task => task.projects))].sort();
+	tags.contexts = [...new Set(tasks.flatMap(task => task.contexts))].sort();
+	priorities = [...new Set(tasks.flatMap(task => task.priority))].sort();
 	const updateModal = (modal, btn, items, attribute, checkedItems) => {
 		modal.querySelector('ul').innerHTML = items.length
 			? items.map(item => `
@@ -172,12 +175,36 @@ function renderTasks() {
 		})
 		.sort((a, b) => settings.sort_complete ? (a.complete && !b.complete ? 1 : -1) : 0);
 
-	// Render tasks
-	DOM.taskList.querySelector('ul').innerHTML = filteredTasks.map(task => `
-		<li id="task-${task.id}" class="flex align-center hover-background padding-xs show-hover-parent ${task.projects.map(p => `project-${p}`).join(' ')} ${task.contexts.map(c => `context-${c}`).join(' ')}">
-			${parseTask(task)}
-		</li>
-	`).join('');
+	for (let i = 0; i < filteredTasks.length; i++) {
+		filteredTasks[i].html = `
+			<li id="task-${filteredTasks[i].id}" class="flex align-center hover-background padding-xs show-hover-parent ${filteredTasks[i].projects.map(p => `project-${p}`).join(' ')} ${filteredTasks[i].contexts.map(c => `context-${c}`).join(' ')}">
+				${parseTask(filteredTasks[i])}
+			</li>
+		`;
+	}
+
+	DOM.taskList.querySelector('ul').innerHTML = '';
+	switch(group) {
+		case 'project':
+		case 'context':
+			const prefix = group === 'project' ? '+' : '@';
+			tags[group + 's'].forEach(tag => {
+				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>${prefix}${tag}</h5></li><li class="group"><hr></li>`;
+				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task[group + 's'].includes(tag) ? task.html : '').join('');
+			});
+			break;
+		case 'priority':
+			priorities.forEach(priority => {
+				if (priority) {
+					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>Priority '${priority}'</h5></li><li class="group"><hr></li>`;
+					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.priority === priority ? task.html : '').join('');
+				}
+			});
+			break;
+		default:
+			// Render tasks
+			DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.html).join('');
+	}
 
 	// Update showAll button visibility
 	if (DOM.showAll) {
@@ -489,9 +516,7 @@ function openList() {
 		DOM.noList.querySelector('span').textContent = hash;
 		DOM.noList.classList.remove('hide');
 	} else if (hash && hash !== 'tasks') {
-		DOM.taskList.querySelectorAll('li').forEach(t => {
-			if (!t.classList.contains(`project-${hash}`)) t.classList.add('hide');
-		});
+		DOM.taskList.querySelectorAll('li').forEach(t => t.classList.toggle('hide', !t.classList.contains(`project-${hash}`) && !t.classList.contains('group')));
 	}
 }
 
@@ -611,6 +636,20 @@ if (DOM.deleteForm) {
 			DOM.deleteError.style.display = 'block';
 		}
 	});
+}
+
+// GROUP ----------------------------------------------------------------------
+
+function groupBy(type) {
+	group = group === type ? 'none' : type;
+	const newIcon = group === 'none' ? '#icon-group' : '#icon-group-fill';
+	DOM.groupClearBtn.classList.toggle('hide', group === 'none');
+	DOM.groupBtn.classList.toggle('outline', group === 'none');
+	DOM.groupBtn.querySelector('use').setAttribute('xlink:href', newIcon);
+	Array.from(DOM.groupBtns.children).forEach((btn) => {
+		btn.classList.toggle('outline', !btn.id.includes(group));
+	});
+	renderTasks();
 }
 
 // MAIN -----------------------------------------------------------------------

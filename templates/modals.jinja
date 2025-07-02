@@ -108,6 +108,50 @@
 		</footer>
 	</article>
 </dialog>
+<dialog id="group-modal">
+	<article>
+		<header>
+			<button aria-label="Close"
+				rel="prev"
+				data-target="group-modal"
+				onclick="toggleModal(event);">
+			</button>
+			<h3>Group By</h3>
+		</header>
+		<div id="group-btns" class="grid">
+			<button id="group-priority"
+				class="outline"
+				data-target="group-modal"
+				onclick="groupBy('priority'); toggleModal(event);">
+				Priority
+			</button>
+			<button id="group-project"
+				class="outline"
+				data-target="group-modal"
+				onclick="groupBy('project'); toggleModal(event);">
+				Project
+			</button>
+			<button id="group-context"
+				class="outline"
+				data-target="group-modal"
+				onclick="groupBy('context'); toggleModal(event);">
+				Context
+			</button>
+		</div>
+		<footer>
+			<button class="secondary"
+				data-target="group-modal"
+				onclick="toggleModal(event);">
+				Cancel
+			</button>
+			<button id="group-clear-btn" class="contrast hide"
+				data-target="group-modal"
+				onclick="groupBy('none'); toggleModal(event);">
+				Clear
+			</button>
+		</footer>
+	</article>
+</dialog>
 <dialog id="settings-modal">
 	<article>
 		<header>
