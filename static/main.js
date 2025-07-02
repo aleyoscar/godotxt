@@ -465,6 +465,7 @@ if (DOM.editDescription) {
 				DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 			} else {
 				DOM.editDescription.value = DOM.editDescription.value.slice(0, item.dataset.start) + item.dataset.tag + DOM.editDescription.value.slice(item.dataset.end);
+				DOM.editDescription.focus();
 				DOM.editDescription.setSelectionRange(parseInt(item.dataset.start) + item.dataset.tag.length, parseInt(item.dataset.start) + item.dataset.tag.length);
 			}
 			populateTags();
@@ -481,6 +482,7 @@ if (DOM.editDescription) {
 			DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 		} else {
 			DOM.editDescription.value = DOM.editDescription.value.slice(0, e.target.dataset.start) + e.target.dataset.tag + DOM.editDescription.value.slice(e.target.dataset.end);
+			DOM.editDescription.focus();
 			DOM.editDescription.setSelectionRange(parseInt(e.target.dataset.start) + e.target.dataset.tag.length, parseInt(e.target.dataset.start) + e.target.dataset.tag.length);
 		}
 		populateTags();
