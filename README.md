@@ -1,4 +1,4 @@
-# Groc.txt
+# GoDo.txt
 
 > v0.3.2
 
@@ -38,7 +38,7 @@ git clone https://github.com/aleyoscar/groctxt
 3. Navigate into the folder and copy `env.example` to `.env`
 
 ```
-cd groctxt
+cd godotxt
 cp env.example .env
 ```
 
