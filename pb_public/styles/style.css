@@ -9,8 +9,9 @@ ul li { list-style-type: none; }
 .align-center { align-items: center; }
 .background-primary { background-color: var(--pico-primary); }
 .border-round { border-radius: 50%; }
-.centered-card { margin: 0 auto; }
+.centered-card { margin: var(--pico-spacing) auto 0; }
 .color-secondary { color: var(--pico-secondary); }
+.error { color: var(--pico-del-color); border: 1px solid var(--pico-del-color); }
 .flex { display: flex; gap: var(--pico-spacing); }
 details.dropdown > summary + ul li a.flex { display: flex; }
 .flex-1 { flex: 1; }
@@ -24,6 +25,7 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .horizontal-scroll button { white-space: nowrap; flex: 0 0 auto; }
 .hover-background:hover { background: var(--pico-table-row-stripped-background-color); }
 .max-width-xs { max-width: 576px; }
+.message { padding: var(--pico-spacing); border-radius: var(--pico-border-radius); }
 .min-width-xxs { min-width: 220px; }
 .mb-0 { margin-bottom: 0; }
 .mb-md { margin-bottom: var(--pico-spacing); }

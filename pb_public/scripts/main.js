@@ -47,6 +47,8 @@ const clearBtn = Object.assign(document.createElement('button'), {
 	onclick: clearSearch,
 });
 
+const pb = new PocketBase();
+
 // GLOBALS --------------------------------------------------------------------
 
 const regex = {
@@ -67,6 +69,7 @@ let filterProjects = [];
 let filterContexts = [];
 let group = 'none';
 let settings = {};
+let authenticated = false;
 
 // HELPERS --------------------------------------------------------------------
 
@@ -526,16 +529,16 @@ window.addEventListener('hashchange', openList);
 
 // SETTINGS -------------------------------------------------------------------
 
-async function fetchSettings() {
-	try {
-		const response = await fetch('/settings');
-		if (!response.ok) throw new Error('Failed to fetch settings');
-		settings = await response.json();
-		await fetchTasks();
-	} catch (error) {
-		console.error('Error loading settings:', error);
-	}
-}
+// async function fetchSettings() {
+// 	try {
+// 		const response = await fetch('/settings');
+// 		if (!response.ok) throw new Error('Failed to fetch settings');
+// 		settings = await response.json();
+// 		await fetchTasks();
+// 	} catch (error) {
+// 		console.error('Error loading settings:', error);
+// 	}
+// }
 
 function openSettings() {
 	DOM.settingsSortComplete.checked = settings.sort_complete || false;
@@ -654,6 +657,66 @@ function groupBy(type) {
 	renderTasks();
 }
 
+// FORMS ----------------------------------------------------------------------
+
+document.querySelectorAll('.form').forEach(f => f.addEventListener('submit', submitForm));
+
+async function submitForm(e) {
+	e.preventDefault();
+	const form = e.target;
+	console.log(e.target);
+	console.log(form);
+	e.currentTarget.querySelector('.error').classList.add('hide');
+
+	const formData = new FormData(form);
+	form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'true');
+	try {
+		switch(form.id) {
+			case 'login-form':
+				const result = await pb.collection('users').authWithPassword(
+					formData.get('email'),
+					formData.get('password')
+				);
+				checkAuth();
+				form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
+				break;
+			default:
+				throw new Error(`Invalid form ${form.id}`);
+		}
+	} catch (error) {
+		form.querySelector('.error').textContent = error.message;
+		form.querySelector('.error').classList.remove('hide');
+		form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
+
+	}
+}
+
+// AUTHENTICATION -------------------------------------------------------------
+
+// Check if logged in
+async function checkAuth() {
+	const users = await pb.collection('usersCount').getOne(1);
+	if (users.total === 0) login(false);
+	else if (pb.authStore.isValid) login();
+	else logout();
+}
+
+function login(auth=true) {
+	authenticated = auth;
+	document.querySelectorAll('.logged-in').forEach(e => e.classList.remove('hide'));
+	document.querySelectorAll('.logged-out').forEach(e => e.classList.add('hide'));
+	document.querySelectorAll('.auth-required').forEach(e => e.classList.toggle('hide', !authenticated));
+	// document.querySelectorAll('.no-auth-required').forEach(e => e.classList.toggle('hide', authenticated));
+}
+
+function logout() {
+	pb.authStore.clear();
+	document.querySelectorAll('.logged-in').forEach(e => e.classList.add('hide'));
+	document.querySelectorAll('.logged-out').forEach(e => e.classList.remove('hide'));
+}
+
 // MAIN -----------------------------------------------------------------------
 
-if (DOM.taskList) fetchSettings();
+// if (DOM.taskList) fetchSettings();
+
+checkAuth();
