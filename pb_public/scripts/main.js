@@ -176,7 +176,7 @@ function renderTasks() {
 			const valB = sortBy === 'description' ? b.description : b[sortBy] || (sortBy === 'priority' ? 'ZZ' : '');
 			return sortAscending ? (valA < valB ? -1 : valA > valB ? 1 : 0) : (valA > valB ? -1 : valA < valB ? 1 : 0);
 		})
-		.sort((a, b) => settings.sort_complete ? (a.complete && !b.complete ? 1 : -1) : 0);
+		.sort((a, b) => settings.sortComplete ? (a.complete && !b.complete ? 1 : -1) : 0);
 
 	for (let i = 0; i < filteredTasks.length; i++) {
 		filteredTasks[i].html = `
@@ -529,19 +529,26 @@ window.addEventListener('hashchange', openList);
 
 // SETTINGS -------------------------------------------------------------------
 
-// async function fetchSettings() {
-// 	try {
-// 		const response = await fetch('/settings');
-// 		if (!response.ok) throw new Error('Failed to fetch settings');
-// 		settings = await response.json();
-// 		await fetchTasks();
-// 	} catch (error) {
-// 		console.error('Error loading settings:', error);
-// 	}
-// }
+async function fetchSettings() {
+	try {
+		const recordId = pb.authStore.isValid ? pb.authStore.record.id : '';
+		const records = await pb.collection('settings').getFullList();
+		const myRecord = records.filter(r => r.userId === recordId);
+		settings = myRecord.length ? myRecord[0] : {
+			userId: recordId,
+			lists:[],
+			sortComplete: true
+		};
+		if (DEBUG) console.log(myRecord.length ? "Fetched settings" : "Created settings", settings);
+		state.newSettings = myRecord.length ? false : true;
+		// fetchTasks();
+	} catch (error) {
+		console.error('Error loading settings:', error);
+	}
+}
 
 function openSettings() {
-	DOM.settingsSortComplete.checked = settings.sort_complete || false;
+	DOM.settingsSortComplete.checked = settings.sortComplete || false;
 	DOM.settingsLists.innerHTML = settings.lists?.map((list, i) => `
 		<fieldset id="settings-list-${i + 1}" class="grid settings-list">
 			<input class="settings-list-name" name="settings-list-${i + 1}-name" placeholder="List Name" value="${list.name}" required />
@@ -552,31 +559,6 @@ function openSettings() {
 		</fieldset>
 	`).join('') || '';
 	openModal(DOM.settingsModal);
-}
-
-if (DOM.settingsForm) {
-	DOM.settingsForm.addEventListener('submit', async e => {
-		e.preventDefault();
-		const lists = Array.from(DOM.settingsForm.querySelectorAll('.settings-list')).map(fieldset => ({
-			name: fieldset.querySelector('.settings-list-name').value,
-			project: fieldset.querySelector('.settings-list-project').value,
-		}));
-		DOM.settingsError.style.display = 'none';
-		try {
-			const response = await fetch('/settings', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ lists, sort_complete: DOM.settingsSortComplete.checked }),
-			});
-			if (!response.ok) throw new Error((await response.json()).description || 'Failed to update settings');
-			settings = await response.json();
-			renderTasks();
-			if (visibleModal) closeModal(visibleModal);
-		} catch (error) {
-			DOM.settingsError.textContent = error.message;
-			DOM.settingsError.style.display = 'block';
-		}
-	});
 }
 
 function addSettingsList(event) {
@@ -664,8 +646,6 @@ document.querySelectorAll('.form').forEach(f => f.addEventListener('submit', sub
 async function submitForm(e) {
 	e.preventDefault();
 	const form = e.target;
-	console.log(e.target);
-	console.log(form);
 	e.currentTarget.querySelector('.error').classList.add('hide');
 
 	const formData = new FormData(form);
@@ -680,6 +660,24 @@ async function submitForm(e) {
 				checkAuth();
 				form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
 				break;
+			case 'settings-form':
+				settings.sortComplete = form.querySelector('#settings-sort-complete').checked;
+				settings.lists = [];
+				form.querySelectorAll('.settings-list').forEach(l => {
+					settings.lists.push({
+						name: l.querySelector('.settings-list-name').value,
+						project: l.querySelector('.settings-list-project').value
+					});
+				});
+				if (state.newSettings) {
+					const newSettings = await pb.collection('settings').create(settings);
+					settings = newSettings;
+					state.newSettings = false;
+				} else {
+					const settingsResponse = await pb.collection('settings').update(settings.id, settings);
+				}
+				// renderTasks();
+				break;
 			default:
 				throw new Error(`Invalid form ${form.id}`);
 		}
@@ -687,7 +685,6 @@ async function submitForm(e) {
 		form.querySelector('.error').textContent = error.message;
 		form.querySelector('.error').classList.remove('hide');
 		form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
-
 	}
 }
 
@@ -696,27 +693,33 @@ async function submitForm(e) {
 // Check if logged in
 async function checkAuth() {
 	const users = await pb.collection('usersCount').getOne(1);
-	if (users.total === 0) login(false);
-	else if (pb.authStore.isValid) login();
-	else logout();
+	if (users.total === 0 || pb.authStore.isValid) {
+		login(users.total > 0);
+		fetchSettings();
+	} else logout();
+	if (DEBUG) console.log(state);
 }
 
 function login(auth=true) {
-	authenticated = auth;
+	if (DEBUG) console.log("Logging in, authenticated: ", auth);
+	state.authenticated = auth;
+	state.loggedIn = true;
+	if (!state.authenticated) pb.authStore.clear();
 	document.querySelectorAll('.logged-in').forEach(e => e.classList.remove('hide'));
 	document.querySelectorAll('.logged-out').forEach(e => e.classList.add('hide'));
-	document.querySelectorAll('.auth-required').forEach(e => e.classList.toggle('hide', !authenticated));
+	document.querySelectorAll('.auth-required').forEach(e => e.classList.toggle('hide', !state.authenticated));
 	// document.querySelectorAll('.no-auth-required').forEach(e => e.classList.toggle('hide', authenticated));
 }
 
 function logout() {
+	if (DEBUG) console.log("Logging out");
 	pb.authStore.clear();
+	state.authenticated = false;
+	state.loggedIn = false;
 	document.querySelectorAll('.logged-in').forEach(e => e.classList.add('hide'));
 	document.querySelectorAll('.logged-out').forEach(e => e.classList.remove('hide'));
 }
 
 // MAIN -----------------------------------------------------------------------
-
-// if (DOM.taskList) fetchSettings();
 
 checkAuth();

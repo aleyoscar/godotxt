@@ -457,13 +457,13 @@
 				</button>
 				<h3>Settings</h3>
 			</header>
-			<form id="settings-form">
-				<p id="settings-error" class="error" style="dislay: none;"></p>
+			<form id="settings-form" class="form">
+				<p class="error message hide">There was an error updating your settings.</p>
 				<h5>General Settings</h5>
 				<hr>
 				<fieldset>
 					<label>
-						<input type="checkbox" id="settings-sort-complete"
+						<input type="checkbox" id="settings-sort-complete" name="settings-sort-complete"
 							role="switch"/>
 						Show completed tasks at the bottom
 					</label>
@@ -479,7 +479,7 @@
 					onclick="toggleModal(event)">
 					Cancel
 				</button>
-				<button form="settings-form">Save</button>
+				<button form="settings-form" class="form-submit">Save</button>
 			</footer>
 		</article>
 	</dialog>
