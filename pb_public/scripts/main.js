@@ -51,8 +51,6 @@ const pb = new PocketBase();
 
 // GLOBALS --------------------------------------------------------------------
 
-const DEBUG = true;
-
 const regex = {
 	project: /\+[A-Za-z0-9_-]+/g,
 	context: /@[A-Za-z0-9_-]+/g,
@@ -73,6 +71,7 @@ let group = 'none';
 let settings = {};
 let state = {
 	authenticated: false,
+	debug: true,
 	loggedIn: false,
 	newSettings: false
 }
@@ -89,6 +88,10 @@ const toggleLoading = (show) => {
 };
 
 const cleanString = (text) => text.trim().replace(/\s+/g, ' ');
+
+function debug(name, message, ...args) {
+	if (state.debug) console.log(`<<DEBUG>> [${name}]: ${message}`, ...args);
+}
 
 // LIST -----------------------------------------------------------------------
 
@@ -545,7 +548,7 @@ async function fetchSettings() {
 			lists:[],
 			sortComplete: true
 		};
-		if (DEBUG) console.log(myRecord.length ? "Fetched settings" : "Created settings", settings);
+		debug("fetchSettings", myRecord.length ? "Fetched settings" : "Created settings", settings);
 		state.newSettings = myRecord.length ? false : true;
 		// fetchTasks();
 	} catch (error) {
@@ -704,11 +707,11 @@ async function checkAuth() {
 		login(users.total > 0);
 		fetchSettings();
 	} else logout();
-	if (DEBUG) console.log(state);
+	debug("checkAuth", "State: ", state);
 }
 
 function login(auth=true) {
-	if (DEBUG) console.log("Logging in, authenticated: ", auth);
+	debug("login", "Logging in, authenticated: ", auth);
 	state.authenticated = auth;
 	state.loggedIn = true;
 	if (!state.authenticated) pb.authStore.clear();
@@ -719,7 +722,7 @@ function login(auth=true) {
 }
 
 function logout() {
-	if (DEBUG) console.log("Logging out");
+	debug("logout", "Logging out");
 	pb.authStore.clear();
 	state.authenticated = false;
 	state.loggedIn = false;
