@@ -71,7 +71,11 @@ let filterProjects = [];
 let filterContexts = [];
 let group = 'none';
 let settings = {};
-let authenticated = false;
+let state = {
+	authenticated: false,
+	loggedIn: false,
+	newSettings: false
+}
 
 // HELPERS --------------------------------------------------------------------
 
