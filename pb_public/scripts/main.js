@@ -51,6 +51,8 @@ const pb = new PocketBase();
 
 // GLOBALS --------------------------------------------------------------------
 
+const DEBUG = true;
+
 const regex = {
 	project: /\+[A-Za-z0-9_-]+/g,
 	context: /@[A-Za-z0-9_-]+/g,
