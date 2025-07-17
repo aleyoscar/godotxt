@@ -659,12 +659,11 @@ async function submitForm(e) {
 	try {
 		switch(form.id) {
 			case 'login-form':
-				const result = await pb.collection('users').authWithPassword(
+				const loginResponse = await pb.collection('users').authWithPassword(
 					formData.get('email'),
 					formData.get('password')
 				);
 				checkAuth();
-				form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
 				break;
 			case 'settings-form':
 				settings.sortComplete = form.querySelector('#settings-sort-complete').checked;
@@ -687,6 +686,8 @@ async function submitForm(e) {
 			default:
 				throw new Error(`Invalid form ${form.id}`);
 		}
+		if (visibleModal) closeModal(visibleModal);
+		form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
 	} catch (error) {
 		form.querySelector('.error').textContent = error.message;
 		form.querySelector('.error').classList.remove('hide');
