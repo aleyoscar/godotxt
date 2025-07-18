@@ -38,6 +38,7 @@ const DOM = {
 	settingsModal: document.getElementById('settings-modal'),
 	settingsSortComplete: document.getElementById('settings-sort-complete'),
 	showAll: document.getElementById('show-all'),
+	sortToggle: document.getElementById('sort-toggle'),
 	taskList: document.getElementById('tasks')
 };
 
@@ -61,7 +62,6 @@ const regex = {
 let tasks = [];
 let tags = { projects: [], contexts: [] };
 let priorities = [];
-let sortBy = 'description';
 let sortAscending = true;
 let filterSearch = '';
 let filterComplete = true;
@@ -297,13 +297,10 @@ if (DOM.search) {
 // SORTING --------------------------------------------------------------------
 
 function sortTasks(event) {
-	sortAscending = sortBy === event.target.dataset.sort ? !sortAscending : true;
-	sortBy = event.target.dataset.sort;
-	const newIcon = sortAscending ? '#icon-caret-down-fill' : '#icon-caret-up-fill';
-	document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.add('outline'));
-	document.querySelectorAll('.sort-btn use').forEach(icon => icon.setAttribute('xlink:href', newIcon.replace('-fill', '')));
-	event.target.classList.remove('outline');
-	event.target.querySelector('use').setAttribute('xlink:href', newIcon);
+	sortAscending = !sortAscending;
+	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up-fill';
+	DOM.sortToggle.classList.toggle('outline', sortAscending);
+	DOM.sortToggle.querySelector('use').setAttribute('xlink:href', newIcon);
 	renderTasks();
 }
 

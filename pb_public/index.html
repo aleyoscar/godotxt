@@ -150,18 +150,9 @@
 	<main class="container logged-in hide">
 		<section class="overflow-auto">
 			<div class="horizontal-scroll">
-				<button class="flex-inline align-center sort-btn"
-					data-sort="description"
+				<button id="sort-toggle" class="flex-inline align-center outline"
 					onclick="sortTasks(event)">
-					Description
-					<svg width="1em" height="1em">
-						<use xlink:href="#icon-caret-down-fill"/>
-					</svg>
-				</button>
-				<button class="flex-inline align-center outline sort-btn"
-					data-sort="priority"
-					onclick="sortTasks(event)">
-					Priority
+					Sort
 					<svg width="1em" height="1em">
 						<use xlink:href="#icon-caret-down"/>
 					</svg>
