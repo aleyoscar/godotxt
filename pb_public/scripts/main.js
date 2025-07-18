@@ -98,9 +98,9 @@ function debug(name, message, ...args) {
 async function fetchTasks() {
 	toggleLoading(true);
 	try {
-		const response = await fetch('/list');
-		if (!response.ok) throw new Error('Failed to fetch tasks');
-		tasks = (await response.json()).tasks;
+		const records = await pb.collection('tasks').getFullList();
+		tasks = records.map(task => new Task(task.text, task.id));
+		debug("fetchTasks", "Fetched tasks", tasks);
 		renderTasks();
 	} catch (error) {
 		console.error('Error loading tasks:', error);
@@ -113,7 +113,7 @@ function parseTask(task) {
 	const taskSub = task.priority ? `<a>(${task.priority})</a>` : '';
 	const taskDates = [
 		task.created ? `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(task.created)}</small>` : '',
-		task.completed ? `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(task.completed)}</ins></small>` : '',
+		task.completionDate ? `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(task.completionDate)}</ins></small>` : '',
 	].join('');
 
 	let taskDesc = task.raw_description.replace(regex.project, match =>
@@ -127,9 +127,9 @@ function parseTask(task) {
 	);
 
 	return `
-		<input type="checkbox" ${task.complete ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)" />
+		<input type="checkbox" ${task.isCompleted ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)" />
 		<hgroup class="pointer flex-grow" data-target="edit-modal" onclick="editTask(${task.id}); toggleModal(event);">
-			<h5 class="flex space-between ${task.complete ? 'muted-color strike' : ''}">
+			<h5 class="flex space-between ${task.isCompleted ? 'muted-color strike' : ''}">
 				<span>${taskSub} ${taskDesc}</span>
 			</h5>
 			<p class="flex gap-xs align-center">${taskDates}</p>
@@ -139,6 +139,7 @@ function parseTask(task) {
 }
 
 function renderTasks() {
+	debug("renderTasks", "Rendering tasks", tasks);
 	// Update aside menu
 	const listUl = DOM.aside?.querySelector('ul');
 	if (listUl) {
@@ -176,17 +177,18 @@ function renderTasks() {
 	const filteredTasks = tasks
 		.filter(task => (
 			(!filterSearch || task.raw_description.toLowerCase().includes(filterSearch.toLowerCase())) &&
-			(filterComplete ? !task.complete : true) &&
+			(!filterComplete ? true: !task.isCompleted) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
 			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c)))
 		))
 		.sort((a, b) => {
-			const valA = sortBy === 'description' ? a.description : a[sortBy] || (sortBy === 'priority' ? 'ZZ' : '');
-			const valB = sortBy === 'description' ? b.description : b[sortBy] || (sortBy === 'priority' ? 'ZZ' : '');
-			return sortAscending ? (valA < valB ? -1 : valA > valB ? 1 : 0) : (valA > valB ? -1 : valA < valB ? 1 : 0);
+			const valA = a.toString().toLowerCase();
+			const valB = b.toString().toLowerCase();
+			const dir = sortAscending ? 1 : -1
+			return valA < valB ? -1 * dir : valA > valB ? 1 * dir : 0;
 		})
-		.sort((a, b) => settings.sortComplete ? (a.complete && !b.complete ? 1 : -1) : 0);
 
+	debug("renderTasks", "Filtered tasks", filteredTasks);
 	for (let i = 0; i < filteredTasks.length; i++) {
 		filteredTasks[i].html = `
 			<li id="task-${filteredTasks[i].id}" class="flex align-center hover-background padding-xs show-hover-parent ${filteredTasks[i].projects.map(p => `project-${p}`).join(' ')} ${filteredTasks[i].contexts.map(c => `context-${c}`).join(' ')}">
@@ -356,7 +358,7 @@ function editTask(id) {
 	DOM.editId.value = task.id;
 	DOM.editDescription.value = task.raw_description;
 	DOM.editPriority.value = task.priority || '--';
-	DOM.editComplete.checked = task.complete;
+	DOM.editComplete.checked = task.isCompleted;
 	DOM.editDelete.dataset.id = task.id;
 	DOM.editDelete.classList.remove('hide');
 	DOM.editSubmit.textContent = 'Save';
@@ -550,7 +552,7 @@ async function fetchSettings() {
 		};
 		debug("fetchSettings", myRecord.length ? "Fetched settings" : "Created settings", settings);
 		state.newSettings = myRecord.length ? false : true;
-		// fetchTasks();
+		fetchTasks();
 	} catch (error) {
 		console.error('Error loading settings:', error);
 	}
@@ -615,7 +617,7 @@ if (DOM.deleteForm) {
 	DOM.deleteForm.addEventListener('submit', async e => {
 		e.preventDefault();
 		const deleteList = Array.from(DOM.deleteForm.querySelectorAll('.delete-switch:checked'))
-			.flatMap(input => tasks.filter(task => task.complete && task.projects.includes(input.dataset.project)).map(task => task.id));
+			.flatMap(input => tasks.filter(task => task.isCompleted && task.projects.includes(input.dataset.project)).map(task => task.id));
 		if (!deleteList.length) return;
 		DOM.deleteError.style.display = 'none';
 		try {
