@@ -1,6 +1,8 @@
 class Task {
-	constructor(line = '') {
+	constructor(line = '', id = '') {
+		this.id = id;
 		this.description = '';
+		this.raw_description = '';
 		this.isCompleted = false;
 		this.completionDate = null;
 		this.creationDate = null;
@@ -41,6 +43,9 @@ class Task {
 			remaining = remaining.slice(dateMatch[0].length).trim();
 		}
 
+		// Store raw_description (everything after completion, priority, and dates)
+		this.raw_description = remaining;
+
 		// Extract projects, contexts, and attributes
 		const words = remaining.split(/\s+/);
 		this.description = [];
@@ -73,19 +78,25 @@ class Task {
 		if (this.creationDate) {
 			parts.push(this.creationDate);
 		}
-		if (this.description) {
+		if (this.raw_description) {
+			parts.push(this.raw_description);
+		} else if (this.description) {
 			parts.push(this.description);
-		}
-		for (const project of this.projects) {
-			parts.push(`+${project}`);
-		}
-		for (const context of this.contexts) {
-			parts.push(`@${context}`);
-		}
-		for (const [key, value] of Object.entries(this.attributes)) {
-			parts.push(`${key}:${value}`);
+			for (const project of this.projects) {
+				parts.push(`+${project}`);
+			}
+			for (const context of this.contexts) {
+				parts.push(`@${context}`);
+			}
+			for (const [key, value] of Object.entries(this.attributes)) {
+				parts.push(`${key}:${value}`);
+			}
 		}
 		return parts.join(' ');
+	}
+
+	get rawDescription() {
+		return this.raw_description;
 	}
 
 	setPriority(priority) {
@@ -108,20 +119,26 @@ class Task {
 	addProject(project) {
 		if (!this.projects.includes(project)) {
 			this.projects.push(project);
+			this.raw_description = this.raw_description ? `${this.raw_description} +${project}` : `+${project}`;
 		}
 	}
 
 	addContext(context) {
 		if (!this.contexts.includes(context)) {
 			this.contexts.push(context);
+			this.raw_description = this.raw_description ? `${this.raw_description} @${context}` : `@${context}`;
 		}
 	}
 
 	setAttribute(key, value) {
 		if (value) {
 			this.attributes[key] = value;
+			this.raw_description = this.raw_description ? `${this.raw_description} ${key}:${value}` : `${key}:${value}`;
 		} else {
 			delete this.attributes[key];
+			// Rebuild raw_description to remove the attribute
+			const words = this.raw_description.split(/\s+/).filter(word => !word.startsWith(`${key}:`));
+			this.raw_description = words.join(' ');
 		}
 	}
 }
@@ -150,7 +167,6 @@ class TodoTxt {
 		return this.tasks.map(task => task.toString()).join('\n') + '\n';
 	}
 
-	// File I/O for Node.js
 	async loadFromFile(filePath) {
 		if (typeof require !== 'undefined') {
 			const fs = require('fs').promises;
@@ -171,7 +187,6 @@ class TodoTxt {
 	}
 }
 
-// Export for Node.js or browser
 if (typeof module !== 'undefined' && module.exports) {
 	module.exports = { Task, TodoTxt };
 } else {
