@@ -37,7 +37,7 @@ const DOM = {
 	settingsLists: document.getElementById('settings-lists'),
 	settingsListsAdd: document.getElementById('settings-lists-add'),
 	settingsModal: document.getElementById('settings-modal'),
-	settingsSortComplete: document.getElementById('settings-sort-complete'),
+	settingsShowComplete: document.getElementById('settings-show-complete'),
 	showAll: document.getElementById('show-all'),
 	sortToggle: document.getElementById('sort-toggle'),
 	taskList: document.getElementById('tasks')
@@ -65,7 +65,7 @@ let tags = { projects: [], contexts: [] };
 let priorities = [];
 let sortAscending = true;
 let filterSearch = '';
-let filterComplete = true;
+let showComplete = false;
 let filterProjects = [];
 let filterContexts = [];
 let group = 'none';
@@ -99,8 +99,8 @@ function debug(name, message, ...args) {
 async function fetchTasks() {
 	toggleLoading(true);
 	try {
-		const records = await pb.collection('tasks').getFullList();
-		tasks = records.map(task => new Task(task.text, task.id));
+		const tasksResponse = await pb.collection('tasks').getFullList();
+		tasks = tasksResponse.map(task => new Task(task.text, task.id));
 		debug("fetchTasks", "Fetched tasks", tasks);
 		renderTasks();
 	} catch (error) {
@@ -178,7 +178,7 @@ function renderTasks() {
 	const filteredTasks = tasks
 		.filter(task => (
 			(!filterSearch || task.raw_description.toLowerCase().includes(filterSearch.toLowerCase())) &&
-			(!filterComplete ? true: !task.isCompleted) &&
+			(showComplete ? true : !task.isCompleted) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
 			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c)))
 		))
@@ -278,12 +278,12 @@ function clearFilters() {
 	filterAttribute();
 }
 
-function toggleComplete(setComplete) {
-	filterComplete = setComplete;
-	const newIcon = filterComplete ? '#icon-eye' : '#icon-eye-fill';
-	DOM.completeToggle.classList.toggle('outline', filterComplete);
+function toggleComplete(setComplete, render=true) {
+	showComplete = setComplete;
+	const newIcon = showComplete ? '#icon-eye-fill' : '#icon-eye';
+	DOM.completeToggle.classList.toggle('outline', !showComplete);
 	DOM.completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
-	renderTasks();
+	if (render) renderTasks();
 }
 
 if (DOM.search) {
@@ -510,15 +510,16 @@ window.addEventListener('hashchange', openList);
 async function fetchSettings() {
 	try {
 		const recordId = pb.authStore.isValid ? pb.authStore.record.id : '';
-		const records = await pb.collection('settings').getFullList();
-		const myRecord = records.filter(r => r.userId === recordId);
-		settings = myRecord.length ? myRecord[0] : {
+		const settingsResponse = await pb.collection('settings').getFullList();
+		const settingsRecord = settingsResponse.filter(r => r.userId === recordId);
+		settings = settingsRecord.length ? settingsRecord[0] : {
 			userId: recordId,
 			lists:[],
-			sortComplete: true
+			showComplete: true
 		};
-		debug("fetchSettings", myRecord.length ? "Fetched settings" : "Created settings", settings);
-		state.newSettings = myRecord.length ? false : true;
+		debug("fetchSettings", settingsRecord.length ? "Fetched settings" : "Created settings", settings);
+		state.newSettings = settingsRecord.length ? false : true;
+		toggleComplete(settings.showComplete, false);
 		fetchTasks();
 	} catch (error) {
 		console.error('Error loading settings:', error);
@@ -526,7 +527,8 @@ async function fetchSettings() {
 }
 
 function openSettings() {
-	DOM.settingsSortComplete.checked = settings.sortComplete || false;
+	console.log(DOM.settingsShowComplete, settings.showComplete);
+	DOM.settingsShowComplete.checked = settings.showComplete || false;
 	DOM.settingsLists.innerHTML = settings.lists?.map((list, i) => `
 		<fieldset id="settings-list-${i + 1}" class="grid settings-list">
 			<input class="settings-list-name" name="settings-list-${i + 1}-name" placeholder="List Name" value="${list.name}" required />
@@ -615,7 +617,7 @@ async function submitForm(e) {
 				checkAuth();
 				break;
 			case 'settings-form':
-				settings.sortComplete = form.querySelector('#settings-sort-complete').checked;
+				settings.showComplete = form.querySelector('#settings-show-complete').checked;
 				settings.lists = [];
 				form.querySelectorAll('.settings-list').forEach(l => {
 					settings.lists.push({
