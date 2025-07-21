@@ -9,6 +9,7 @@ const DOM = {
 	deleteError: document.getElementById('delete-error'),
 	deleteForm: document.getElementById('delete-form'),
 	deleteLists: document.getElementById('delete-lists'),
+	deleteModal: document.getElementById('delete-modal'),
 	editComplete: document.getElementById('edit-complete'),
 	editContexts: document.getElementById('edit-contexts'),
 	editDelete: document.getElementById('edit-delete'),
@@ -386,9 +387,8 @@ async function completeTask(event) {
 async function deleteTask(event) {
 	if (!confirm('Are you sure you want to delete this task?')) return;
 	try {
-		const response = await fetch(`/delete/${event.target.dataset.id}`, { method: 'DELETE' });
-		if (!response.ok) throw new Error('Failed to delete task');
-		await fetchTasks();
+		const deleteResponse = await pb.collection('tasks').delete(event.currentTarget.dataset.id);
+		fetchTasks();
 		if (visibleModal) closeModal(visibleModal);
 	} catch (error) {
 		alert('Error: ' + error.message);
@@ -584,29 +584,6 @@ function openDelete() {
 	openModal(DOM.deleteModal);
 }
 
-if (DOM.deleteForm) {
-	DOM.deleteForm.addEventListener('submit', async e => {
-		e.preventDefault();
-		const deleteList = Array.from(DOM.deleteForm.querySelectorAll('.delete-switch:checked'))
-			.flatMap(input => tasks.filter(task => task.isCompleted && task.projects.includes(input.dataset.project)).map(task => task.id));
-		if (!deleteList.length) return;
-		DOM.deleteError.style.display = 'none';
-		try {
-			const response = await fetch('/delete-multiple', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(deleteList),
-			});
-			if (!response.ok) throw new Error((await response.json()).description || 'Failed to delete tasks');
-			await fetchTasks();
-			if (visibleModal) closeModal(visibleModal);
-		} catch (error) {
-			DOM.deleteError.textContent = error.message;
-			DOM.deleteError.style.display = 'block';
-		}
-	});
-}
-
 // GROUP ----------------------------------------------------------------------
 
 function groupBy(type) {
@@ -673,6 +650,15 @@ async function submitForm(e) {
 				} else { // Add
 					const addResponse = await pb.collection('tasks').create({ userId: userId, text: newTask.toString() });
 				}
+				fetchTasks();
+				break;
+			case 'delete-form':
+				const deleteList = Array.from(form.querySelectorAll('.delete-switch:checked'))
+					.flatMap(input => tasks.filter(task => task.isCompleted && task.projects.includes(input.dataset.project)).map(task => task.id));
+				if (!deleteList.length) return;
+				const batch = pb.createBatch();
+				deleteList.forEach(d => { batch.collection('tasks').delete(d); });
+				const deleteMulResponse = await batch.send();
 				fetchTasks();
 				break;
 			default:

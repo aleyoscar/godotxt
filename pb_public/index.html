@@ -485,8 +485,8 @@
 				</button>
 				<h3>Delete Done</h3>
 			</header>
-			<form id="delete-form">
-				<p id="delete-error" class="error" style="dislay: none;"></p>
+			<form id="delete-form" class="form">
+				<p id="delete-error" class="error message hide">Error deleting tasks</p>
 				<fieldset id="delete-lists"></fieldset>
 			</form>
 			<footer>
@@ -495,7 +495,7 @@
 					onclick="toggleModal(event)">
 					Cancel
 				</button>
-				<button class="danger"
+				<button class="danger form-submit"
 					form="delete-form">
 					Delete
 				</button>
