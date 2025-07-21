@@ -366,21 +366,17 @@ function editTask(id) {
 }
 
 async function completeTask(event) {
-	const id = parseInt(event.target.dataset.id);
+	const id = event.currentTarget.dataset.id;
 	const task = tasks.find(t => t.id === id);
 	if (!task) return;
 	try {
-		const response = await fetch(`/complete/${id}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ complete: event.target.checked }),
-		});
-		if (!response.ok) throw new Error((await response.json()).description || 'Failed to complete task');
-		tasks[tasks.findIndex(t => t.id === id)] = (await response.json()).task;
-		renderTasks();
+		event.currentTarget.checked ? task.complete() : task.uncomplete();
+		const userId = pb.authStore.isValid ? pb.authStore.record.id : '';
+		const completeResponse = await pb.collection('tasks').update(id, { userId: userId, text: task.toString() });
+		fetchTasks();
 	} catch (error) {
 		alert('Error: ' + error.message);
-		renderTasks();
+		fetchTasks();
 	}
 }
 
