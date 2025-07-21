@@ -79,7 +79,7 @@ let state = {
 // HELPERS --------------------------------------------------------------------
 
 const getDateString = (date) => {
-	const d = new Date(date);
+	const d = new Date(date ? date : Date.now());
 	return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
 };
 
@@ -112,7 +112,7 @@ async function fetchTasks() {
 function parseTask(task) {
 	const taskSub = task.priority ? `<a>(${task.priority})</a>` : '';
 	const taskDates = [
-		task.created ? `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(task.created)}</small>` : '',
+		task.creationDate ? `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(task.creationDate)}</small>` : '',
 		task.completionDate ? `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(task.completionDate)}</ins></small>` : '',
 	].join('');
 
@@ -128,7 +128,7 @@ function parseTask(task) {
 
 	return `
 		<input type="checkbox" ${task.isCompleted ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)" />
-		<hgroup class="pointer flex-grow" data-target="edit-modal" onclick="editTask(${task.id}); toggleModal(event);">
+		<hgroup class="pointer flex-grow" data-target="edit-modal" onclick="editTask('${task.id}'); toggleModal(event);">
 			<h5 class="flex space-between ${task.isCompleted ? 'muted-color strike' : ''}">
 				<span>${taskSub} ${taskDesc}</span>
 			</h5>
@@ -347,7 +347,7 @@ function addTask() {
 }
 
 function editTask(id) {
-	const task = tasks.find(t => t.id === parseInt(id));
+	const task = tasks.find(t => t.id === id);
 	if (!task) return;
 	DOM.autocomplete.classList.add('hide');
 	DOM.editForm.reset();
@@ -362,32 +362,6 @@ function editTask(id) {
 	DOM.editDescription.focus();
 	DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 	populateTags();
-}
-
-if (DOM.editForm) {
-	DOM.editForm.addEventListener('submit', async e => {
-		e.preventDefault();
-		DOM.editError.classList.add('hide');
-		const id = parseInt(DOM.editId.value || 0);
-		try {
-			const description = DOM.editDescription.value.trim();
-			const priority = DOM.editPriority.value === '--' ? null : DOM.editPriority.value;
-			const complete = DOM.editComplete.checked;
-			const endpoint = id ? `/edit/${id}` : '/add';
-			const method = id ? 'PUT' : 'POST';
-			const response = await fetch(endpoint, {
-				method,
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ description, priority, complete }),
-			});
-			if (!response.ok) throw new Error((await response.json()).description || `Failed to ${id ? 'update' : 'add'} task`);
-			await fetchTasks();
-			if (visibleModal) closeModal(visibleModal);
-		} catch (error) {
-			DOM.editError.textContent = error.message;
-			DOM.editError.classList.remove('hide');
-		}
-	});
 }
 
 async function completeTask(event) {
@@ -683,7 +657,23 @@ async function submitForm(e) {
 				} else {
 					const settingsResponse = await pb.collection('settings').update(settings.id, settings);
 				}
-				// renderTasks();
+				renderTasks();
+				break;
+			case 'edit-form':
+				debug("submitForm", "Adding/editing task", formData);
+				const userId = pb.authStore.isValid ? pb.authStore.record.id : '';
+				const newTask = new Task(`${getDateString()} ${formData.get('edit-description')}`);
+				formData.get('edit-complete') ? newTask.complete() : newTask.uncomplete();
+				newTask.setPriority(formData.get('edit-priority') === '--' ? '' : formData.get('edit-priority'));
+				if (formData.get('edit-id')) { // Edit
+					const task = tasks.find(t => t.id === formData.get('edit-id'));
+					if (!task) throw new Error(`Could not find task with id ${formData.get('edit-id')}`);
+					newTask.creationDate = task.creationDate;
+					const editResponse = await pb.collection('tasks').update(formData.get('edit-id'), { userId: userId, text: newTask.toString() });
+				} else { // Add
+					const addResponse = await pb.collection('tasks').create({ userId: userId, text: newTask.toString() });
+				}
+				fetchTasks();
 				break;
 			default:
 				throw new Error(`Invalid form ${form.id}`);
