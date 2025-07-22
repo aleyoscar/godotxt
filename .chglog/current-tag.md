@@ -1,31 +1,21 @@
 
-v1.0.0
-## [v1.0.0](https://github.com/aleyoscar/groctxt/compare/v0.3.2...v1.0.0) (2025-07-22)
+v1.0.1
+## [v1.0.1](https://github.com/aleyoscar/groctxt/compare/v1.0.0...v1.0.1) (2025-07-22)
+
+### Bug Fixes
+
+* **web:** Show task line number instead of id in edit form
+* **web:** Fixed autocomplete edit. Reorganized functions. Fixes [#34](https://github.com/aleyoscar/groctxt/issues/34)
+* **web:** Rename compose file and exclude from git
 
 ### Code Refactoring
 
-* **core:** Migrate gen-chglog to pb
-* **core:** Migrate compose to pb
-* **core:** Removed python files
-* **docs:** Migrate README to pb
-* **web:** Migrate delete to pb
-* **web:** Migrate complete task to pb
-* **web:** Changed filterComplete & sortComplete to showComplete
-* **web:** Migrate add/edit task to pb
-* **web:** Migrate task listing to pb
-* **web:** Restructured form submit
-* **web:** Migrate settings to pb
-* **web:** Migrate templates into index.html
-* **web:** Migrate static files to pb
+* **core:** Migrate version update to pb
+* **web:** Remove console log
+* **web:** Switch to proper getter function for raw description
 
 ### Features
 
-* **web:** Always sort by todo.txt standards
-* **web:** Added id and raw_description to todotxt library
-* **web:** Moved debug to state. Created helper function
-* **web:** Created state variable
-* **web:** Added debug option
-* **web:** Migrate auth from flask to pb. Added auth-less option
-* **web:** Added pocketbase v0.28.4 as backend
-* **web:** Renamed project to GoDo.txt
+* **core:** Added powershell gen-chglog script
+* **web:** Add windows pb executable
 
