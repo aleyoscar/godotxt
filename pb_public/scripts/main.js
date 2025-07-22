@@ -402,79 +402,77 @@ function filterTags(text, char, reg, taskTags) {
 		.map(t => ({ tag: `${char}${t}`, start: index, end: cursor }));
 }
 
-if (DOM.editDescription) {
-	DOM.editDescription.addEventListener('input', e => {
-		populateTags();
-		const query = cleanString(e.currentTarget.value.toLowerCase()).replace(regex.project, '').replace(regex.context, '').trim();
-		const filteredTags = [
-			...filterTags(e.currentTarget.value, '+', regex.projectSingle, tags.projects),
-			...filterTags(e.currentTarget.value, '@', regex.contextSingle, tags.contexts),
-		].sort((a, b) => a.tag.localeCompare(b.tag));
-		const currentTaskId = parseInt(DOM.editId.value) || 0;
-		const filteredTasks = query ? tasks.filter(task => task.id !== currentTaskId && task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
+DOM.editDescription.addEventListener('input', e => {
+	populateTags();
+	const query = cleanString(e.currentTarget.value.toLowerCase()).replace(regex.project, '').replace(regex.context, '').trim();
+	const filteredTags = [
+		...filterTags(e.currentTarget.value, '+', regex.projectSingle, tags.projects),
+		...filterTags(e.currentTarget.value, '@', regex.contextSingle, tags.contexts),
+	].sort((a, b) => a.tag.localeCompare(b.tag));
+	const currentTaskId = parseInt(DOM.editId.value) || 0;
+	const filteredTasks = query ? tasks.filter(task => task.id !== currentTaskId && task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
 
-		DOM.autocomplete.innerHTML = (filteredTags.length || filteredTasks.length)
-			? [...filteredTags.map(t => `<li class="auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
-				 ...filteredTasks.map(t => `<li class="auto-tag flex space-between" data-id="${t.id}">${t.raw_description}<b onclick="editTask(${t.id})"><svg width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></b></li>`)].join('')
-			: '';
-		DOM.autocomplete.classList.toggle('hide', !filteredTags.length && !filteredTasks.length);
-	});
+	DOM.autocomplete.innerHTML = (filteredTags.length || filteredTasks.length)
+		? [...filteredTags.map(t => `<li class="auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
+			 ...filteredTasks.map(t => `<li class="auto-tag flex space-between" data-id="${t.id}">${t.rawDescription}<b onclick="editTask('${t.id}')"><svg width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></b></li>`)].join('')
+		: '';
+	DOM.autocomplete.classList.toggle('hide', !filteredTags.length && !filteredTasks.length);
+});
 
-	DOM.editDescription.addEventListener('keydown', e => {
-		const items = DOM.autocomplete.querySelectorAll('li');
-		if (!items.length) return;
-		const index = Array.from(items).findIndex(item => item.classList.contains('selected'));
-		if (e.key === 'ArrowDown' && index < items.length - 1) {
-			e.preventDefault();
-			items[index]?.classList.remove('selected');
-			items[index + 1].classList.add('selected');
-			items[index + 1].scrollIntoView({ block: 'nearest' });
-		} else if (e.key === 'ArrowUp' && index > 0) {
-			e.preventDefault();
-			items[index].classList.remove('selected');
-			items[index - 1].classList.add('selected');
-			items[index - 1].scrollIntoView({ block: 'nearest' });
-		} else if ((e.key === 'Enter' || e.key === 'Tab') && index >= 0) {
-			e.preventDefault();
-			const item = items[index];
-			DOM.autocomplete.classList.add('hide');
-			DOM.autocomplete.innerHTML = '';
-			if (item.dataset.id) {
-				if (e.key === 'Enter') editTask(item.dataset.id);
-				else DOM.editDescription.value = items[index].textContent;
-				DOM.editDescription.focus();
-				DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
-			} else {
-				DOM.editDescription.value = DOM.editDescription.value.slice(0, item.dataset.start) + item.dataset.tag + DOM.editDescription.value.slice(item.dataset.end);
-				DOM.editDescription.focus();
-				DOM.editDescription.setSelectionRange(parseInt(item.dataset.start) + item.dataset.tag.length, parseInt(item.dataset.start) + item.dataset.tag.length);
-			}
-			populateTags();
-		}
-	});
-
-	DOM.autocomplete.addEventListener('click', e => {
-		if (e.target.tagName !== 'LI') return;
+DOM.editDescription.addEventListener('keydown', e => {
+	const items = DOM.autocomplete.querySelectorAll('li');
+	if (!items.length) return;
+	const index = Array.from(items).findIndex(item => item.classList.contains('selected'));
+	if (e.key === 'ArrowDown' && index < items.length - 1) {
+		e.preventDefault();
+		items[index]?.classList.remove('selected');
+		items[index + 1].classList.add('selected');
+		items[index + 1].scrollIntoView({ block: 'nearest' });
+	} else if (e.key === 'ArrowUp' && index > 0) {
+		e.preventDefault();
+		items[index].classList.remove('selected');
+		items[index - 1].classList.add('selected');
+		items[index - 1].scrollIntoView({ block: 'nearest' });
+	} else if ((e.key === 'Enter' || e.key === 'Tab') && index >= 0) {
+		e.preventDefault();
+		const item = items[index];
 		DOM.autocomplete.classList.add('hide');
 		DOM.autocomplete.innerHTML = '';
-		if (e.target.dataset.id) {
-			DOM.editDescription.value = e.target.textContent;
+		if (item.dataset.id) {
+			if (e.key === 'Enter') editTask(item.dataset.id);
+			else DOM.editDescription.value = items[index].textContent;
 			DOM.editDescription.focus();
 			DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 		} else {
-			DOM.editDescription.value = DOM.editDescription.value.slice(0, e.target.dataset.start) + e.target.dataset.tag + DOM.editDescription.value.slice(e.target.dataset.end);
+			DOM.editDescription.value = DOM.editDescription.value.slice(0, item.dataset.start) + item.dataset.tag + DOM.editDescription.value.slice(item.dataset.end);
 			DOM.editDescription.focus();
-			DOM.editDescription.setSelectionRange(parseInt(e.target.dataset.start) + e.target.dataset.tag.length, parseInt(e.target.dataset.start) + e.target.dataset.tag.length);
+			DOM.editDescription.setSelectionRange(parseInt(item.dataset.start) + item.dataset.tag.length, parseInt(item.dataset.start) + item.dataset.tag.length);
 		}
 		populateTags();
-	});
+	}
+});
 
-	document.addEventListener('click', e => {
-		if (!DOM.editDescription.contains(e.target) && !DOM.autocomplete.contains(e.target)) {
-			DOM.autocomplete.classList.add('hide');
-		}
-	});
-}
+DOM.autocomplete.addEventListener('click', e => {
+	if (e.target.tagName !== 'LI') return;
+	DOM.autocomplete.classList.add('hide');
+	DOM.autocomplete.innerHTML = '';
+	if (e.target.dataset.id) {
+		DOM.editDescription.value = e.target.textContent;
+		DOM.editDescription.focus();
+		DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
+	} else {
+		DOM.editDescription.value = DOM.editDescription.value.slice(0, e.target.dataset.start) + e.target.dataset.tag + DOM.editDescription.value.slice(e.target.dataset.end);
+		DOM.editDescription.focus();
+		DOM.editDescription.setSelectionRange(parseInt(e.target.dataset.start) + e.target.dataset.tag.length, parseInt(e.target.dataset.start) + e.target.dataset.tag.length);
+	}
+	populateTags();
+});
+
+document.addEventListener('click', e => {
+	if (!DOM.editDescription.contains(e.target) && !DOM.autocomplete.contains(e.target)) {
+		DOM.autocomplete.classList.add('hide');
+	}
+});
 
 // ASIDE MENU -----------------------------------------------------------------
 
