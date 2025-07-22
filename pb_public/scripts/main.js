@@ -525,7 +525,6 @@ async function fetchSettings() {
 }
 
 function openSettings() {
-	console.log(DOM.settingsShowComplete, settings.showComplete);
 	DOM.settingsShowComplete.checked = settings.showComplete || false;
 	DOM.settingsLists.innerHTML = settings.lists?.map((list, i) => `
 		<fieldset id="settings-list-${i + 1}" class="grid settings-list">
