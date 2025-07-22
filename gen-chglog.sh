@@ -7,8 +7,11 @@ else
 	TAG_CONFIG=.chglog/config-tag.yml
 	TAG_FILE=.chglog/current-tag.md
 
-	echo "Updating version info in README.md and app.py to $1"
-	sed -i "10s/.*/VERSION = '$1'/" app.py
+	echo "Updating version info in README.md and index.html to $1"
+	# sed -i "15s/.*/<link rel='stylesheet' href=\"/styles/style.css?v=$1\">" pb_public/index.html
+	# sed -i "17s/.*/<script src=\"/scripts/todotxt.js?v=$1\" defer></script>" pb_public/index.html
+	# sed -i "18s/.*/<script src=\"/scripts/modal.js?v=$1\" defer></script>" pb_public/index.html
+	# sed -i "19s/.*/<script src=\"/scripts/main.js?v=$1\" defer></script>" pb_public/index.html
 	sed -i "3s/.*/> $1/" README.md
 
 	echo "Generating CHANGELOG file"
