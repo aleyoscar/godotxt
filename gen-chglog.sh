@@ -8,10 +8,11 @@ else
 	TAG_FILE=.chglog/current-tag.md
 
 	echo "Updating version info in README.md and index.html to $1"
-	# sed -i "15s/.*/<link rel='stylesheet' href=\"/styles/style.css?v=$1\">" pb_public/index.html
-	# sed -i "17s/.*/<script src=\"/scripts/todotxt.js?v=$1\" defer></script>" pb_public/index.html
-	# sed -i "18s/.*/<script src=\"/scripts/modal.js?v=$1\" defer></script>" pb_public/index.html
-	# sed -i "19s/.*/<script src=\"/scripts/main.js?v=$1\" defer></script>" pb_public/index.html
+
+	sed -i '' -E "s|(href=\".*/styles/style.css\?v=)[^\"]*|\1$1|" "pb_public/index.html"
+	sed -i '' -E "s|(src=\".*/scripts/todotxt.js\?v=)[^\"]*|\1$1|" "pb_public/index.html"
+	sed -i '' -E "s|(src=\".*/scripts/modal.js\?v=)[^\"]*|\1$1|" "pb_public/index.html"
+	sed -i '' -E "s|(src=\".*/scripts/main.js\?v=)[^\"]*|\1$1|" "pb_public/index.html"
 	sed -i "3s/.*/> $1/" README.md
 
 	echo "Generating CHANGELOG file"
