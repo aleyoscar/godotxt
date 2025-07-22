@@ -72,7 +72,7 @@ let group = 'none';
 let settings = {};
 let state = {
 	authenticated: false,
-	debug: true,
+	debug: false,
 	loggedIn: false,
 	newSettings: false
 }

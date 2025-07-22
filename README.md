@@ -1,6 +1,6 @@
 # GoDo.txt
 
-> v0.3.2
+> v1.0.0
 
 Self-hosted web app for todo.txt lists
 
