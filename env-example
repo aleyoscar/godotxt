@@ -1,4 +1,0 @@
-APP_PORT=5050
-SECRET_KEY=your-secret-key
-USERNAME=admin
-PASSWORD_HASH=your-password-hash
