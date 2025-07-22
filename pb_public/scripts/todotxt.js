@@ -1,6 +1,7 @@
 class Task {
-	constructor(line = '', id = '') {
+	constructor(line = '', id = '', lineNum = 0) {
 		this.id = id;
+		this.lineNum = lineNum;
 		this.description = '';
 		this.raw_description = '';
 		this.isCompleted = false;

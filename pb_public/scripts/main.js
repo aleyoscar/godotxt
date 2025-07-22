@@ -100,7 +100,7 @@ async function fetchTasks() {
 	toggleLoading(true);
 	try {
 		const tasksResponse = await pb.collection('tasks').getFullList();
-		tasks = tasksResponse.map(task => new Task(task.text, task.id));
+		tasks = tasksResponse.map((task, index) => new Task(task.text, task.id, index + 1));
 		debug("fetchTasks", "Fetched tasks", tasks);
 		renderTasks();
 	} catch (error) {
@@ -352,7 +352,7 @@ function editTask(id) {
 	if (!task) return;
 	DOM.autocomplete.classList.add('hide');
 	DOM.editForm.reset();
-	DOM.editTitle.textContent = `Edit task #${task.id}`;
+	DOM.editTitle.textContent = `Edit task #${task.lineNum}`;
 	DOM.editId.value = task.id;
 	DOM.editDescription.value = task.raw_description;
 	DOM.editPriority.value = task.priority || '--';
