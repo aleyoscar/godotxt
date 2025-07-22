@@ -117,7 +117,7 @@ function parseTask(task) {
 		task.completionDate ? `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(task.completionDate)}</ins></small>` : '',
 	].join('');
 
-	let taskDesc = task.raw_description.replace(regex.project, match =>
+	let taskDesc = task.rawDescription.replace(regex.project, match =>
 		task.projects.includes(match.slice(1))
 			? `<a data-attribute="projects" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>`
 			: match
@@ -177,7 +177,7 @@ function renderTasks() {
 	// Filter and sort tasks
 	const filteredTasks = tasks
 		.filter(task => (
-			(!filterSearch || task.raw_description.toLowerCase().includes(filterSearch.toLowerCase())) &&
+			(!filterSearch || task.rawDescription.toLowerCase().includes(filterSearch.toLowerCase())) &&
 			(showComplete ? true : !task.isCompleted) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
 			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c)))
@@ -354,7 +354,7 @@ function editTask(id) {
 	DOM.editForm.reset();
 	DOM.editTitle.textContent = `Edit task #${task.lineNum}`;
 	DOM.editId.value = task.id;
-	DOM.editDescription.value = task.raw_description;
+	DOM.editDescription.value = task.rawDescription;
 	DOM.editPriority.value = task.priority || '--';
 	DOM.editComplete.checked = task.isCompleted;
 	DOM.editDelete.dataset.id = task.id;
