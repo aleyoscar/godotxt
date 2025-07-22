@@ -6,7 +6,7 @@ Self-hosted web app for todo.txt lists
 
 ## Description
 
-A self-hosted, responsive and mobile-friendly web application to manage a [todo.txt](http://todotxt.org/) file with configurable lists. The app is run using [python flask](https://flask.palletsprojects.com/en/stable/) and packaged as a docker container for self-hosting on any web server. Todo.txt gives you the flexibility to take your task list with you wherever you go and does not lock you into a proprietary service. All task data is stored in a text file that you can write to using any other application or text editor.
+A self-hosted, responsive and mobile-friendly web application to manage a [todo.txt](http://todotxt.org/) file with "custom" lists. The app is a static site with a [pocketbase](https://pocketbase.io/) backend. Todo.txt gives you the flexibility to take your task list with you wherever you go and does not lock you into a proprietary service. All task data is stored in a text file that you can write to using any other application or text editor, and pocketbase gives you the flexibility to have single user or multiple user authentication.
 
 ## Features
 
@@ -18,7 +18,7 @@ A self-hosted, responsive and mobile-friendly web application to manage a [todo.
 - Filter and order tasks
 - Specify special lists that automatically tag tasks with a `+project` and display in a separate tab
 - Manage your already established todo.txt file by using docker's volumes
-- Single-user authentication for privacy and protection of your task data
+- Single or multi-user authentication for privacy and protection of your and anyone else's task data
 - Responsive and mobile-friendly
 
 **Planned Features**
@@ -28,94 +28,43 @@ A self-hosted, responsive and mobile-friendly web application to manage a [todo.
 
 ## Installation
 
-1. Install [docker and docker-compose](https://docs.docker.com/compose/install/)
-2. Clone this repository into a folder or download from [releases](https://github.com/aleyoscar/groctxt/releases)
+### Manual
 
-```
-git clone https://github.com/aleyoscar/groctxt
-```
+1. Clone this repository into a folder or download from [releases](https://github.com/aleyoscar/groctxt/releases)
+2. Navigate into the folder and start the pocketbase server using the command `./pocketbase serve`
+3. Open the link provided in the prompt to create a new superuser account
+4. Access your GoDo web app at [localhost:8090](http://localhost:8090)
 
-3. Navigate into the folder and copy `env.example` to `.env`
+### Docker
 
-```
-cd godotxt
-cp env.example .env
-```
+1. An example compose file is provided in the repository
+2. Install [docker and docker-compose](https://docs.docker.com/compose/install/)
+3. Clone this repository into a folder or download from [releases](https://github.com/aleyoscar/groctxt/releases)
+4. (Optional) Change the external port to your desired port in `compose.yml`
+5. Run the container using `docker compose up -d`
+6. Access your app at [localhost:8090](http://localhost:8090) or whichever port you specified
 
-4. Change `SECRET_KEY`, `USERNAME` and `PASSWORD_HASH` to your own values
+## Authentication
 
-```
-# Generate a secret key
-python -c "import os; print(os.urandom(24).hex())"
-
-# Generate a password hash, replace `PASSWORD` with your own secure password
-python -c "import hashlib; print(hashlib.sha256('PASSWORD'.encode()).hexdigest())"
-```
-
-> **NOTE:** If you don't have python on your system, you can also go to [online-python](https://www.online-python.com/) and paste in the following script to generate a secret and your password hash. Remember to replace `PASSWORD` with your own strong and secure password.
-
-```
-import os, hashlib
-print(os.urandom(24).hex())
-print(hashlib.sha256('PASSWORD'.encode()).hexdigest())
-```
-
-5. (Optional) Change the `APP_PORT` to your desired port
-6. (Optional) Change the volume in `compose.yml` to point to your own todo.txt folder
-
-```
-volumes:
-  - ~/Documents/TodoFolder:/app/data
-```
-
-6. Build the docker container
-
-```
-docker compose build
-```
-
-7. Run the container
-
-```
-docker compose up -d
-```
-
-8. Access your app at `http://localhost:APP_PORT` where `APP_PORT` is the port you specified in your .env file, default is `5050`
-
-## Update
-
-1. Stop the container
-2. Fetch and pull from the main branch
-3. Re-build the container
-4. Start the container
-
-```
-docker compose down
-git fetch && git pull
-docker compose build
-docker compose up -d
-```
+By using Pocketbase as a backend, GoDo.txt has the ability to allow single or multiple users. Currently you must create each user manually through the pocketbase admin dashboard at [localhost:8090/_](http://localhost:8090/_). Open the `users` collection and
 
 ## Settings
 
-Settings are configurable within the app, but there is also a `settings.json` file that allows you to manually edit the configuration file. Current settings include:
+Settings are configurable within the app or you can edit the rows of the `settings` collection directly in pocketbase.
 
 | Setting Key	| Description						| Default/Example		|
 | ---			| ---								| ---					|
-| sort_complete	| Sort completed tasks to bottom	| false					|
-| lists			| Object array of custom lists		| empty array []		|
+| showComplete	| Show completed tasks by default	| false					|
+| lists			| JSON array of custom lists		| empty array []		|
 |   - name		| Name of the list displayed		| EX: "Shopping List"	|
 |   - project	| Project to be added automatically	| EX: "shopping"		|
 
-An example settings file is included in the repository as `settings.json`.
-
 ## Sources
 
-References and sources used in the project
+References and sources used in the project. The Pytodotxt library was ported over to javascript using [Grok](https://grok.com).
 
 - [Todo.txt](http://todotxt.org/)
-- [Flask](https://flask.palletsprojects.com/)
+- [Pocketbase](https://pocketbase.io)
 - [Pytodotxt](https://vonshednob.cc/pytodotxt/doc/)
-- [Docker](https://docker.com/)
 - [Pico CSS](https://picocss.com/)
 - [Bootstrap Icons](https://icons.getbootstrap.com/)
