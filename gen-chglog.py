@@ -68,7 +68,7 @@ def main():
 	update_version("README.md", prev_version, args.version)
 	run(['git-chglog', '--next-tag', args.version, '-o', log_path])
 	run(['git-chglog', '--config', tag_config_path, '--next-tag', args.version, '-o', tag_file_path, args.version])
-	run(['git', 'commit', '-am', f"'release {args.version}'"])
+	run(['git', 'commit', '-am', f"release {args.version}"])
 	run(['git', 'tag', args.version, '-F', tag_file_path])
 	print(f"  >> <<SUCCESS>> Created new tag {args.version}")
 	print(f"  >> Remember to use 'git push && git push origin --tags'")
