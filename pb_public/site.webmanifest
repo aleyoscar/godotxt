@@ -1,0 +1,21 @@
+{
+	"name": "GoDo.txt",
+	"short_name": "GoDo.txt",
+	"icons": [
+		{
+		"src": "/images/web-app-manifest-192x192.png?v=v1.0.1",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{
+		"src": "/images/web-app-manifest-512x512.png?v=v1.0.1",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	],
+	"theme_color": "#13171f",
+	"background_color": "#13171f",
+	"display": "standalone"
+}
