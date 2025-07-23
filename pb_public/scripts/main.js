@@ -302,14 +302,12 @@ function toggleComplete(setComplete, render=true) {
 	if (render) renderTasks();
 }
 
-if (DOM.search) {
-	DOM.search.addEventListener('input', e => {
-		filterSearch = e.target.value.trim();
-		if (filterSearch) DOM.search.parentElement.appendChild(clearBtn);
-		else clearSearch();
-		renderTasks();
-	});
-}
+DOM.search.addEventListener('input', e => {
+	filterSearch = e.target.value.trim();
+	if (filterSearch) DOM.search.parentElement.appendChild(clearBtn);
+	else clearSearch();
+	renderTasks();
+});
 
 // SORTING --------------------------------------------------------------------
 
