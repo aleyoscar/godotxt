@@ -141,6 +141,7 @@ function parseTask(task) {
 
 function renderTasks() {
 	debug("renderTasks", "Rendering tasks", tasks);
+
 	// Update aside menu
 	const listUl = DOM.aside?.querySelector('ul');
 	if (listUl) {
@@ -174,13 +175,28 @@ function renderTasks() {
 	updateModal(DOM.projectsModal, DOM.projectsBtn, tags.projects, 'projects', filterProjects);
 	updateModal(DOM.contextsModal, DOM.contextsBtn, tags.contexts, 'contexts', filterContexts);
 
+	// Get list hash
+	const hash = location.hash.slice(1) || '';
+	let filterList = '';
+	let listTitle = 'Tasks'
+	DOM.noList.classList.add('hide');
+	if (hash && hash !== 'tasks' && document.getElementById(`list-${hash}`)) {
+		filterList = hash;
+		listTitle = document.getElementById(`list-${hash}`).dataset.title
+	} else if (hash && hash !== 'tasks' && !document.getElementById(`list-${hash}`)) {
+		DOM.noList.querySelector('span').textContent = hash;
+		DOM.noList.classList.remove('hide');
+	}
+	DOM.listTitle.textContent = listTitle;
+
 	// Filter and sort tasks
 	const filteredTasks = tasks
 		.filter(task => (
 			(!filterSearch || task.rawDescription.toLowerCase().includes(filterSearch.toLowerCase())) &&
 			(showComplete ? true : !task.isCompleted) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
-			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c)))
+			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c))) &&
+			(!filterList || task.projects.includes(filterList))
 		))
 		.sort((a, b) => {
 			const valA = a.toString().toLowerCase();
@@ -204,13 +220,15 @@ function renderTasks() {
 		case 'context':
 			const prefix = group === 'project' ? '+' : '@';
 			tags[group + 's'].forEach(tag => {
-				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>${prefix}${tag}</h5></li><li class="group"><hr></li>`;
-				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task[group + 's'].includes(tag) ? task.html : '').join('');
+				if (filteredTasks.filter(task => task[group + 's'].includes(tag)).length) {
+					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>${prefix}${tag}</h5></li><li class="group"><hr></li>`;
+					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task[group + 's'].includes(tag) ? task.html : '').join('');
+				}
 			});
 			break;
 		case 'priority':
 			priorities.forEach(priority => {
-				if (priority) {
+				if (priority && filteredTasks.filter(task => task.priority === priority).length) {
 					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>Priority '${priority}'</h5></li><li class="group"><hr></li>`;
 					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.priority === priority ? task.html : '').join('');
 				}
@@ -225,8 +243,6 @@ function renderTasks() {
 	if (DOM.showAll) {
 		DOM.showAll.classList.toggle('hide', !(filterSearch || filterProjects.length || filterContexts.length));
 	}
-
-	openList();
 }
 
 // FILTER ---------------------------------------------------------------------
@@ -486,22 +502,7 @@ if (DOM.aside) {
 	});
 }
 
-function openList() {
-	const hash = location.hash.slice(1) || '';
-	DOM.noList.classList.toggle('hide', !hash || document.getElementById(`list-${hash}`) || hash === 'tasks');
-	DOM.taskList.querySelectorAll('li').forEach(t => t.classList.remove('hide'));
-	DOM.listTitle.textContent = hash && document.getElementById(`list-${hash}`)
-		? document.getElementById(`list-${hash}`).dataset.title
-		: 'Tasks';
-	if (hash && hash !== 'tasks' && !document.getElementById(`list-${hash}`)) {
-		DOM.noList.querySelector('span').textContent = hash;
-		DOM.noList.classList.remove('hide');
-	} else if (hash && hash !== 'tasks') {
-		DOM.taskList.querySelectorAll('li').forEach(t => t.classList.toggle('hide', !t.classList.contains(`project-${hash}`) && !t.classList.contains('group')));
-	}
-}
-
-window.addEventListener('hashchange', openList);
+window.addEventListener('hashchange', renderTasks);
 
 // SETTINGS -------------------------------------------------------------------
 
