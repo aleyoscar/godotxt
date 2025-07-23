@@ -29,7 +29,7 @@ def run(command):
 		print(f"  >> ({' '.join(command)}) completed successfully")
 		return result.stdout.strip()
 	except subprocess.CalledProcessError as e:
-		print(f"  >> <<ERROR>> ({' '.join(command)}) failed: {e}")
+		error_quit(f"({' '.join(command)}) failed: {e}")
 		return None
 
 def update_version(file_path, old_version, new_version):
