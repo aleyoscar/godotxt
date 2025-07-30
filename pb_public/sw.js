@@ -9,9 +9,9 @@ const urls = [
 	`/images/web-app-manifest-512x512.png?v=${version}`,
 	`/scripts/main.js?v=${version}`,
 	`/scripts/modal.js?v=${version}`,
-	`/scripts/pocketbase.umd.js`,
+	`/scripts/pocketbase.umd.js?v=v0.26.1`,
 	`/scripts/todotxt.js?v=${version}`,
-	`/styles/pico.red.min.css`,
+	`/styles/pico.red.min.css?v=v2.1.1`,
 	`/styles/style.css?v=${version}`,
 	`/index.html`,
 	`/site.webmanifest?v=${version}`
