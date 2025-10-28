@@ -58,6 +58,7 @@ const regex = {
 	context: /@[A-Za-z0-9_-]+/g,
 	projectSingle: /^\+[A-Za-z0-9_-]+$/,
 	contextSingle: /^@[A-Za-z0-9_-]+$/,
+	url: /(https?:\/\/|ftp:\/\/|www\.)[\w\-%.]+\.[a-z]{2,}(?:[\/\w\-.$?=&%#:]*)?/gi,
 };
 
 let tasks = [];
@@ -125,7 +126,12 @@ function parseTask(task) {
 		task.contexts.includes(match.slice(1))
 			? `<a class="contrast" data-attribute="contexts" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>`
 			: match
-	);
+	).replace(regex.url, (match) => {
+		const href = match.startsWith('http') ? match : 'https://' + match;
+		const label = new URL(href).hostname.replace(/^www\./i, '').split('.').slice(-2, -1)[0];
+		return `<a class="task-link secondary" href=${href} target="_blank" rel="noopener noreferrer">
+			<svg width="1em" height="1em"><use xlink:href="#icon-link"/></svg>${label}</a>`;
+	});
 
 	return `
 		<input type="checkbox" ${task.isCompleted ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)" />
@@ -243,6 +249,13 @@ function renderTasks() {
 	if (DOM.showAll) {
 		DOM.showAll.classList.toggle('hide', !(filterSearch || filterProjects.length || filterContexts.length));
 	}
+
+	// Update task links to stop propagation
+	document.querySelectorAll('.task-link').forEach((link) => {
+		link.addEventListener('click', (e) => {
+			e.stopPropagation();
+		});
+	});
 }
 
 // FILTER ---------------------------------------------------------------------
