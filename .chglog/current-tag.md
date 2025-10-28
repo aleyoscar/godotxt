@@ -1,21 +1,15 @@
 
-v1.1.0
-## [v1.1.0](https://github.com/aleyoscar/groctxt/compare/v1.0.1...v1.1.0) (2025-07-23)
-
-### Bug Fixes
-
-* **core:** Quit script on process fail
-* **core:** Removed quotes from commit message
-* **web:** Moved openlist to render. Fixes [#31](https://github.com/aleyoscar/groctxt/issues/31)
-
-### Code Refactoring
-
-* **core:** Migrated gen-chglog scripts to python
-* **web:** Moved webmanifest. Added version query
-* **web:** Removed obsolete search check
+v1.2.0
+## [v1.2.0](https://github.com/aleyoscar/groctxt/compare/v1.1.0...v1.2.0) (2025-10-28)
 
 ### Features
 
-* **web:** Added service worker
-* **web:** Added version query to images
+* Update windows pocketbase to v0.30.0
+* Update chglog script
+* **core:** Update chglog script
+* **web:** Replace links with link tag. Closes [#32](https://github.com/aleyoscar/groctxt/issues/32)
+* **web:** Update windows pocketbase to v0.31.0
+* **web:** Update pocketbase js-sdk to v0.26.2
+* **web:** Add pb-sdk and pico version info to sw
+* **web:** Update pb to 0.29.0
 
