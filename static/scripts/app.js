@@ -592,6 +592,19 @@ async function submitForm(e) {
 	}
 }
 
+// EXPORT --------------------------------------------------------------
+
+function openExport() {
+	debug("openExport", "Exporting");
+	const blob = new Blob([todos.toString()], { type: 'text/plain' });
+	const link = document.createElement('a');
+	link.href = URL.createObjectURL(blob);
+	link.download = 'todo.txt';
+	link.click();
+	URL.revokeObjectURL(link.href);
+	link.remove();
+}
+
 // MAIN -----------------------------------------------------------------------
 
 // Register service worker
