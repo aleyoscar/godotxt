@@ -1,16 +1,9 @@
 services:
-  pocketbase:
-    image: ghcr.io/muchobien/pocketbase:latest
+  godotxt:
+    build: .
     container_name: godotxt
     restart: unless-stopped
     ports:
-      - "8090:8090" # Change the first port to your preferred EX: "5050:8090"
+      - "8080:3000" # Change the first port to your preferred EX: "5050:3000"
     volumes:
-      - ./pb_data:/pb_data
-      - ./pb_public:/pb_public
-      - ./pb_migrations:/pb_migrations
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
-      interval: 30s
-      timeout: 5s
-      retries: 5
+      - ./data:/app/data
