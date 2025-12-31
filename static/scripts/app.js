@@ -560,7 +560,7 @@ async function submitForm(e) {
 				formData.get('edit-complete') ? newTask.complete() : newTask.uncomplete();
 				newTask.setPriority(formData.get('edit-priority') === '--' ? '' : formData.get('edit-priority'));
 				if (formData.get('edit-id')) { // Edit
-					const task = tasks.find(t => t.id === formData.get('edit-id'));
+					const task = todos.tasks.find(t => t.id === formData.get('edit-id'));
 					if (!task) throw new Error(`Could not find task with id ${formData.get('edit-id')}`);
 					newTask.creationDate = task.creationDate;
 					newTask.id = task.id;
