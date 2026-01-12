@@ -56,12 +56,7 @@ def validate_version(ver_str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Create CHANGELOG using git-chglog and update version info",
-        epilog="Optionally specify a file to --replace the previous version string with new version\n"
-               "Optionally specify a --dry run without committing or writing to files\n"
-               "Optionally specify the --output CHANGELOG path. Default is 'CHANGELOG.md'\n"
-               "Optionally specify the git-chglog --config path. Default is '.chglog/config-tag.yml'\n"
-               "Optionally specify the --temp file path. Default is '.chglog/current-tag.md'"
+        description="Create CHANGELOG using git-chglog and update version info"
     )
     parser.add_argument("version", help="New version string (e.g., v1.0.1)")
     parser.add_argument("--replace", "-r", action="append", type=Path, default=[],

@@ -46,3 +46,11 @@ References and sources used in the project.
 - [Todo.txt](http://todotxt.org/)
 - [Pico CSS](https://picocss.com/)
 - [Bootstrap Icons](https://icons.getbootstrap.com/)
+
+
+
+> Changelog script
+
+```
+python gen-chglog.py {version} -r static/index.html -r static/sw.js -r README.md -r package.json
+```
