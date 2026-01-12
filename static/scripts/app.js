@@ -39,6 +39,10 @@ const DOM = {
 	settingsModal: document.getElementById('settings-modal'),
 	settingsShowComplete: document.getElementById('settings-show-complete'),
 	showAll: document.getElementById('show-all'),
+	sortBtns: document.getElementById('sort-btns'),
+	sortByText: document.getElementById('sortby-text'),
+	sortByToggle: document.getElementById('sortby-toggle'),
+	sortDefaultBtn: document.getElementById('sort-priority'),
 	sortToggle: document.getElementById('sort-toggle'),
 	taskList: document.getElementById('tasks')
 };
@@ -66,6 +70,7 @@ let showComplete = false;
 let filterProjects = [];
 let filterContexts = [];
 let group = 'none';
+let sortType = 'priority';
 let settings = {};
 let state = {
 	debug: true,
@@ -87,6 +92,8 @@ const cleanString = (text) => text.trim().replace(/\s+/g, ' ');
 function debug(name, message, ...args) {
 	if (state.debug) console.log(`<<DEBUG>> [${name}]: ${message}`, ...args);
 }
+
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 // LIST -----------------------------------------------------------------------
 
@@ -187,21 +194,48 @@ function renderTasks() {
 	}
 	DOM.listTitle.textContent = listTitle;
 
-	// Filter and sort todos
-	const filteredTasks = todos.tasks
+	// Filter todos
+	let filteredTasks = todos.tasks
 		.filter(task => (
 			(!filterSearch || task.raw.toLowerCase().includes(filterSearch.toLowerCase())) &&
 			(showComplete ? true : !task.isCompleted) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
 			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c))) &&
 			(!filterList || task.projects.includes(filterList))
-		))
-		.sort((a, b) => {
-			const valA = a.toString().toLowerCase();
-			const valB = b.toString().toLowerCase();
-			const dir = sortAscending ? 1 : -1
-			return valA < valB ? -1 * dir : valA > valB ? 1 * dir : 0;
-		})
+		));
+
+	// Sort todos
+	const dir = sortAscending ? 1 : -1;
+	const sortByDefault = (a, b) => {
+		const valA = a.toString().toLowerCase();
+		const valB = b.toString().toLowerCase();
+		return valA < valB ? -1 * dir : valA > valB ? 1 * dir : 0;
+	}
+	const sortByDescription = (a, b) => {
+		const valA = a.description.toLowerCase();
+		const valB = b.description.toLowerCase();
+		return valA < valB ? -1 * dir : valA > valB ? 1 * dir : 0;
+	}
+	const sortByPriority = (a, b) => {
+		const valA = a.priority;
+		const valB = b.priority;
+		return valA < valB ? -1 * dir : valA > valB ? 1 * dir : 0;
+	}
+	const sortByDate = (a, b) => {
+		const valA = a.creationDate ? a.creationDate : '';
+		const valB = b.creationDate ? b.creationDate : '';
+		return valA < valB ? -1 * dir : valA > valB ? 1 * dir : 0;
+	}
+	switch(sortType) {
+		case 'description':
+			filteredTasks = filteredTasks.sort(sortByDefault).sort(sortByDescription);
+			break;
+		case 'date':
+			filteredTasks = filteredTasks.sort(sortByDefault).sort(sortByDate);
+			break;
+		default:
+			filteredTasks = filteredTasks.sort(sortByDefault);
+	}
 
 	debug("renderTasks", "Filtered todos", filteredTasks);
 	for (let i = 0; i < filteredTasks.length; i++) {
@@ -212,6 +246,7 @@ function renderTasks() {
 		`;
 	}
 
+	// Group todos
 	DOM.taskList.querySelector('ul').innerHTML = '';
 	switch(group) {
 		case 'project':
@@ -339,6 +374,17 @@ function sortTasks(event) {
 	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up-fill';
 	DOM.sortToggle.classList.toggle('outline', sortAscending);
 	DOM.sortToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+	renderTasks();
+}
+
+function sortBy(type) {
+	debug("sortBy", `Sorting by ${type}`);
+	sortType = type;
+	Array.from(DOM.sortBtns.children).forEach((btn) => {
+		btn.classList.toggle('outline', !btn.id.includes(type));
+	});
+	DOM.sortByToggle.classList.toggle('outline', !DOM.sortDefaultBtn.classList.contains('outline'));
+	DOM.sortByText.textContent = capitalize(type);
 	renderTasks();
 }
 

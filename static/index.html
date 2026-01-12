@@ -110,6 +110,9 @@
 			<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
 			<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
 		</symbol>
+		<symbol id="icon-sort" viewBox="0 0 16 16">
+			<path d="M2 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+		</symbol>
 	</svg>
 	<header class="container flex space-between align-center align-left-sm flex-column-lg">
 		<h1 id="title" class="flex align-center gap-xs">
@@ -166,6 +169,13 @@
 					Sort
 					<svg width="1em" height="1em">
 						<use xlink:href="#icon-caret-down"/>
+					</svg>
+				</button>
+				<button id="sortby-toggle" class="flex-inline align-center outline"
+					onclick="toggleModal(event)" data-target="sort-modal">
+					<span id="sortby-text">Priority</span>
+					<svg width="1em" height="1em">
+						<use xlink:href="#icon-sort"/>
 					</svg>
 				</button>
 				<button id="complete-toggle"
@@ -425,6 +435,45 @@
 					data-target="group-modal"
 					onclick="groupBy('none'); toggleModal(event);">
 					Clear
+				</button>
+			</footer>
+		</article>
+	</dialog>
+	<dialog id="sort-modal">
+		<article>
+			<header>
+				<button aria-label="Close"
+					rel="prev"
+					data-target="sort-modal"
+					onclick="toggleModal(event);">
+				</button>
+				<h3>Sort By</h3>
+			</header>
+			<div id="sort-btns" class="grid">
+				<button id="sort-priority"
+					class=""
+					data-target="sort-modal"
+					onclick="sortBy('priority'); toggleModal(event);">
+					Priority
+				</button>
+				<button id="sort-description"
+					class="outline"
+					data-target="sort-modal"
+					onclick="sortBy('description'); toggleModal(event);">
+					Description
+				</button>
+				<button id="sort-date"
+					class="outline"
+					data-target="sort-modal"
+					onclick="sortBy('date'); toggleModal(event);">
+					Date
+				</button>
+			</div>
+			<footer>
+				<button class="secondary"
+					data-target="sort-modal"
+					onclick="toggleModal(event);">
+					Cancel
 				</button>
 			</footer>
 		</article>
