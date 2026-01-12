@@ -215,12 +215,18 @@ function renderTasks() {
 	DOM.taskList.querySelector('ul').innerHTML = '';
 	switch(group) {
 		case 'project':
+			todos.projects.forEach(tag => {
+				if (filteredTasks.filter(task => task.projects.includes(tag)).length) {
+					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>+${tag}</h5></li><li class="group"><hr></li>`;
+					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.projects.includes(tag) ? task.html : '').join('');
+				}
+			});
+			break;
 		case 'context':
-			const prefix = group === 'project' ? '+' : '@';
-			tags[group + 's'].forEach(tag => {
-				if (filteredTasks.filter(task => task[group + 's'].includes(tag)).length) {
-					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>${prefix}${tag}</h5></li><li class="group"><hr></li>`;
-					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task[group + 's'].includes(tag) ? task.html : '').join('');
+			todos.contexts.forEach(tag => {
+				if (filteredTasks.filter(task => task.contexts.includes(tag)).length) {
+					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>@${tag}</h5></li><li class="group"><hr></li>`;
+					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.contexts.includes(tag) ? task.html : '').join('');
 				}
 			});
 			break;
