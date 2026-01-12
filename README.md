@@ -6,7 +6,7 @@ Self-hosted web app for todo.txt lists
 
 ## Description
 
-A self-hosted, responsive and mobile-friendly PWA (Progressive Web App) to manage a [todo.txt](http://todotxt.org/) file. Todo.txt gives you the flexibility to take your task list with you wherever you go and does not lock you into a proprietary service. All task data is stored in a text file that you can write to using any other application or text editor. GoDo your tasks and worry less about how to maintaining it!
+A self-hosted, responsive and mobile-friendly PWA (Progressive Web App) to manage a [todo.txt](http://todotxt.org/) file. Todo.txt gives you the flexibility to take your task list with you wherever you go and does not lock you into a proprietary service. All task data is stored in a text file that you can write to using any other application or text editor. GoDo your tasks and worry less about how to maintain it!
 
 ## Features
 
@@ -15,7 +15,7 @@ A self-hosted, responsive and mobile-friendly PWA (Progressive Web App) to manag
 - Edit and delete tasks
 - Quickly Delete all completed tasks
 - Quickly mark tasks as completed
-- Filter and order tasks
+- Filter, sort and group tasks
 - Side menu with all `+projects` present for quick filtering
 - Manage your already established todo.txt file by using docker's volumes
 - Responsive and mobile-friendly
