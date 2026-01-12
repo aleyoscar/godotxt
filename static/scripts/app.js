@@ -221,6 +221,10 @@ function renderTasks() {
 					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.projects.includes(tag) ? task.html : '').join('');
 				}
 			});
+			if (filteredTasks.filter(task => !task.projects.length)) {
+				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No project</h5></li><li class="group"><hr></li>`;
+				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => !task.projects.length ? task.html : '').join('');
+			}
 			break;
 		case 'context':
 			todos.contexts.forEach(tag => {
@@ -229,6 +233,10 @@ function renderTasks() {
 					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.contexts.includes(tag) ? task.html : '').join('');
 				}
 			});
+			if (filteredTasks.filter(task => !task.contexts.length)) {
+				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No context</h5></li><li class="group"><hr></li>`;
+				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => !task.contexts.length ? task.html : '').join('');
+			}
 			break;
 		case 'priority':
 			todos.priorities.forEach(priority => {
@@ -237,6 +245,10 @@ function renderTasks() {
 					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.priority === priority ? task.html : '').join('');
 				}
 			});
+			if (filteredTasks.filter(task => !task.priority)) {
+				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No priority</h5></li><li class="group"><hr></li>`;
+				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => !task.priority ? task.html : '').join('');
+			}
 			break;
 		default:
 			// Render todos
