@@ -579,6 +579,17 @@ async function submitForm(e) {
 				deleteList.forEach(d => { todos.delete(d); });
 				saveTasks();
 				break;
+			case 'import-form':
+				const reader = new FileReader();
+				reader.onload = function () {
+					const lines = reader.result.split('\n');
+					const appending = formData.get('import-append');
+					debug("submitForm", `${appending ? 'Appending' : 'Importing'} ${lines.length} tasks`, reader.result, lines);
+					todos.parse(reader.result, appending);
+					saveTasks();
+				}
+				reader.readAsText(formData.get('import-file'));
+				break;
 			default:
 				throw new Error(`Invalid form ${form.id}`);
 		}

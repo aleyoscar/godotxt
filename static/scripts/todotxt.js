@@ -162,15 +162,16 @@ class TodoTxt {
 		this.update();
 	}
 
-	parse(text) {
-		this.tasks = [];
+	parse(text, append=false) {
+		let newTasks = [];
 		let linenr = 0;
 		text.split('\n').forEach(line => {
 			if (line.trim()) {
-				this.tasks.push(new Task(line.trim(), linenr.toString(), linenr));
+				newTasks.push(new Task(line.trim(), linenr.toString(), linenr));
 			}
 			linenr += 1;
 		});
+		this.tasks = append ? this.tasks.concat(newTasks) : newTasks;
 		this.update();
 	}
 
