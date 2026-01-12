@@ -406,6 +406,12 @@
 				<h3>Group By</h3>
 			</header>
 			<div id="group-btns" class="grid">
+				<button id="group-clear-btn"
+					class="contrast outline hide"
+					data-target="group-modal"
+					onclick="groupBy('none'); toggleModal(event);">
+					None
+				</button>
 				<button id="group-priority"
 					class="outline"
 					data-target="group-modal"
@@ -430,11 +436,6 @@
 					data-target="group-modal"
 					onclick="toggleModal(event);">
 					Cancel
-				</button>
-				<button id="group-clear-btn" class="contrast hide"
-					data-target="group-modal"
-					onclick="groupBy('none'); toggleModal(event);">
-					Clear
 				</button>
 			</footer>
 		</article>
