@@ -5,6 +5,8 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
+app.set('trust proxy', true);
+
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
 	fs.mkdirSync(dataDir);
@@ -31,6 +33,7 @@ app.put('/todo.txt', (req, res) => {
 app.use(express.static('static'));
 
 app.get('/*splat', (req, res) => {
+	console.log(req.protocol, req.hostname);
 	res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
 
