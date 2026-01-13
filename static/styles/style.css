@@ -15,10 +15,12 @@ ul li { list-style-type: none; }
 .flex { display: flex; gap: var(--pico-spacing); }
 details.dropdown > summary + ul li a.flex { display: flex; }
 .flex-1 { flex: 1; }
+.flex-column { flex-direction: column; }
 .flex-inline { display: inline-flex; gap: var(--pico-spacing); }
 .flex-grow { flex: 1; }
 .float-left { float: left; }
 .float-right { float: right; }
+.gap-xxs { gap: 4px; }
 .gap-xs { gap: calc(var(--pico-spacing) / 1.6); }
 .hide { display: none; }
 .horizontal-scroll { display: flex; flex-wrap: nowrap; gap: calc(var(--pico-spacing) / 3); }

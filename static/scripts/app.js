@@ -28,6 +28,8 @@ const DOM = {
 	listTitle: document.getElementById('list-title'),
 	logo: document.getElementById('logo'),
 	noList: document.getElementById('no-list'),
+	onlineStatus: document.getElementById('online-status'),
+	onlineProgress: document.getElementById('online-progress'),
 	projectsBtn: document.getElementById('projects-btn'),
 	projectsModal: document.getElementById('projects-modal'),
 	search: document.getElementById('search'),
@@ -53,6 +55,9 @@ const clearBtn = Object.assign(document.createElement('button'), {
 	onclick: clearSearch,
 });
 
+const PING_INTERVAL = 15;
+const PING_TIMEOUT = 5000;
+
 // GLOBALS --------------------------------------------------------------------
 
 const regex = {
@@ -74,6 +79,8 @@ let sortType = 'priority';
 let settings = {};
 let state = {
 	debug: true,
+	online: navigator.onLine,
+	countdown: PING_INTERVAL
 }
 
 // HELPERS --------------------------------------------------------------------
@@ -680,6 +687,60 @@ function openExport() {
 	link.remove();
 }
 
+// ONLINE ---------------------------------------------------------------------
+
+function updateOnlineStatus() {
+	const newIcon = `#icon-${state.online ? 'online' : 'offline'}`;
+	DOM.onlineStatus.querySelector('use').setAttribute('xlink:href', newIcon);
+	debug("updateOnlineStatus", "Online:", state.online);
+}
+
+function onlineChange() {
+	state.online = navigator.onLine;
+	updateOnlineStatus();
+	if (state.online) {
+		console.log("Save tasks");
+	}
+}
+
+window.addEventListener('online', onlineChange);
+window.addEventListener('offline', onlineChange);
+
+async function checkConnectivity() {
+	try {
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), PING_TIMEOUT);
+
+		const response = await fetch('/health', {
+			method: 'HEAD',
+			cache: 'no-store',
+			signal: controller.signal
+		});
+		clearTimeout(timeoutId);
+
+		const wasOffline = !state.online;
+		state.online = response.ok;
+
+		if (state.online && wasOffline) {
+			console.log("Save tasks");
+		}
+
+		updateOnlineStatus();
+	} catch (error) {
+		state.online = false;
+		updateOnlineStatus();
+	}
+}
+
+setInterval(() => {
+	state.countdown -= 1;
+	if (state.countdown <= 0) {
+		checkConnectivity();
+		state.countdown = PING_INTERVAL;
+	}
+	DOM.onlineProgress.value = parseInt((PING_INTERVAL - state.countdown) * 100 / PING_INTERVAL);
+}, 1000);
+
 // MAIN -----------------------------------------------------------------------
 
 // Register service worker
@@ -691,4 +752,6 @@ if ('serviceWorker' in navigator) {
 	});
 }
 
+updateOnlineStatus();
+checkConnectivity();
 fetchTasks();

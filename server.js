@@ -30,10 +30,18 @@ app.put('/todo.txt', (req, res) => {
 	res.status(200).send('OK');
 });
 
+app.get('/health', (req, res) => {
+	res.status(200).json({
+		status: 'UP',
+		uptime: process.uptime(),
+		timestamp: new Date().toISOString(),
+		message: 'GoDo.txt is healthy'
+	});
+});
+
 app.use(express.static('static'));
 
 app.get('/*splat', (req, res) => {
-	console.log(req.protocol, req.hostname);
 	res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
 
