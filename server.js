@@ -18,7 +18,14 @@ app.use(express.raw({type: '*/*', limit: '10mb'}));
 
 app.get('/todo.txt', (req, res) => {
 	if (fs.existsSync(TODO_FILE)) {
-		res.sendFile(TODO_FILE);
+		fs.stat(TODO_FILE, (err, stats) => {
+			if (err) {
+				return res.status(404).send(`Error sending file: ${err}`);
+			}
+
+			res.set('Last-Modified', stats.mtime.toUTCString());
+			res.sendFile(TODO_FILE);
+		})
 	} else {
 		res.status(200).send('');
 	}

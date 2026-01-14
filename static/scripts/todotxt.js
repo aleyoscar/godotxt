@@ -151,6 +151,7 @@ class TodoTxt {
 		this.projects = [];
 		this.contexts = [];
 		this.priorities = [];
+		this.modified = null;
 		if (text) this.parse(text);
 	}
 
@@ -210,6 +211,7 @@ class TodoTxt {
 		this.projects.sort();
 		this.contexts.sort();
 		this.priorities.sort();
+		this.modified = new Date();
 	}
 
 	async loadFromFile(filePath) {
