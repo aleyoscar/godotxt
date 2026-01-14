@@ -33,7 +33,7 @@ app.get('/todo.txt', (req, res) => {
 
 app.put('/todo.txt', (req, res) => {
 	fs.writeFileSync(TODO_FILE, req.body);
-	console.log('todo.txt updated');
+	console.log(`[${new Date().toUTCString()}] todo.txt updated`);
 	res.status(200).send('OK');
 });
 
@@ -53,5 +53,5 @@ app.get('/*splat', (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`Server running on http://localhost:${PORT}`);
+	console.log(`[${new Date().toUTCString()}] Server running on http://localhost:${PORT}`);
 });
