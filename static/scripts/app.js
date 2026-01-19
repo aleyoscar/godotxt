@@ -56,7 +56,7 @@ const clearBtn = Object.assign(document.createElement('button'), {
 	onclick: clearSearch,
 });
 
-const PING_INTERVAL = 15;
+const PING_INTERVAL = 10;
 const PING_TIMEOUT = 5000;
 
 // GLOBALS --------------------------------------------------------------------
@@ -724,6 +724,13 @@ function openExport() {
 
 // ONLINE ---------------------------------------------------------------------
 
+function setWifi(theme = [0, 0, 0, 0]) {
+	document.documentElement.style.setProperty('--arc1', theme[0] ? 'var(--pico-primary)' : 'var(--pico-color)');
+	document.documentElement.style.setProperty('--arc2', theme[1] ? 'var(--pico-primary)' : 'var(--pico-color)');
+	document.documentElement.style.setProperty('--arc3', theme[2] ? 'var(--pico-primary)' : 'var(--pico-color)');
+	document.documentElement.style.setProperty('--arc4', theme[3] ? 'var(--pico-primary)' : 'var(--pico-color)');
+}
+
 function updateOnlineStatus() {
 	const newIcon = `#icon-${state.online ? 'online' : 'offline'}`;
 	DOM.onlineStatus.querySelector('use').setAttribute('xlink:href', newIcon);
@@ -765,6 +772,11 @@ setInterval(() => {
 		checkConnectivity();
 		state.countdown = PING_INTERVAL;
 	}
+	let interval = PING_INTERVAL / 4;
+	if (state.countdown > interval * 3) setWifi([1, 0, 0, 0]);
+	else if (state.countdown > interval * 2) setWifi([1, 1, 0, 0]);
+	else if (state.countdown > interval) setWifi([1, 1, 1, 0]);
+	else setWifi([1, 1, 1, 1]);
 }, 1000);
 
 // AUTHENTICATION -------------------------------------------------------------

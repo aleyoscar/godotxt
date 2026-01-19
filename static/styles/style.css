@@ -52,6 +52,11 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .strike { text-decoration: line-through; }
 .text-center { text-align: center; }
 
+.arc-1 { fill: var(--arc1, --pico-color); }
+.arc-2 { fill: var(--arc2, --pico-color); }
+.arc-3 { fill: var(--arc3, --pico-color); }
+.arc-4 { fill: var(--arc4, --pico-color); }
+
 button.danger {
 	background-color: var(--pico-form-element-invalid-border-color);
 	border-color: var(--pico-form-element-invalid-border-color);
