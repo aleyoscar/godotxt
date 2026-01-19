@@ -28,6 +28,7 @@ const DOM = {
 	listTitle: document.getElementById('list-title'),
 	logo: document.getElementById('logo'),
 	noList: document.getElementById('no-list'),
+	noAuth: document.getElementById('no-auth'),
 	onlineStatus: document.getElementById('online-status'),
 	onlineProgress: document.getElementById('online-progress'),
 	projectsBtn: document.getElementById('projects-btn'),
@@ -46,7 +47,8 @@ const DOM = {
 	sortByToggle: document.getElementById('sortby-toggle'),
 	sortDefaultBtn: document.getElementById('sort-priority'),
 	sortToggle: document.getElementById('sort-toggle'),
-	taskList: document.getElementById('tasks')
+	taskList: document.getElementById('tasks'),
+	tokenInput: document.getElementById('token-input')
 };
 
 const clearBtn = Object.assign(document.createElement('button'), {
@@ -80,7 +82,9 @@ let settings = {};
 let state = {
 	debug: true,
 	online: navigator.onLine,
-	countdown: PING_INTERVAL
+	countdown: PING_INTERVAL,
+	auth: false,
+	token: localStorage.getItem('token') || 'token'
 }
 
 // HELPERS --------------------------------------------------------------------
@@ -107,10 +111,20 @@ const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCa
 async function fetchTasks() {
 	toggleLoading(true);
 	try {
-		const res = await fetch('/todo.txt');
+		const res = await fetch('/todo.txt', {
+			headers: {
+				'Authorization': `Bearer ${state.token}`
+			}
+		});
+		if (res.status === 401) {
+			updateAuthStatus(false);
+			throw new Error('Wrong/empty token');
+		}
+		if (!res.ok) throw new Error('Failed to fetch todos');
 		const text = await res.text();
 		todos = new TodoTxt(text);
 		debug("fetchTasks", "Fetched todos", todos);
+		updateAuthStatus(true);
 		renderTasks();
 	} catch (error) {
 		console.error('Error loading todos:', error);
@@ -475,11 +489,17 @@ async function deleteTask(event) {
 
 async function saveTasks() {
 	try {
-		await fetch('/todo.txt', {
+		const res = await fetch('/todo.txt', {
 			method: 'PUT',
-			headers: { 'Content-Type': 'text/plain' },
+			headers: { 'Content-Type': 'text/plain', 'Authorization': `Bearer ${state.token}`},
 			body: todos.toString()
 		});
+		if (res.status === 401) {
+			updateAuthStatus(false);
+			throw new Error('Wrong/empty token');
+		}
+		if (!res.ok) throw new Error('Sync failed');
+		updateAuthStatus(true);
 		fetchTasks();
 		if (visibleModal) closeModal(visibleModal);
 	} catch (error) {
@@ -661,6 +681,16 @@ async function submitForm(e) {
 				}
 				reader.readAsText(formData.get('import-file'));
 				break;
+			case 'token-form':
+				const newToken = formData.get('token-input');
+				if (newToken) {
+					localStorage.setItem('token', newToken);
+					state.token = newToken;
+					fetchTasks();
+				} else {
+					throw new Error('Invalid token');
+				}
+				break;
 			default:
 				throw new Error(`Invalid form ${form.id}`);
 		}
@@ -740,6 +770,22 @@ setInterval(() => {
 	}
 	DOM.onlineProgress.value = parseInt((PING_INTERVAL - state.countdown) * 100 / PING_INTERVAL);
 }, 1000);
+
+// AUTHENTICATION -------------------------------------------------------------
+
+function openToken() {
+	DOM.tokenInput.value = state.token === 'token' ? '' : state.token;
+}
+
+function updateAuthStatus(auth) {
+	state.auth = auth;
+	DOM.noAuth.classList.toggle('hide', state.auth);
+	DOM.taskList.classList.toggle('hide', !state.auth);
+	if (!state.auth) {
+		todos = [];
+		renderTasks();
+	}
+}
 
 // MAIN -----------------------------------------------------------------------
 

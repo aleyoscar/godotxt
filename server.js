@@ -4,6 +4,24 @@ const path = require('path');
 
 const app = express();
 const PORT = 3000;
+const TOKEN = process.env.TOKEN || 'token';
+
+const authToken = (req, res, next) => {
+	const authHeader = req.headers['authorization'];
+
+	if (!authHeader) {
+		return res.status(401).json({ error: 'Authorization header missing'});
+	}
+
+	const token = authHeader.split(' ')[1];
+	if (!token || token !== TOKEN) {
+		return res.status(401).json({
+			error: 'Invalid or missing API token'
+		});
+	}
+
+	next();
+}
 
 app.set('trust proxy', true);
 
@@ -14,6 +32,7 @@ if (!fs.existsSync(dataDir)) {
 
 const TODO_FILE = path.join(dataDir, 'todo.txt');
 
+app.use('/todo.txt', authToken);
 app.use(express.raw({type: '*/*', limit: '10mb'}));
 
 app.get('/todo.txt', (req, res) => {
@@ -47,7 +66,6 @@ app.get('/health', (req, res) => {
 });
 
 app.use(express.static('static'));
-
 app.get('/*splat', (req, res) => {
 	res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
