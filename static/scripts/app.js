@@ -79,7 +79,7 @@ let group = 'none';
 let sortType = 'priority';
 let settings = {};
 let state = {
-	debug: true,
+	debug: false,
 	online: navigator.onLine,
 	countdown: PING_INTERVAL,
 	auth: false,
