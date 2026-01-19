@@ -5,5 +5,7 @@ services:
     restart: unless-stopped
     ports:
       - "8080:3000" # Change the first port to your preferred EX: "5050:3000"
+    env_file: # Optional if using authentication token
+      - .env
     volumes:
       - ./data:/app/data
