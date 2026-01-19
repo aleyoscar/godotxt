@@ -71,5 +71,5 @@ app.get('/*splat', (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`[${new Date().toUTCString()}] Server running on http://localhost:${PORT}`);
+	console.log(`[${new Date().toUTCString()}] Server running on http://localhost:${PORT}${TOKEN === 'token' ? "" : " with authentication."}`);
 });
