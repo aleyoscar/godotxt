@@ -186,16 +186,22 @@ function renderTasks() {
 	// Populate project & context dropdowns
 	const updateModal = (modal, btn, items, attribute, checkedItems) => {
 		debug("updateModal", "Updating Tags Modals", items);
-		modal.querySelector('ul').innerHTML = items.length
-			? items.map(item => `
-				<li><label>
-					<input type="checkbox" class="attribute-filter" data-attribute="${attribute}" name="${item}" ${checkedItems.includes(item) ? 'checked' : ''}/>
-					${item}
-				</label></li>
-			`).join('')
-			: '';
-		btn.toggleAttribute('disabled', !items.length);
-		btn.classList.toggle('secondary', !items.length);
+		if (!items) {
+			modal.querySelector('ul').innerHTML = '';
+			btn.toggleAttribute('disabled', !items);
+			btn.classList.toggle('secondary', !items);
+		} else {
+			modal.querySelector('ul').innerHTML = items.length
+				? items.map(item => `
+					<li><label>
+						<input type="checkbox" class="attribute-filter" data-attribute="${attribute}" name="${item}" ${checkedItems.includes(item) ? 'checked' : ''}/>
+						${item}
+					</label></li>
+				`).join('')
+				: '';
+			btn.toggleAttribute('disabled', !items.length);
+			btn.classList.toggle('secondary', !items.length);
+		}
 	};
 	updateModal(DOM.projectsModal, DOM.projectsBtn, todos.projects, 'projects', filterProjects);
 	updateModal(DOM.contextsModal, DOM.contextsBtn, todos.contexts, 'contexts', filterContexts);
@@ -203,7 +209,7 @@ function renderTasks() {
 	// Get list hash
 	const hash = location.hash.slice(1) || '';
 	let filterList = '';
-	let listTitle = 'Tasks'
+	let listTitle = 'Tasks';
 	DOM.noList.classList.add('hide');
 	if (hash && hash !== 'tasks' && document.getElementById(`list-${hash}`)) {
 		filterList = hash;
@@ -215,14 +221,14 @@ function renderTasks() {
 	DOM.listTitle.textContent = listTitle;
 
 	// Filter todos
-	let filteredTasks = todos.tasks
+	let filteredTasks = todos.tasks ? todos.tasks
 		.filter(task => (
 			(!filterSearch || task.raw.toLowerCase().includes(filterSearch.toLowerCase())) &&
 			(showComplete ? true : !task.isCompleted) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
 			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c))) &&
 			(!filterList || task.projects.includes(filterList))
-		));
+		)) : [];
 
 	// Sort todos
 	const dir = sortAscending ? 1 : -1;
