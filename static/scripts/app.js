@@ -30,7 +30,6 @@ const DOM = {
 	noList: document.getElementById('no-list'),
 	noAuth: document.getElementById('no-auth'),
 	onlineStatus: document.getElementById('online-status'),
-	onlineProgress: document.getElementById('online-progress'),
 	projectsBtn: document.getElementById('projects-btn'),
 	projectsModal: document.getElementById('projects-modal'),
 	search: document.getElementById('search'),
@@ -768,7 +767,6 @@ setInterval(() => {
 		checkConnectivity();
 		state.countdown = PING_INTERVAL;
 	}
-	DOM.onlineProgress.value = parseInt((PING_INTERVAL - state.countdown) * 100 / PING_INTERVAL);
 }, 1000);
 
 // AUTHENTICATION -------------------------------------------------------------
