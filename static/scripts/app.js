@@ -727,14 +727,13 @@ function openExport() {
 function updateOnlineStatus() {
 	const newIcon = `#icon-${state.online ? 'online' : 'offline'}`;
 	DOM.onlineStatus.querySelector('use').setAttribute('xlink:href', newIcon);
-	debug("updateOnlineStatus", "Online:", state.online);
 }
 
 function onlineChange() {
-	state.online = navigator.onLine;
+	checkConnectivity();
 	updateOnlineStatus();
 	if (state.online) {
-		console.log("Save tasks");
+		fetchTasks();
 	}
 }
 
@@ -752,14 +751,7 @@ async function checkConnectivity() {
 			signal: controller.signal
 		});
 		clearTimeout(timeoutId);
-
-		const wasOffline = !state.online;
 		state.online = response.ok;
-
-		if (state.online && wasOffline) {
-			console.log("Save tasks");
-		}
-
 		updateOnlineStatus();
 	} catch (error) {
 		state.online = false;
