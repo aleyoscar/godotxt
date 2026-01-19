@@ -1,6 +1,6 @@
 {
   "name": "godotxt",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Self-hosted web app for todo.txt",
   "main": "server.js",
   "directories": {

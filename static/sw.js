@@ -1,4 +1,4 @@
-const version = 'v2.0.0';
+const version = 'v2.1.0';
 const CACHE_NAME = `godotxt-${version}`;
 const urls = [
 	`/images/apple-touch-icon.png?v=${version}`,
