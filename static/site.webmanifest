@@ -1,21 +1,44 @@
 {
 	"name": "GoDo.txt",
 	"short_name": "GoDo.txt",
+	"description": "Self-hosted web app for todo.txt",
+	"start_url": "/",
 	"icons": [
 		{
-		"src": "/images/web-app-manifest-192x192.png?v=v1.1.0",
+			"src": "/images/web-app-manifest-192x192.png?v=v2.0.0",
 			"sizes": "192x192",
 			"type": "image/png",
 			"purpose": "maskable"
 		},
 		{
-		"src": "/images/web-app-manifest-512x512.png?v=v1.1.0",
+			"src": "/images/web-app-manifest-512x512.png?v=v2.0.0",
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "maskable"
+		},
+		{
+			"src": "/images/favicon.svg?v=v2.0.0",
+			"sizes": "512x512",
+			"type": "image/svg",
+			"purpose": "any"
 		}
+
 	],
 	"theme_color": "#13171f",
 	"background_color": "#13171f",
-	"display": "standalone"
+	"display": "standalone",
+	"screenshots": [
+		{
+			"src": "/images/screenshot-narrow-720x1280.png?v=v2.0.0",
+			"type": "image/png",
+			"sizes": "720x1280",
+			"form_factor": "narrow"
+		},
+		{
+			"src": "/images/screenshot-wide-1280x720.png?v=v2.0.0",
+			"type": "image/png",
+			"sizes": "1280x720",
+			"form_factor": "wide"
+		}
+	]
 }
