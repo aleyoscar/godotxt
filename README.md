@@ -2,7 +2,7 @@
 
 > v2.0.0
 
-Self-hosted web app for todo.txt lists
+Self-hosted web app for todo.txt
 
 ## Description
 
@@ -43,6 +43,12 @@ A self-hosted, responsive and mobile-friendly PWA (Progressive Web App) to manag
 		- Normal start `docker compose up -d`
 5. Access the app at [localhost:8080](http://localhost:8080)
 
+## Updating
+
+1. Stop the container `docker compose down`
+2. Use `git fetch` and `git pull` to get the latest changes from github.
+3. Restart the container `docker compose up --build -d`
+
 ## Sources
 
 References and sources used in the project.
@@ -56,5 +62,5 @@ References and sources used in the project.
 > Changelog script
 
 ```
-python gen-chglog.py {version} -r static/index.html -r static/sw.js -r README.md -r package.json
+python gen-chglog.py {version} -r static/index.html -r static/sw.js -r README.md -r package.json -r static/site.webmanifest
 ```
