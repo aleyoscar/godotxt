@@ -4,6 +4,8 @@
 
 Self-hosted web app for todo.txt
 
+![Widescreen Screenshot of GoDo.txt app](static/images/screenshot-wide-1280x720.png)
+
 ## Description
 
 A self-hosted, responsive and mobile-friendly PWA (Progressive Web App) to manage a [todo.txt](http://todotxt.org/) file. Todo.txt gives you the flexibility to take your task list with you wherever you go and does not lock you into a proprietary service. All task data is stored in a text file that you can write to using any other application or text editor. GoDo your tasks and worry less about how to maintain it!
