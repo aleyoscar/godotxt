@@ -3,25 +3,20 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const TOKEN = process.env.TOKEN || 'token';
 
 const authToken = (req, res, next) => {
 	const authHeader = req.headers['authorization'];
-
 	if (!authHeader) {
-		return res.status(401).json({ error: 'Authorization header missing'});
+		return res.status(401).json({ error: 'Authorization header missing' });
 	}
-
 	const token = authHeader.split(' ')[1];
 	if (!token || token !== TOKEN) {
-		return res.status(401).json({
-			error: 'Invalid or missing API token'
-		});
+		return res.status(401).json({ error: 'Invalid or missing API token' });
 	}
-
 	next();
-}
+};
 
 app.set('trust proxy', true);
 
