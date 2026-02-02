@@ -28,7 +28,7 @@ A privacy-friendly and responsive PWA (Progressive Web App) to manage a [todo.tx
 
 ## Installation / Use
 
-No install is necessary! You can simply go to [godo.aleyoscar.com](https://godo.aleyoscar.com) and access your own text file on your device by selecting 'Pick a file'
+No install is necessary! You can simply go to [godo.aleyoscar.com](https://godo.aleyoscar.com) and access your own text file on your device by selecting 'select a file'
 
 > Note: Uses the File System Access API which has only been tested to work on Chromium based browsers
 
@@ -38,6 +38,19 @@ You can also host the web app on your own server and with your own domain:
 
 1. Clone this repository into a folder or download from [releases](https://github.com/aleyoscar/godotxt/releases)
 2. Copy/upload/ftp the 'static' folder into your server's web directory
+
+Or if you have cPanel on your server, you can use cPanel's git version control
+
+1. Open cPanel Tools > Git Version Control
+2. Create a new repository
+3. Set the 'Clone URL' to the repo's https url: https://github.com/aleyoscar/godotxt.git
+4. Set the repository path to `<username>/git/godotxt`
+
+> Note: The default cPanel repo path uses `repository` instead of `git` which I have changed. This must be set to `git` to deploy correctly
+
+5. Set the name to whatever you would like, for example `godotxt`
+6. After it's created go back into the repository and open the `Pull or Deploy` tab
+7. Select `Update from Remote` and then `Deploy HEAD Commit`
 
 ## Sources
 
