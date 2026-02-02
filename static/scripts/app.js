@@ -28,7 +28,6 @@ const DOM = {
 	listTitle: document.getElementById('list-title'),
 	logo: document.getElementById('logo'),
 	noList: document.getElementById('no-list'),
-	noAuth: document.getElementById('no-auth'),
 	projectsBtn: document.getElementById('projects-btn'),
 	projectsModal: document.getElementById('projects-modal'),
 	search: document.getElementById('search'),
@@ -46,7 +45,6 @@ const DOM = {
 	sortDefaultBtn: document.getElementById('sort-priority'),
 	sortToggle: document.getElementById('sort-toggle'),
 	taskList: document.getElementById('tasks'),
-	tokenInput: document.getElementById('token-input')
 };
 
 const clearBtn = Object.assign(document.createElement('button'), {
@@ -77,8 +75,6 @@ let sortType = 'priority';
 let settings = {};
 let state = {
 	debug: false,
-	auth: false,
-	token: localStorage.getItem('token') || 'token'
 }
 
 // HELPERS --------------------------------------------------------------------
@@ -681,18 +677,6 @@ async function submitForm(e) {
 				}
 				reader.readAsText(formData.get('import-file'));
 				break;
-			case 'token-form':
-				const newToken = formData.get('token-input');
-				if (newToken) {
-					localStorage.setItem('token', newToken);
-					state.token = newToken;
-					fetchTasks();
-				} else {
-					throw new Error('Invalid token');
-				}
-				break;
-			default:
-				throw new Error(`Invalid form ${form.id}`);
 		}
 		if (visibleModal) closeModal(visibleModal);
 		form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
@@ -715,23 +699,6 @@ function openExport() {
 	link.click();
 	URL.revokeObjectURL(link.href);
 	link.remove();
-}
-
-
-// AUTHENTICATION -------------------------------------------------------------
-
-function openToken() {
-	DOM.tokenInput.value = state.token === 'token' ? '' : state.token;
-}
-
-function updateAuthStatus(auth) {
-	state.auth = auth;
-	DOM.noAuth.classList.toggle('hide', state.auth);
-	DOM.taskList.classList.toggle('hide', !state.auth);
-	if (!state.auth) {
-		todos = [];
-		renderTasks();
-	}
 }
 
 // MAIN -----------------------------------------------------------------------

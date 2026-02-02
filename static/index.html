@@ -173,14 +173,6 @@
 							Delete Done<svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg>
 						</a>
 					</li>
-					<li class="min-width-xxs">
-						<a class="pointer flex align-center space-between gap-xs"
-							dir="ltr"
-							data-target="token-modal"
-							onclick="openToken(); toggleModal(event);">
-							Token<svg width="1em" height="1em"><use xlink:href="#icon-key"/></svg>
-						</a>
-					</li>
 					<li class="min-width-xxs color-secondary"><small>v2.1.1</small></li>
 				</ul>
 			</details>
@@ -269,7 +261,6 @@
 			</aside>
 			<div class="flex-1">
 				<div id="no-list" class="hide">No list with the name <span></span></div>
-				<div id="no-auth">Authentication failed. Please <a class="pointer" data-target="token-modal" onclick="openToken(); toggleModal(event);">provide a token</a></div>
 				<div id="tasks">
 					<section class="flex align-center">
 						<h3 id="list-title" class="mb-0">Tasks</h3>
@@ -565,39 +556,6 @@
 					form="import-form">
 					Import
 				</button>
-			</footer>
-		</article>
-	</dialog>
-	<dialog id="token-modal">
-		<article>
-			<header>
-				<button aria-label="Close"
-					rel="prev"
-					data-target="token-modal"
-					onclick="toggleModal(event)">
-				</button>
-				<h3>Authentication Token</h3>
-			</header>
-			<form id="token-form" class="form">
-				<p class="error message hide">There was an error updating the token.</p>
-				<fieldset>
-					<label>Token
-						<input type="text"
-							id="token-input"
-							name="token-input"
-							placeholder="Token"
-							autocomplete="off"
-							required />
-					</label>
-				</fieldset>
-			</form>
-			<footer>
-				<button class="secondary"
-					data-target="token-modal"
-					onclick="toggleModal(event)">
-					Cancel
-				</button>
-				<button id="token-submit" class="form-submit" form="token-form">Save</button>
 			</footer>
 		</article>
 	</dialog>
