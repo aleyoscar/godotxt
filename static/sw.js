@@ -10,7 +10,7 @@ const urls = [
 	`/scripts/app.js?v=${version}`,
 	`/scripts/modal.js?v=${version}`,
 	`/scripts/todotxt.js?v=${version}`,
-	`/styles/pico.red.min.css?v=v2.1.1`,
+	`/styles/pico.min.css?v=v2.1.1`,
 	`/styles/style.css?v=${version}`,
 	`/index.html`,
 	`/site.webmanifest?v=${version}`
