@@ -22,12 +22,14 @@ const DOM = {
 	editProjects: document.getElementById('edit-projects'),
 	editSubmit: document.getElementById('edit-submit'),
 	editTitle: document.getElementById('edit-title'),
+	fileStatus: document.getElementById('file-status'),
 	groupBtn: document.getElementById('group-btn'),
 	groupBtns: document.getElementById('group-btns'),
 	groupClearBtn: document.getElementById('group-clear-btn'),
 	listTitle: document.getElementById('list-title'),
 	logo: document.getElementById('logo'),
 	noList: document.getElementById('no-list'),
+	pickFile: document.getElementById('pick-file'),
 	projectsBtn: document.getElementById('projects-btn'),
 	projectsModal: document.getElementById('projects-modal'),
 	search: document.getElementById('search'),
@@ -53,6 +55,9 @@ const clearBtn = Object.assign(document.createElement('button'), {
 	onclick: clearSearch,
 });
 
+const DB_NAME = 'godotxtdb';
+const STORE_NAME = 'handles';
+const KEY = 'todotxtfile';
 
 // GLOBALS --------------------------------------------------------------------
 
@@ -74,6 +79,7 @@ let group = 'none';
 let sortType = 'priority';
 let settings = {};
 let state = {
+	handle: null,
 	debug: false,
 }
 
@@ -96,32 +102,146 @@ function debug(name, message, ...args) {
 
 const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-// LIST -----------------------------------------------------------------------
+// FILE ACCESS -----------------------------------------------------------------------
 
-async function fetchTasks() {
+async function openDB() {
+	return new Promise((resolve, reject) => {
+		const req = indexedDB.open(DB_NAME, 1);
+		req.onupgradeneeded = (e) => {
+			e.target.result.createObjectStore(STORE_NAME);
+		};
+		req.onsuccess = (e) => resolve(e.target.result);
+		req.onerror = (e) => reject(e.target.error);
+	});
+}
+
+async function saveHandle(handle) {
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(STORE_NAME, 'readwrite');
+		const store = tx.objectStore(STORE_NAME);
+		store.put(handle, KEY);
+		tx.oncomplete = () => resolve();
+		tx.onerror = (e) => reject(e.target.error);
+	});
+}
+
+async function loadHandle() {
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(STORE_NAME, 'readonly');
+		const store = tx.objectStore(STORE_NAME);
+		const req = store.get(KEY);
+		req.onsuccess = () => resolve(req.result || null);
+		req.onerror = (e) => reject(e.target.error);
+	});
+}
+
+async function verifyAndRequestPermission(handle, mode = 'readwrite') {
+	if (!handle) return false;
+	try {
+		const perm = await handle.queryPermission({ mode });
+		if (perm === 'granted') return true;
+		if (perm === 'prompt') {
+			const status = await handle.requestPermission({ mode });
+			return status === 'granted';
+		}
+		return false;
+	} catch (err) {
+		console.error('Permission check failed:', err);
+		return false;
+	}
+}
+
+async function readFile(handle) {
+	if (!(await verifyAndRequestPermission(handle, 'read'))) {
+		throw new Error('Read permission denied');
+	}
+	const file = await handle.getFile();
+	return await file.text();
+}
+
+async function writeFile(handle, content) {
+	if (!(await verifyAndRequestPermission(handle, 'readwrite'))) {
+		throw new Error('Write permission denied');
+	}
+	const writable = await handle.createWritable();
+	await writable.write(content);
+	await writable.close();
+	console.log('File saved successfully');
+}
+
+async function loadPersistedFile() {
 	toggleLoading(true);
 	try {
-		const res = await fetch('/todo.txt', {
-			headers: {
-				'Authorization': `Bearer ${state.token}`
-			}
-		});
-		if (res.status === 401) {
-			updateAuthStatus(false);
-			throw new Error('Wrong/empty token');
+		state.handle = await loadHandle();
+		if (state.handle) {
+			const content = await readFile(state.handle);
+			todos = new TodoTxt(content);
+			updateStatus(`Loaded persisted file: ${state.handle.name || '(unknown)'}`);
 		}
-		if (!res.ok) throw new Error('Failed to fetch todos');
-		const text = await res.text();
-		todos = new TodoTxt(text);
-		debug("fetchTasks", "Fetched todos", todos);
-		updateAuthStatus(true);
-		renderTasks();
-	} catch (error) {
-		console.error('Error loading todos:', error);
+	} catch (err) {
+		console.warn('Could not load persisted file:', err);
+		updateStatus('No persisted file or permission lost. Pick a file again.', true, true);
 	} finally {
+		toggleLoading(false);
+		renderTasks();
+	}
+}
+
+async function openFile() {
+	try {
+		const [handle] = await window.showOpenFilePicker({
+			types: [{
+				description: 'Todo.txt File',
+				accept: { 'text/plain': ['.txt'] }
+			}],
+			multiple: false
+		});
+
+		state.handle = handle;
+
+		let permission = await handle.queryPermission({ mode: 'readwrite' });
+		if (permission !== 'granted') {
+			permission = await handle.requestPermission({ mode: 'readwrite' });
+		}
+
+		if (permission !== 'granted') {
+			updateStatus('Write permission denied', true);
+		} else {
+			updateStatus(`Opened ${handle.name}`);
+		}
+
+		await saveHandle(handle);
+		loadPersistedFile();
+	} catch (err) {
+		if (err.name !== 'AbortError') {
+			updateStatus(`Error: ${err.message}`, true);
+		}
+	}
+}
+
+async function saveFile() {
+	if (!state.handle) return;
+	toggleLoading(true);
+	try {
+		await writeFile(state.handle, todos.toString());
+		updateStatus(`File saved: ${state.handle.name}`);
+	} catch (err) {
+		updateStatus(`Save failed: ${err.message}`, true);
+	} finally {
+		renderTasks();
 		toggleLoading(false);
 	}
 }
+
+function updateStatus(msg, isError=false, pickFile=false) {
+	DOM.fileStatus.textContent = `Status: ${msg}`;
+	DOM.fileStatus.style.color = isError ? 'crimson' : '#555';
+	DOM.pickFile.classList.toggle('hide', !pickFile);
+}
+
+// RENDER -----------------------------------------------------------------------
 
 function parseTask(task) {
 	const taskSub = task.priority ? `<a>(${task.priority})</a>` : '';
@@ -374,7 +494,7 @@ DOM.search.addEventListener('input', e => {
 	filterSearch = e.target.value.trim();
 	if (filterSearch) DOM.search.parentElement.appendChild(clearBtn);
 	else clearSearch();
-	renderTasks();
+	debouncedRender();
 });
 
 function clearSearch() {
@@ -471,7 +591,7 @@ async function completeTask(event) {
 	if (!task) return;
 	event.currentTarget.checked ? task.complete() : task.uncomplete();
 	todos.replace(task);
-	saveTasks();
+	saveFile();
 }
 
 async function deleteTask(event) {
@@ -480,28 +600,8 @@ async function deleteTask(event) {
 	const task = todos.tasks.find(t => t.id === id);
 	if (!task) return;
 	todos.delete(task);
-	saveTasks();
-}
-
-async function saveTasks() {
-	try {
-		const res = await fetch('/todo.txt', {
-			method: 'PUT',
-			headers: { 'Content-Type': 'text/plain', 'Authorization': `Bearer ${state.token}`},
-			body: todos.toString()
-		});
-		if (res.status === 401) {
-			updateAuthStatus(false);
-			throw new Error('Wrong/empty token');
-		}
-		if (!res.ok) throw new Error('Sync failed');
-		updateAuthStatus(true);
-		fetchTasks();
-		if (visibleModal) closeModal(visibleModal);
-	} catch (error) {
-		alert('Error: ' + error.message);
-		fetchTasks();
-	}
+	saveFile();
+	if (visibleModal) closeModal(visibleModal);
 }
 
 // AUTOCOMPLETE ---------------------------------------------------------------
@@ -656,7 +756,7 @@ async function submitForm(e) {
 				} else { // Add
 					todos.addTask(newTask);
 				}
-				saveTasks();
+				saveFile();
 				break;
 			case 'delete-form':
 				const deleteIds = Array.from(form.querySelectorAll('.delete-switch:checked'))
@@ -664,7 +764,7 @@ async function submitForm(e) {
 				if (!deleteIds.length) return;
 				const deleteList = todos.tasks.filter(task => deleteIds.includes(task.id));
 				deleteList.forEach(d => { todos.delete(d); });
-				saveTasks();
+				saveFile();
 				break;
 			case 'import-form':
 				const reader = new FileReader();
@@ -673,7 +773,7 @@ async function submitForm(e) {
 					const appending = formData.get('import-append');
 					debug("submitForm", `${appending ? 'Appending' : 'Importing'} ${lines.length} tasks`, reader.result, lines);
 					todos.parse(reader.result, appending);
-					saveTasks();
+					saveFile();
 				}
 				reader.readAsText(formData.get('import-file'));
 				break;
@@ -712,4 +812,4 @@ if ('serviceWorker' in navigator) {
 	});
 }
 
-fetchTasks();
+loadPersistedFile();
