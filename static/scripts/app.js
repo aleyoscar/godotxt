@@ -29,7 +29,6 @@ const DOM = {
 	logo: document.getElementById('logo'),
 	noList: document.getElementById('no-list'),
 	noAuth: document.getElementById('no-auth'),
-	onlineStatus: document.getElementById('online-status'),
 	projectsBtn: document.getElementById('projects-btn'),
 	projectsModal: document.getElementById('projects-modal'),
 	search: document.getElementById('search'),
@@ -56,8 +55,6 @@ const clearBtn = Object.assign(document.createElement('button'), {
 	onclick: clearSearch,
 });
 
-const PING_INTERVAL = 10;
-const PING_TIMEOUT = 5000;
 
 // GLOBALS --------------------------------------------------------------------
 
@@ -80,8 +77,6 @@ let sortType = 'priority';
 let settings = {};
 let state = {
 	debug: false,
-	online: navigator.onLine,
-	countdown: PING_INTERVAL,
 	auth: false,
 	token: localStorage.getItem('token') || 'token'
 }
@@ -722,62 +717,6 @@ function openExport() {
 	link.remove();
 }
 
-// ONLINE ---------------------------------------------------------------------
-
-function setWifi(theme = [0, 0, 0, 0]) {
-	document.documentElement.style.setProperty('--arc1', theme[0] ? 'var(--pico-primary)' : 'var(--pico-color)');
-	document.documentElement.style.setProperty('--arc2', theme[1] ? 'var(--pico-primary)' : 'var(--pico-color)');
-	document.documentElement.style.setProperty('--arc3', theme[2] ? 'var(--pico-primary)' : 'var(--pico-color)');
-	document.documentElement.style.setProperty('--arc4', theme[3] ? 'var(--pico-primary)' : 'var(--pico-color)');
-}
-
-function updateOnlineStatus() {
-	const newIcon = `#icon-${state.online ? 'online' : 'offline'}`;
-	DOM.onlineStatus.querySelector('use').setAttribute('xlink:href', newIcon);
-}
-
-function onlineChange() {
-	checkConnectivity();
-	updateOnlineStatus();
-	if (state.online) {
-		fetchTasks();
-	}
-}
-
-window.addEventListener('online', onlineChange);
-window.addEventListener('offline', onlineChange);
-
-async function checkConnectivity() {
-	try {
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), PING_TIMEOUT);
-
-		const response = await fetch('/health', {
-			method: 'HEAD',
-			cache: 'no-store',
-			signal: controller.signal
-		});
-		clearTimeout(timeoutId);
-		state.online = response.ok;
-		updateOnlineStatus();
-	} catch (error) {
-		state.online = false;
-		updateOnlineStatus();
-	}
-}
-
-setInterval(() => {
-	state.countdown -= 1;
-	if (state.countdown <= 0) {
-		checkConnectivity();
-		state.countdown = PING_INTERVAL;
-	}
-	let interval = PING_INTERVAL / 4;
-	if (state.countdown > interval * 3) setWifi([1, 0, 0, 0]);
-	else if (state.countdown > interval * 2) setWifi([1, 1, 0, 0]);
-	else if (state.countdown > interval) setWifi([1, 1, 1, 0]);
-	else setWifi([1, 1, 1, 1]);
-}, 1000);
 
 // AUTHENTICATION -------------------------------------------------------------
 
@@ -806,6 +745,4 @@ if ('serviceWorker' in navigator) {
 	});
 }
 
-updateOnlineStatus();
-checkConnectivity();
 fetchTasks();
