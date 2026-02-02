@@ -1,4 +1,4 @@
-const version = 'v2.1.1';
+const version = 'v3.0.0';
 const CACHE_NAME = `godotxt-${version}`;
 const urls = [
 	`/images/apple-touch-icon.png?v=${version}`,
@@ -10,7 +10,7 @@ const urls = [
 	`/scripts/app.js?v=${version}`,
 	`/scripts/modal.js?v=${version}`,
 	`/scripts/todotxt.js?v=${version}`,
-	`/styles/pico.min.css?v=v2.1.1`,
+	`/styles/pico.min.css?v=v3.0.0`,
 	`/styles/style.css?v=${version}`,
 	`/index.html`,
 	`/site.webmanifest?v=${version}`
