@@ -1,9 +1,0 @@
----
-deployment:
-    tasks:
-        - export DEPLOYPATH=/home/$USER/public_html/godotxt/
-        - export REPOPATH=/home/$USER/git/godotxt/
-        - /bin/rsync -a --delete ${REPOPATH}static/ ${DEPLOYPATH}
-        - /bin/chmod 755 $DEPLOYPATH
-        - /bin/find $DEPLOYPATH -type d -exec /bin/chmod 755 '{}' \;
-        - /bin/find $DEPLOYPATH -type f -exec /bin/chmod 644 '{}' \;

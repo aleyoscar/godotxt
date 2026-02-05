@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="/src/pico.min.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>GoDo.txt</title>
+		<script type="module" src="/src/main.js" defer></script>
+	</head>
+
+	<body>
+		<main class="container">
+			<h1>GoDo.txt</h1>
+            <p id="status">Please select a Todo.txt file</p>
+            <button id="todos-open">Open File</button>
+			<form id="todos-form">
+				<textarea
+					id="todos-textarea"
+					name="todos-textarea"
+					placeholder="Tasks..."
+					aria-label="Todo.txt task list"
+				></textarea>
+				<button id="todos-save" type="submit">Save</button>
+			</form>
+		</main>
+	</body>
+</html>
