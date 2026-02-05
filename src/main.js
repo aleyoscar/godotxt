@@ -5,7 +5,7 @@ import { load } from '@tauri-apps/plugin-store';
 const DOM = {
 	status: document.getElementById('status'),
 	todosForm: document.getElementById('todos-form'),
-	todosOpen: document.getElementById('todos-open'),
+	menuOpenFile: document.getElementById('menu-open-file'),
 	todosTextarea: document.getElementById('todos-textarea'),
 }
 
@@ -28,7 +28,8 @@ DOM.todosForm.addEventListener("submit", async (e) => {
 	}
 });
 
-DOM.todosOpen.addEventListener("click", async (e) => {
+DOM.menuOpenFile.addEventListener("click", async (e) => {
+	e.preventDefault();
 	const todoPath = await openFile();
 	if (todoPath) {
 		await store.set(KEY_FILE, todoPath);
