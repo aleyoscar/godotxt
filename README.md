@@ -42,5 +42,5 @@ References and sources used in the project.
 > Changelog script
 
 ```
-python gen-chglog.py {version} -r README.md -r package.json -r src-tauri/tauri.conf.json
+python gen-chglog.py {version} -r index.html -r README.md -r package.json -r src-tauri/tauri.conf.json
 ```
