@@ -1,5 +1,7 @@
 
 import { openFile, readFile, saveFile } from './file.js';
+import { visibleModal, toggleModal, openModal, closeModal } from './modal.js';
+import { Task, TodoTxt } from './todotxt.js';
 import { load } from '@tauri-apps/plugin-store';
 
 const DOM = {
