@@ -8,6 +8,7 @@ import { clearBtn, getDateString, toggleLoading, cleanString, stdout, stderr, ca
 import { clearAttributeFilters, selectAttribute, setAttributeFilters, clearFilters, clearSearch, sortBy } from './refine.js';
 import { renderTasks, toggleAside } from './render.js';
 import { submitForm, addTask, populateTags, filterTags, deleteTask, deleteConfirm } from './manage.js';
+import { getVersion } from '@tauri-apps/api/app';
 
 // DOM.todosForm.addEventListener("submit", async (e) => {
 // 	e.preventDefault();
@@ -261,7 +262,18 @@ async function loadStore() {
 	}
 }
 
+async function loadVersion() {
+	try {
+		const version = await getVersion();
+		DOM.versionInfo.textContent = `v${version}`;
+		console.log(`App version: ${version}`);
+	} catch (err) {
+		console.error(`Unable to get app version info`, err);
+	}
+}
+
 async function startup() {
+	await loadVersion();
 	await loadStore();
 	await loadPersistedTodo();
 }

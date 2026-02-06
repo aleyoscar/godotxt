@@ -52,6 +52,7 @@ const DOM = {
 	status: document.getElementById('status'),
 	taskList: document.getElementById('tasks'),
 	toggleModals: document.querySelectorAll('.toggle-modal'),
+	versionInfo: document.getElementById('version-info'),
 }
 
 const KEYS = {
