@@ -36,6 +36,10 @@ DOM.listAll.addEventListener('click', async (e) => {
 	toggleAside();
 });
 
+DOM.asideClosers.forEach((b) => {
+	b.addEventListener('click', toggleAside);
+});
+
 // EVENT LISTENERS ------------------------------------------------------------
 
 DOM.showAll.addEventListener('click', clearFilters);

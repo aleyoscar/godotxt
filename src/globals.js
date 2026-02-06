@@ -2,6 +2,7 @@
 
 const DOM = {
 	aside: document.querySelector('aside'),
+	asideClosers: document.querySelectorAll('.aside-closer'),
 	autocomplete: document.getElementById('autocomplete'),
 	clearAttributesBtns: document.querySelectorAll('.clear-attributes-btn'),
 	completeToggle: document.getElementById('complete-toggle'),
