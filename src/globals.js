@@ -47,7 +47,7 @@ const DOM = {
 	sortBtns: document.getElementById('sort-btns'),
 	sortByText: document.getElementById('sortby-text'),
 	sortByToggle: document.getElementById('sortby-toggle'),
-	sortDefaultBtn: document.getElementById('sort-priority'),
+	sortDefaultBtn: document.getElementById('sort-default'),
 	sortToggle: document.getElementById('sort-toggle'),
 	status: document.getElementById('status'),
 	taskList: document.getElementById('tasks'),

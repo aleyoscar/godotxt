@@ -74,6 +74,7 @@ function completeTask(event) {
 	event.currentTarget.checked ? task.complete() : task.uncomplete();
 	STATE.todos.replace(task);
 	saveFile();
+	renderTasks();
 }
 
 function deleteConfirm(event) {
