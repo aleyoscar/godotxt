@@ -23,7 +23,7 @@ function selectAttribute(event) {
 }
 
 async function setAttributeFilters(e) {
-	const currentTarget = e.currentTarget;
+	const currentTarget = e ? e.currentTarget : null;
 	const filterProjects = [];
 	const filterContexts = [];
 	// await clearAttributeFilters();
@@ -40,13 +40,13 @@ async function setAttributeFilters(e) {
 	await STATE.store.set(KEYS.filterContexts, filterContexts);
 	await STATE.store.save();
 	await renderTasks();
-	toggleModal(e, currentTarget);
+	if (e) toggleModal(e, currentTarget);
 }
 
 function clearFilters() {
 	clearSearch();
 	[DOM.projectsModal, DOM.contextsModal].forEach(modal => modal.querySelectorAll('input').forEach(i => i.checked = false));
-	filterAttribute();
+	setAttributeFilters();
 }
 
 function clearSearch() {

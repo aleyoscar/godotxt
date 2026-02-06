@@ -38,6 +38,8 @@ DOM.listAll.addEventListener('click', async (e) => {
 
 // EVENT LISTENERS ------------------------------------------------------------
 
+DOM.showAll.addEventListener('click', clearFilters);
+
 DOM.toggleModals.forEach((m) => { m.addEventListener('click', toggleModal) });
 
 // Refine
