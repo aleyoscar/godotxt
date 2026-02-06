@@ -1,0 +1,77 @@
+// CONSTANTS ------------------------------------------------------------------
+
+const DOM = {
+	aside: document.querySelector('aside'),
+	autocomplete: document.getElementById('autocomplete'),
+	clearAttributesBtns: document.querySelectorAll('.clear-attributes-btn'),
+	completeToggle: document.getElementById('complete-toggle'),
+	contextsBtn: document.getElementById('contexts-btn'),
+	contextsModal: document.getElementById('contexts-modal'),
+	deleteError: document.getElementById('delete-error'),
+	deleteForm: document.getElementById('delete-form'),
+	deleteLists: document.getElementById('delete-lists'),
+	deleteModal: document.getElementById('delete-modal'),
+	editComplete: document.getElementById('edit-complete'),
+	editContexts: document.getElementById('edit-contexts'),
+	editDelete: document.getElementById('edit-delete'),
+	editDescription: document.getElementById('edit-description'),
+	editError: document.getElementById('edit-error'),
+	editForm: document.getElementById('edit-form'),
+	editId: document.getElementById('edit-id'),
+	editPriority: document.getElementById('edit-priority'),
+	editPriorityDefault: document.getElementById('edit-priority-default'),
+	editProjects: document.getElementById('edit-projects'),
+	editSubmit: document.getElementById('edit-submit'),
+	editTitle: document.getElementById('edit-title'),
+	filterAttributeBtns: document.querySelectorAll('.filter-attribute-btn'),
+	groupBtn: document.getElementById('group-btn'),
+	groupBtns: document.getElementById('group-btns'),
+	groupClearBtn: document.getElementById('group-clear-btn'),
+	groupSortBtns: document.querySelectorAll('.group-sort-btn'),
+	listTitle: document.getElementById('list-title'),
+	logo: document.getElementById('logo'),
+	menuOpenFile: document.getElementById('menu-open-file'),
+	noList: document.getElementById('no-list'),
+	pickFile: document.getElementById('pick-file'),
+	projectsBtn: document.getElementById('projects-btn'),
+	projectsModal: document.getElementById('projects-modal'),
+	search: document.getElementById('search'),
+	searchBtn: document.getElementById('search-btn'),
+	showAll: document.getElementById('show-all'),
+	sortBtns: document.getElementById('sort-btns'),
+	sortByText: document.getElementById('sortby-text'),
+	sortByToggle: document.getElementById('sortby-toggle'),
+	sortDefaultBtn: document.getElementById('sort-priority'),
+	sortToggle: document.getElementById('sort-toggle'),
+	status: document.getElementById('status'),
+	taskList: document.getElementById('tasks'),
+	toggleModals: document.querySelectorAll('.toggle-modal'),
+}
+
+const KEYS = {
+	storeFile: 'store.json',
+	todoPath: 'todo-path',
+	sortAscending: 'sort-ascending',
+	sortGroup: 'sort-group',
+	sortType: 'sort-type',
+	showComplete: 'show-complete',
+	filterContexts: 'filter-contexts',
+	filterList: 'filter-list',
+	filterProjects: 'filter-projects',
+}
+
+const REGEX = {
+	project: /\+[A-Za-z0-9_-]+/g,
+	context: /@[A-Za-z0-9_-]+/g,
+	projectSingle: /^\+[A-Za-z0-9_-]+$/,
+	contextSingle: /^@[A-Za-z0-9_-]+$/,
+	url: /(https?:\/\/|ftp:\/\/|www\.)[\w\-%.]+\.[a-z]{2,}(?:[\/\w\-.$?=&%#:]*)?/gi,
+};
+
+const STATE = {
+	store: null,
+	todos: [],
+	search: '',
+}
+
+export { DOM, KEYS, REGEX, STATE }
