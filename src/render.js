@@ -3,6 +3,7 @@ import { DOM, KEYS, REGEX, STATE } from './globals.js';
 import { capitalize, getDateString } from './helpers.js';
 import { completeTask, editTask } from './manage.js';
 import { toggleModal } from './modal.js';
+import { selectAttribute } from './refine.js';
 
 function toggleAside() {
 	DOM.aside?.classList.toggle('open');
@@ -17,11 +18,11 @@ function parseTask(task) {
 
 	let taskDesc = task.raw.replace(REGEX.project, match =>
 		task.projects.includes(match.slice(1))
-			? `<a data-attribute="projects" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>`
+			? `<a class="task-attribute-filter" data-attribute="projects" data-name="${match.slice(1)}">${match}</a>`
 			: match
 	).replace(REGEX.context, match =>
 		task.contexts.includes(match.slice(1))
-			? `<a class="contrast" data-attribute="contexts" data-name="${match.slice(1)}" onclick="selectAttribute(event)">${match}</a>`
+			? `<a class="contrast task-attribute-filter" data-attribute="contexts" data-name="${match.slice(1)}">${match}</a>`
 			: match
 	).replace(REGEX.url, (match) => {
 		const href = match.startsWith('http') ? match : 'https://' + match;
@@ -57,13 +58,6 @@ function parseTask(task) {
 		<p class="flex gap-xs align-center">${taskDates}</p>
 	`;
 	li.appendChild(hgroup);
-
-	const svg = document.createElement('svg');
-	svg.classList.add('show-hover');
-	svg.width = '1em';
-	svg.height = '1em';
-	svg.innerHTML = '<use xlink:href="#icon-edit"/>';
-	li.appendChild(svg);
 
 	return li;
 }
@@ -239,6 +233,14 @@ async function renderTasks() {
 	document.querySelectorAll('.task-link').forEach((link) => {
 		link.addEventListener('click', (e) => {
 			e.stopPropagation();
+		});
+	});
+
+	// Select attribute filters by clicking on task projects or contexts
+	document.querySelectorAll('.task-attribute-filter').forEach((link) => {
+		link.addEventListener('click', (e) => {
+			e.stopPropagation();
+			selectAttribute(e);
 		});
 	});
 }

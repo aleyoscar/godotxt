@@ -11,7 +11,7 @@ function selectAttribute(event) {
 	document.querySelectorAll('.attribute-filter').forEach(input => {
 		input.checked = input.dataset.attribute === attribute && input.name === name;
 	});
-	filterAttribute();
+	setAttributeFilters();
 }
 
 function setAttributeFiltersChecked(attribute, checked) {
