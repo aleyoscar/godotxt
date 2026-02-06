@@ -161,6 +161,7 @@ async function submitForm(e) {
 				reader.readAsText(formData.get('import-file'));
 				break;
 		}
+		renderTasks();
 		if (STATE.visibleModal) closeModal(STATE.visibleModal);
 		form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
 	} catch (error) {
