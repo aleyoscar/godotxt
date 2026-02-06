@@ -5,7 +5,16 @@ import { Task, TodoTxt } from './todotxt.js';
 import { load } from '@tauri-apps/plugin-store';
 import { DOM, KEYS, REGEX, STATE } from './globals.js';
 import { clearBtn, getDateString, toggleLoading, cleanString, stdout, stderr, capitalize } from './helpers.js';
-import { clearAttributeFilters, selectAttribute, setAttributeFilters, clearFilters, clearSearch, sortBy } from './refine.js';
+import {
+	selectAttribute,
+	setAttributeFilters,
+	setAttributeFiltersChecked,
+	setAttributeFiltersDOM,
+	clearFilters,
+	clearSearch,
+	sortBy,
+	setSortBy
+} from './refine.js';
 import { renderTasks, toggleAside } from './render.js';
 import { submitForm, addTask, populateTags, filterTags, deleteTask, deleteConfirm } from './manage.js';
 import { getVersion } from '@tauri-apps/api/app';
@@ -71,13 +80,17 @@ DOM.filterAttributeBtns.forEach((b) => {
 
 DOM.completeToggle.addEventListener('click', async (e) => {
 	const showComplete = !await STATE.store.get(KEYS.showComplete);
-	const newIcon = showComplete ? '#icon-eye-fill' : '#icon-eye';
-	DOM.completeToggle.classList.toggle('outline', !showComplete);
-	DOM.completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+	setShowComplete(showComplete);
 	await STATE.store.set(KEYS.showComplete, showComplete);
 	await STATE.store.save();
 	await renderTasks();
 });
+
+function setShowComplete(showComplete) {
+	const newIcon = showComplete ? '#icon-eye-fill' : '#icon-eye';
+	DOM.completeToggle.classList.toggle('outline', !showComplete);
+	DOM.completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+}
 
 DOM.search.addEventListener('input', (e) => {
 	STATE.search = e.target.value.trim();
@@ -88,13 +101,17 @@ DOM.search.addEventListener('input', (e) => {
 
 DOM.sortToggle.addEventListener('click', async (e) => {
 	const sortAscending = !await STATE.store.get(KEYS.sortAscending);
-	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up-fill';
-	DOM.sortToggle.classList.toggle('outline', sortAscending);
-	DOM.sortToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+	setSort(sortAscending);
 	await STATE.store.set(KEYS.sortAscending, sortAscending);
 	await STATE.store.save();
 	await renderTasks();
 });
+
+function setSort(sortAscending) {
+	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up-fill';
+	DOM.sortToggle.classList.toggle('outline', sortAscending);
+	DOM.sortToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+}
 
 DOM.groupSortBtns.forEach((b) => {
 	b.addEventListener('click', async (e) => {
@@ -102,19 +119,23 @@ DOM.groupSortBtns.forEach((b) => {
 		const type = currentTarget.dataset.group;
 		let group = await STATE.store.get(KEYS.sortGroup);
 		group = group === type ? 'none' : type;
-		const newIcon = group === 'none' ? '#icon-group' : '#icon-group-fill';
-		DOM.groupBtn.classList.toggle('outline', group === 'none');
-		DOM.groupBtn.querySelector('use').setAttribute('xlink:href', newIcon);
-		Array.from(DOM.groupBtns.children).forEach((btn) => {
-			btn.classList.toggle('outline', !btn.id.includes(group));
-		});
+		setGroup(group);
 		await STATE.store.set(KEYS.sortGroup, group);
 		await STATE.store.save();
 		await renderTasks();
 		toggleModal(e, currentTarget);
-		DOM.groupClearBtn.classList.toggle('hide', group === 'none');
 	});
 });
+
+function setGroup(group) {
+	const newIcon = group === 'none' ? '#icon-group' : '#icon-group-fill';
+	DOM.groupBtn.classList.toggle('outline', group === 'none');
+	DOM.groupBtn.querySelector('use').setAttribute('xlink:href', newIcon);
+	Array.from(DOM.groupBtns.children).forEach((btn) => {
+		btn.classList.toggle('outline', !btn.id.includes(group));
+	});
+	DOM.groupClearBtn.classList.toggle('hide', group === 'none');
+}
 
 // Menu
 
@@ -249,9 +270,13 @@ async function loadStore() {
 	try {
 		STATE.store = await load(KEYS.storeFile, { autosave: false });
 		if (!await STATE.store.has(KEYS.sortAscending)) await STATE.store.set(KEYS.sortAscending, true);
+		setSort(await STATE.store.get(KEYS.sortAscending));
 		if (!await STATE.store.has(KEYS.sortGroup)) await STATE.store.set(KEYS.sortGroup, 'none');
+		setGroup(await STATE.store.get(KEYS.sortGroup));
 		if (!await STATE.store.has(KEYS.sortType)) await STATE.store.set(KEYS.sortType, 'priority');
+		setSortBy(await STATE.store.get(KEYS.sortType));
 		if (!await STATE.store.has(KEYS.showComplete)) await STATE.store.set(KEYS.showComplete, false);
+		setShowComplete(await STATE.store.get(KEYS.showComplete));
 		if (!await STATE.store.has(KEYS.filterContexts)) await STATE.store.set(KEYS.filterContexts, []);
 		if (!await STATE.store.has(KEYS.filterList)) await STATE.store.set(KEYS.filterList, '');
 		if (!await STATE.store.has(KEYS.filterProjects)) await STATE.store.set(KEYS.filterProjects, []);
@@ -276,6 +301,11 @@ async function startup() {
 	await loadVersion();
 	await loadStore();
 	await loadPersistedTodo();
+	setAttributeFiltersChecked('projects', await STATE.store.get(KEYS.filterProjects));
+	setAttributeFiltersDOM('projects');
+	setAttributeFiltersChecked('contexts', await STATE.store.get(KEYS.filterContexts));
+	setAttributeFiltersDOM('contexts');
+	renderTasks();
 }
 
 startup();
