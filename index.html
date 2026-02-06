@@ -144,13 +144,13 @@
 								Open File<svg width="1em" height="1em"><use xlink:href="#icon-folder"/></svg>
 							</a>
 						</li>
-						<li class="min-width-xxs">
+						<!-- <li class="min-width-xxs">
 							<a class="pointer flex align-center space-between gap-xs"
 								dir="ltr"
 								onclick="openDelete()">
 								Delete Done<svg width="1em" height="1em"><use xlink:href="#icon-trash"/></svg>
 							</a>
-						</li>
+						</li> -->
 						<li class="min-width-xxs color-secondary"><small>v3.0.0</small></li>
 					</ul>
 				</details>
@@ -463,5 +463,32 @@
 				</footer>
 			</article>
 		</dialog>
+		<!-- <dialog id="delete-modal">
+			<article>
+				<header>
+					<button
+						class="toggle-modal"
+						aria-label="Close"
+						rel="prev"
+						data-target="delete-modal">
+					</button>
+					<h3>Delete Done</h3>
+				</header>
+				<form id="delete-form" class="form">
+					<p id="delete-error" class="error message hide">Error deleting tasks</p>
+					<fieldset id="delete-lists"></fieldset>
+				</form>
+				<footer>
+					<button class="secondary toggle-modal"
+						data-target="delete-modal">
+						Cancel
+					</button>
+					<button class="danger form-submit"
+						form="delete-form">
+						Delete
+					</button>
+				</footer>
+			</article>
+		</dialog> -->
 	</body>
 </html>
