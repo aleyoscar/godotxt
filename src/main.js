@@ -149,13 +149,13 @@ async function loadPersistedTodo() {
 	try {
 		const todoPath = await STATE.store.get(KEYS.todoPath);
 		if (todoPath) {
-			console.log(`Loaded persisted file: ${todoPath}`);
+			stdout(`Loaded persisted file: ${todoPath}`);
 			await setContent(todoPath);
 		} else {
-			console.log(`No todo.txt file set. Please open a todo.txt file`);
+			stdout(`No todo.txt file set. Please open a todo.txt file`);
 		}
 	} catch (err) {
-		console.error(`Unable to load persisted todo file`, err);
+		stderr(`Unable to load persisted todo file`, err);
 	}
 }
 

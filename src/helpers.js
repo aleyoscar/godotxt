@@ -21,13 +21,13 @@ const cleanString = (text) => text.trim().replace(/\s+/g, ' ');
 
 function stdout(message, ...args) {
 	console.log(message, ...args);
-	DOM.status.textContent(message);
+	DOM.status.querySelector('small').textContent = message;
 	DOM.status.classList.remove('error');
 }
 
 function stderr(message, ...args) {
 	console.error(message, ...args);
-	DOM.status.textContent(message);
+	DOM.status.querySelector('small').textContent = message;
 	DOM.status.classList.add('error');
 }
 
