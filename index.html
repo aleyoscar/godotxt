@@ -157,16 +157,234 @@
 			</div>
 		</header>
 		<main class="container">
-			<h1>GoDo.txt</h1>
-			<form id="todos-form">
-				<textarea
-					id="todos-textarea"
-					name="todos-textarea"
-					placeholder="Tasks..."
-					aria-label="Todo.txt task list"
-				></textarea>
-				<button id="todos-save" type="submit">Save</button>
-			</form>
+			<section class="overflow-auto">
+				<div class="horizontal-scroll">
+					<button id="sort-toggle" class="flex-inline align-center outline">
+						Sort
+						<svg width="1em" height="1em">
+							<use xlink:href="#icon-caret-down"/>
+						</svg>
+					</button>
+					<button id="sortby-toggle"
+						class="flex-inline align-center outline toggle-modal"
+						data-target="sort-modal">
+						<span id="sortby-text">Priority</span>
+						<svg width="1em" height="1em">
+							<use xlink:href="#icon-sort"/>
+						</svg>
+					</button>
+					<button id="complete-toggle"
+						class="flex-inline align-center outline">
+						Completed
+						<svg width="1em" height="1em">
+							<use xlink:href="#icon-eye"/>
+						</svg>
+					</button>
+					<button id="projects-btn"
+						class="flex-inline align-center outline toggle-modal"
+						data-target="projects-modal">
+						Projects
+						<svg width="1em" height="1em">
+							<use xlink:href="#icon-rocket"/>
+						</svg>
+					</button>
+					<button id="contexts-btn"
+						class="flex-inline align-center outline toggle-modal"
+						data-target="contexts-modal">
+						Contexts
+						<svg width="1em" height="1em">
+							<use xlink:href="#icon-at"/>
+						</svg>
+					</button>
+					<button id="group-btn"
+						class="flex-inline align-center outline toggle-modal"
+						data-target="group-modal">
+						Group
+						<svg width="1em" height="1em">
+							<use xlink:href="#icon-group"/>
+						</svg>
+					</button>
+				</div>
+			</section>
+			<section>
+				<a id="show-all"
+					class="secondary hide pointer"
+					onclick="clearFilters()">
+					Show All
+				</a>
+			</section>
+			<div class="content flex">
+				<aside class="width-xs">
+					<article>
+						<nav>
+							<a id="menu-close"
+								class="show-sm float-right pointer secondary"
+								onclick="toggleAside()">
+								<svg width="1em" height="1em">
+									<use xlink:href="#icon-x"/>
+								</svg>
+							</a>
+							<h6>Lists</h6>
+							<hr>
+							<ul>
+								<li><a class="contrast"
+									href="#tasks"
+									onclick="renderTasks(); toggleAside();">
+									Tasks</a>
+								</li>
+							</ul>
+						</nav>
+					</article>
+				</aside>
+				<div class="flex-1">
+					<div id="no-list" class="hide">No list with the name <span></span></div>
+					<div id="pick-file" class="hide">Please select a todo.txt file</div>
+					<div id="tasks">
+						<section class="flex align-center">
+							<h3 id="list-title" class="mb-0">Tasks</h3>
+							<!-- <button id="add-task-btn"
+								class="border-round flex-inline align-center padding-xs"
+								onclick="addTask(); toggleModal(event);"
+								data-target="edit-modal">
+								<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
+							</button> -->
+						</section>
+						<section>
+							<div class="loading" aria-busy="true"></div>
+							<ul></ul>
+						</section>
+					</div>
+				</div>
+			</div>
 		</main>
+		<footer><section><p id="status"></p></section></footer>
+		<dialog id="projects-modal">
+			<article>
+				<header>
+					<button class="filter-attribute-btn"
+						aria-label="Close"
+						rel="prev"
+						data-target="projects-modal">
+					</button>
+					<h3>Projects</h3>
+				</header>
+				<ul></ul>
+				<footer>
+					<button class="secondary clear-attributes-btn"
+						data-target="projects-modal">
+						Clear
+					</button>
+					<button class="filter-attribute-btn"
+						data-target="projects-modal">
+						Filter
+					</button>
+				</footer>
+			</article>
+		</dialog>
+		<dialog id="contexts-modal">
+			<article>
+				<header>
+					<button
+						class="filter-attribute-btn"
+						aria-label="Close"
+						rel="prev"
+						data-target="contexts-modal">
+					</button>
+					<h3>Contexts</h3>
+				</header>
+				<ul></ul>
+				<footer>
+					<button class="secondary clear-attributes-btn"
+						data-target="contexts-modal">
+						Clear
+					</button>
+					<button class="filter-attribute-btn"
+						data-target="contexts-modal">
+						Filter
+					</button>
+				</footer>
+			</article>
+		</dialog>
+		<dialog id="group-modal">
+			<article>
+				<header>
+					<button class="toggle-modal"
+						aria-label="Close"
+						rel="prev"
+						data-target="group-modal">
+					</button>
+					<h3>Group By</h3>
+				</header>
+				<div id="group-btns" class="grid">
+					<button id="group-clear-btn"
+						class="contrast outline hide group-sort-btn"
+						data-target="group-modal"
+						data-group="none">
+						None
+					</button>
+					<button id="group-priority"
+						class="outline group-sort-btn"
+						data-target="group-modal"
+						data-group="priority">
+						Priority
+					</button>
+					<button id="group-project"
+						class="outline group-sort-btn"
+						data-target="group-modal"
+						data-group="project">
+						Project
+					</button>
+					<button id="group-context"
+						class="outline group-sort-btn"
+						data-target="group-modal"
+						data-group="context">
+						Context
+					</button>
+				</div>
+				<footer>
+					<button class="secondary toggle-modal"
+						data-target="group-modal">
+						Cancel
+					</button>
+				</footer>
+			</article>
+		</dialog>
+		<dialog id="sort-modal">
+			<article>
+				<header>
+					<button class="toggle-modal" aria-label="Close"
+						rel="prev"
+						data-target="sort-modal">
+					</button>
+					<h3>Sort By</h3>
+				</header>
+				<div id="sort-btns" class="grid">
+					<button id="sort-priority"
+						class=""
+						data-target="sort-modal"
+						data-sort="priority">
+						Priority
+					</button>
+					<button id="sort-description"
+						class="outline"
+						data-target="sort-modal"
+						data-sort="description">
+						Description
+					</button>
+					<button id="sort-date"
+						class="outline"
+						data-target="sort-modal"
+						data-sort="date">
+						Date
+					</button>
+				</div>
+				<footer>
+					<button class="secondary toggle-modal"
+						data-target="sort-modal">
+						Cancel
+					</button>
+				</footer>
+			</article>
+		</dialog>
 	</body>
 </html>
