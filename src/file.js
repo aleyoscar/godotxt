@@ -2,10 +2,12 @@
 import { open } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import { AndroidFs, isAndroid } from 'tauri-plugin-android-fs-api';
+import { KEYS, STATE } from './globals.js';
 
-async function saveFile(path, content) {
+async function saveFile() {
 	try {
-		await writeTextFile(path, content);
+		const path = await STATE.store.get(KEYS.todoPath);
+		await writeTextFile(path, STATE.todos.toString());
 		console.log(`Saved ${path}`);
 	} catch (err) {
 		console.error(`Unable to save file ${path}`, err);

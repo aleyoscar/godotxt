@@ -1,3 +1,6 @@
+
+import { STATE } from './globals.js';
+
 // CONFIG ---------------------------------------------------------------------
 
 const CONFIG = {
@@ -7,8 +10,6 @@ const CONFIG = {
 	scrollbarWidthCssVar: '--pico-scrollbar-width',
 	animationDuration: 400, // ms
 };
-
-let visibleModal = null;
 
 // HELPERS --------------------------------------------------------------------
 
@@ -29,14 +30,14 @@ function openModal(modal) {
 	document.documentElement.classList.add(CONFIG.isOpenClass, CONFIG.openingClass);
 	modal.showModal();
 	setTimeout(() => {
-		visibleModal = modal;
+		STATE.visibleModal = modal;
 		document.documentElement.classList.remove(CONFIG.openingClass);
 		modal.querySelector('.modal-focus')?.focus();
 	}, CONFIG.animationDuration);
 }
 
 function closeModal(modal) {
-	visibleModal = null;
+	STATE.visibleModal = null;
 	document.documentElement.classList.add(CONFIG.closingClass);
 	setTimeout(() => {
 		document.documentElement.classList.remove(CONFIG.closingClass, CONFIG.isOpenClass);
@@ -49,13 +50,13 @@ function closeModal(modal) {
 // EVENT LISTENERS ------------------------------------------------------------
 
 document.addEventListener('click', (event) => {
-	if (!visibleModal) return;
+	if (!STATE.visibleModal) return;
 	const isClickInside = event.target.closest('article, #autocomplete, [data-target], kbd b, .auto-tag');
-	if (!isClickInside) closeModal(visibleModal);
+	if (!isClickInside) closeModal(STATE.visibleModal);
 });
 
 document.addEventListener('keydown', (event) => {
-	if (event.key === 'Escape' && visibleModal) closeModal(visibleModal);
+	if (event.key === 'Escape' && STATE.visibleModal) closeModal(STATE.visibleModal);
 });
 
-export { visibleModal, toggleModal, openModal, closeModal }
+export { toggleModal, openModal, closeModal }

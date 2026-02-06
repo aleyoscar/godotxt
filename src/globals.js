@@ -1,6 +1,7 @@
 // CONSTANTS ------------------------------------------------------------------
 
 const DOM = {
+	addTaskBtn: document.getElementById('add-task-btn'),
 	aside: document.querySelector('aside'),
 	asideClosers: document.querySelectorAll('.aside-closer'),
 	autocomplete: document.getElementById('autocomplete'),
@@ -25,6 +26,7 @@ const DOM = {
 	editSubmit: document.getElementById('edit-submit'),
 	editTitle: document.getElementById('edit-title'),
 	filterAttributeBtns: document.querySelectorAll('.filter-attribute-btn'),
+	forms: document.querySelectorAll('.form'),
 	groupBtn: document.getElementById('group-btn'),
 	groupBtns: document.getElementById('group-btns'),
 	groupClearBtn: document.getElementById('group-clear-btn'),
@@ -75,6 +77,7 @@ const STATE = {
 	store: null,
 	todos: [],
 	search: '',
+	visibleModal: null,
 }
 
 export { DOM, KEYS, REGEX, STATE }
