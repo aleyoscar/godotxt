@@ -4,6 +4,7 @@ import { Task } from './todotxt.js';
 import { getDateString } from './helpers.js';
 import { saveFile } from './file.js';
 import { closeModal } from './modal.js';
+import { renderTasks } from './render.js';
 
 // ADD/EDIT TASK --------------------------------------------------------------
 
@@ -59,13 +60,14 @@ function editTask(id) {
 	DOM.editComplete.checked = task.isCompleted;
 	DOM.editDelete.dataset.id = task.id;
 	DOM.editDelete.classList.remove('hide');
+	DOM.editDeleteConfirm.classList.add('hide');
 	DOM.editSubmit.textContent = 'Save';
 	DOM.editDescription.focus();
 	DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 	populateTags();
 }
 
-async function completeTask(event) {
+function completeTask(event) {
 	const id = event.currentTarget.dataset.id;
 	const task = STATE.todos.tasks.find(t => t.id === id);
 	if (!task) return;
@@ -74,13 +76,18 @@ async function completeTask(event) {
 	saveFile();
 }
 
-async function deleteTask(event) {
-	if (!confirm('Are you sure you want to delete this task?')) return;
+function deleteConfirm(event) {
+	DOM.editDeleteConfirm.classList.remove('hide');
+	DOM.editDeleteConfirm.dataset.id = event.currentTarget.dataset.id;
+}
+
+function deleteTask(event) {
 	const id = event.currentTarget.dataset.id;
 	const task = STATE.todos.tasks.find(t => t.id === id);
 	if (!task) return;
 	STATE.todos.delete(task);
 	saveFile();
+	renderTasks();
 	if (STATE.visibleModal) closeModal(STATE.visibleModal);
 }
 
@@ -164,4 +171,4 @@ async function submitForm(e) {
 	}
 }
 
-export { submitForm, addTask, populateTags, filterTags }
+export { submitForm, addTask, populateTags, filterTags, completeTask, editTask, deleteTask, deleteConfirm }

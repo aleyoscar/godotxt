@@ -16,6 +16,7 @@ const DOM = {
 	editComplete: document.getElementById('edit-complete'),
 	editContexts: document.getElementById('edit-contexts'),
 	editDelete: document.getElementById('edit-delete'),
+	editDeleteConfirm: document.getElementById('edit-delete-confirm'),
 	editDescription: document.getElementById('edit-description'),
 	editError: document.getElementById('edit-error'),
 	editForm: document.getElementById('edit-form'),

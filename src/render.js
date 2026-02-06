@@ -1,6 +1,8 @@
 
 import { DOM, KEYS, REGEX, STATE } from './globals.js';
 import { capitalize, getDateString } from './helpers.js';
+import { completeTask, editTask } from './manage.js';
+import { toggleModal } from './modal.js';
 
 function toggleAside() {
 	DOM.aside?.classList.toggle('open');
@@ -28,16 +30,42 @@ function parseTask(task) {
 			<svg width="1em" height="1em"><use xlink:href="#icon-link"/></svg>${label}</a>`;
 	});
 
-	return `
-		<input type="checkbox" ${task.isCompleted ? 'checked' : ''} data-id="${task.id}" onclick="completeTask(event)" />
-		<hgroup class="pointer flex-grow" data-target="edit-modal" onclick="editTask('${task.id}'); toggleModal(event);">
-			<h5 class="flex space-between ${task.isCompleted ? 'muted-color strike' : ''}">
-				<span>${taskSub} ${taskDesc}</span>
-			</h5>
-			<p class="flex gap-xs align-center">${taskDates}</p>
-		</hgroup>
-		<svg class="show-hover" width="1em" height="1em"><use xlink:href="#icon-edit"/></svg>
+	const li = document.createElement('li');
+	li.id = `task-${task.id}`;
+	li.classList.add('flex', 'align-center', 'hover-background', 'padding-xs', 'show-hover-parent');
+	task.projects.forEach((p) => li.classList.add(p));
+	task.contexts.forEach((c) => li.classList.add(c));
+
+	const input = document.createElement('input');
+	input.type = 'checkbox';
+	input.checked = task.isCompleted;
+	input.dataset.id = task.id;
+	input.addEventListener('click', completeTask);
+	li.appendChild(input);
+
+	const hgroup = document.createElement('hgroup');
+	hgroup.classList.add('pointer', 'flex-grow');
+	hgroup.dataset.target = 'edit-modal';
+	hgroup.addEventListener('click', (e) => {
+		editTask(task.id);
+		toggleModal(e);
+	});
+	hgroup.innerHTML = `
+		<h5 class="flex space-between ${task.isCompleted ? 'muted-color strike' : ''}">
+			<span>${taskSub} ${taskDesc}</span>
+		</h5>
+		<p class="flex gap-xs align-center">${taskDates}</p>
 	`;
+	li.appendChild(hgroup);
+
+	const svg = document.createElement('svg');
+	svg.classList.add('show-hover');
+	svg.width = '1em';
+	svg.height = '1em';
+	svg.innerHTML = '<use xlink:href="#icon-edit"/>';
+	li.appendChild(svg);
+
+	return li;
 }
 
 async function renderTasks() {
@@ -135,11 +163,7 @@ async function renderTasks() {
 	}
 
 	for (let i = 0; i < filteredTasks.length; i++) {
-		filteredTasks[i].html = `
-			<li id="task-${filteredTasks[i].id}" class="flex align-center hover-background padding-xs show-hover-parent ${filteredTasks[i].projects.map(p => `project-${p}`).join(' ')} ${filteredTasks[i].contexts.map(c => `context-${c}`).join(' ')}">
-				${parseTask(filteredTasks[i])}
-			</li>
-		`;
+		filteredTasks[i].element = parseTask(filteredTasks[i]);
 	}
 
 	// Group todos
@@ -149,41 +173,61 @@ async function renderTasks() {
 			STATE.todos.projects.forEach(tag => {
 				if (filteredTasks.filter(task => task.projects.includes(tag)).length) {
 					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>+${tag}</h5></li><li class="group"><hr></li>`;
-					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.projects.includes(tag) ? task.html : '').join('');
+					filteredTasks.forEach((t) => {
+						if (t.projects.includes(tag))
+							DOM.taskList.querySelector('ul').appendChild(t.element);
+					});
 				}
 			});
 			if (filteredTasks.filter(task => !task.projects.length)) {
 				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No project</h5></li><li class="group"><hr></li>`;
-				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => !task.projects.length ? task.html : '').join('');
+				filteredTasks.forEach((t) => {
+					if (!t.projects.length)
+						DOM.taskList.querySelector('ul').appendChild(t.element);
+				});
 			}
 			break;
 		case 'context':
 			STATE.todos.contexts.forEach(tag => {
 				if (filteredTasks.filter(task => task.contexts.includes(tag)).length) {
 					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>@${tag}</h5></li><li class="group"><hr></li>`;
-					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.contexts.includes(tag) ? task.html : '').join('');
+					filteredTasks.forEach((t) => {
+						if (t.contexts.includes(tag))
+							DOM.taskList.querySelector('ul').appendChild(t.element);
+					});
 				}
 			});
 			if (filteredTasks.filter(task => !task.contexts.length)) {
 				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No context</h5></li><li class="group"><hr></li>`;
-				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => !task.contexts.length ? task.html : '').join('');
+				filteredTasks.forEach((t) => {
+					if (!t.contexts.length)
+						DOM.taskList.querySelector('ul').appendChild(t.element);
+				});
 			}
 			break;
 		case 'priority':
 			STATE.todos.priorities.forEach(priority => {
 				if (priority && filteredTasks.filter(task => task.priority === priority).length) {
 					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>Priority '${priority}'</h5></li><li class="group"><hr></li>`;
-					DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.priority === priority ? task.html : '').join('');
+					filteredTasks.forEach((t) => {
+						if (t.priority === priority)
+							DOM.taskList.querySelector('ul').appendChild(t.element);
+					});
 				}
 			});
 			if (filteredTasks.filter(task => !task.priority)) {
 				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No priority</h5></li><li class="group"><hr></li>`;
-				DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => !task.priority ? task.html : '').join('');
+				filteredTasks.forEach((t) => {
+					if (!t.priority)
+						DOM.taskList.querySelector('ul').appendChild(t.element);
+				});
 			}
 			break;
 		default:
 			// Render todos
-			DOM.taskList.querySelector('ul').innerHTML += filteredTasks.map(task => task.html).join('');
+			filteredTasks.forEach((t) => {
+				DOM.taskList.querySelector('ul').appendChild(t.element);
+			});
 	}
 
 	// Update showAll button visibility

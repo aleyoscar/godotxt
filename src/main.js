@@ -7,7 +7,7 @@ import { DOM, KEYS, REGEX, STATE } from './globals.js';
 import { clearBtn, getDateString, toggleLoading, cleanString, stdout, stderr, capitalize } from './helpers.js';
 import { clearAttributeFilters, selectAttribute, setAttributeFilters, clearFilters, clearSearch, sortBy } from './refine.js';
 import { renderTasks, toggleAside } from './render.js';
-import { submitForm, addTask, populateTags, filterTags } from './manage.js';
+import { submitForm, addTask, populateTags, filterTags, deleteTask, deleteConfirm } from './manage.js';
 
 // DOM.todosForm.addEventListener("submit", async (e) => {
 // 	e.preventDefault();
@@ -186,6 +186,9 @@ DOM.editDescription.addEventListener('keydown', e => {
 		populateTags();
 	}
 });
+
+DOM.editDelete.addEventListener('click', deleteConfirm);
+DOM.editDeleteConfirm.addEventListener('click', deleteTask);
 
 DOM.autocomplete.addEventListener('click', e => {
 	if (e.target.tagName !== 'LI') return;

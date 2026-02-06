@@ -446,11 +446,14 @@
 				<footer>
 					<button id="edit-delete"
 						class="float-left"
-						data-id=""
-						onclick="deleteTask(event)">
+						data-id="">
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-trash"/>
 						</svg>
+					</button>
+					<button id="edit-delete-confirm"
+						class="float-left danger hide">
+						Confirm Delete?
 					</button>
 					<button class="secondary toggle-modal"
 						data-target="edit-modal">
