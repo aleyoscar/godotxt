@@ -16,9 +16,10 @@ const getScrollbarWidth = () => window.innerWidth - document.documentElement.cli
 
 // MODAL HANDLING -------------------------------------------------------------
 
-function toggleModal(event) {
+function toggleModal(event, currentTarget=null) {
+	currentTarget = currentTarget ? currentTarget : event.currentTarget;
 	event.preventDefault();
-	const modal = document.getElementById(event.currentTarget.dataset.target);
+	const modal = document.getElementById(currentTarget.dataset.target);
 	if (modal) modal.open ? closeModal(modal) : openModal(modal);
 }
 
