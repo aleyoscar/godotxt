@@ -6,7 +6,7 @@ import { load } from '@tauri-apps/plugin-store';
 import { DOM, KEYS, REGEX, STATE } from './globals.js';
 import { clearBtn, getDateString, toggleLoading, cleanString, stdout, stderr, capitalize } from './helpers.js';
 import { clearAttributeFilters, selectAttribute, setAttributeFilters, clearFilters, clearSearch, sortBy } from './refine.js';
-import { renderTasks } from './render.js';
+import { renderTasks, toggleAside } from './render.js';
 
 // DOM.todosForm.addEventListener("submit", async (e) => {
 // 	e.preventDefault();
@@ -21,17 +21,20 @@ import { renderTasks } from './render.js';
 // 	}
 // });
 
-// ASIDE MENU -----------------------------------------------------------------
-
-function toggleAside() {
-	DOM.aside?.classList.toggle('open');
-}
+// PROJECT LIST ---------------------------------------------------------------
 
 if (DOM.aside) {
 	DOM.aside.addEventListener('click', e => {
 		if (DOM.aside.classList.contains('open') && e.target === DOM.aside) toggleAside();
 	});
 }
+
+DOM.listAll.addEventListener('click', async (e) => {
+	await STATE.store.set(KEYS.filterList, '');
+	await STATE.store.save();
+	await renderTasks();
+	toggleAside();
+});
 
 // EVENT LISTENERS ------------------------------------------------------------
 

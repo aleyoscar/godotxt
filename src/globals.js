@@ -28,6 +28,8 @@ const DOM = {
 	groupBtns: document.getElementById('group-btns'),
 	groupClearBtn: document.getElementById('group-clear-btn'),
 	groupSortBtns: document.querySelectorAll('.group-sort-btn'),
+	listAll: document.getElementById('list-all'),
+	listProjects: document.getElementById('list-projects'),
 	listTitle: document.getElementById('list-title'),
 	logo: document.getElementById('logo'),
 	menuOpenFile: document.getElementById('menu-open-file'),

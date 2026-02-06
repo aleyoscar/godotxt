@@ -1,6 +1,10 @@
 
 import { DOM, KEYS, REGEX, STATE } from './globals.js';
-import { getDateString } from './helpers.js';
+import { capitalize, getDateString } from './helpers.js';
+
+function toggleAside() {
+	DOM.aside?.classList.toggle('open');
+}
 
 function parseTask(task) {
 	const taskSub = task.priority ? `<a>(${task.priority})</a>` : '';
@@ -39,24 +43,28 @@ function parseTask(task) {
 async function renderTasks() {
 	const filterProjects = await STATE.store.get(KEYS.filterProjects);
 	const filterContexts = await STATE.store.get(KEYS.filterContexts);
+	const filterList = await STATE.store.get(KEYS.filterList);
 	const showComplete = await STATE.store.get(KEYS.showComplete);
 	const sortAscending = await STATE.store.get(KEYS.sortAscending);
 	const sortType = await STATE.store.get(KEYS.sortType);
 	const group = await STATE.store.get(KEYS.sortGroup);
 
 	// Update aside menu
-	const listUl = DOM.aside?.querySelector('ul');
-	if (listUl) {
-		DOM.logo.classList.toggle('hide-sm', STATE.todos.projects?.length);
-		DOM.logo.nextElementSibling.classList.toggle('hide', !STATE.todos.projects?.length);
-		DOM.aside.classList.toggle('hide', !STATE.todos.projects?.length);
-		while (listUl.children.length > 1) listUl.lastElementChild.remove();
-		STATE.todos.projects?.forEach(project => {
-			listUl.insertAdjacentHTML('beforeend', `
-				<li><a id="list-${project}" class="contrast" href="#${project}" onclick="toggleAside()" data-title="${project}">${project}</a></li>
-			`);
+	DOM.listProjects.innerHTML = '';
+	DOM.logo.classList.toggle('hide-sm', STATE.todos.projects?.length);
+	DOM.logo.nextElementSibling.classList.toggle('hide', !STATE.todos.projects?.length);
+	DOM.aside.classList.toggle('hide', !STATE.todos.projects?.length);
+	STATE.todos.projects?.forEach(project => {
+		const li = document.createElement('li');
+		li.innerHTML = `<a id="list-${project}" class="contrast pointer">${project}</a>`;
+		li.addEventListener('click', async (e) => {
+			await STATE.store.set(KEYS.filterList, project);
+			await STATE.store.save();
+			await renderTasks();
+			toggleAside();
 		});
-	}
+		DOM.listProjects.append(li);
+	});
 
 	// Populate project & context dropdowns
 	const updateModal = (modal, btn, items, attribute, checkedItems) => {
@@ -80,19 +88,8 @@ async function renderTasks() {
 	updateModal(DOM.projectsModal, DOM.projectsBtn, STATE.todos.projects, 'projects', filterProjects);
 	updateModal(DOM.contextsModal, DOM.contextsBtn, STATE.todos.contexts, 'contexts', filterContexts);
 
-	// Get list hash
-	const hash = location.hash.slice(1) || '';
-	let filterList = '';
-	let listTitle = 'Tasks';
-	DOM.noList.classList.add('hide');
-	if (hash && hash !== 'tasks' && document.getElementById(`list-${hash}`)) {
-		filterList = hash;
-		listTitle = document.getElementById(`list-${hash}`).dataset.title
-	} else if (hash && hash !== 'tasks' && !document.getElementById(`list-${hash}`)) {
-		DOM.noList.querySelector('span').textContent = hash;
-		DOM.noList.classList.remove('hide');
-	}
-	DOM.listTitle.textContent = listTitle;
+	// Update list title
+	DOM.listTitle.textContent = filterList === '' ? 'Tasks' : capitalize(filterList);
 
 	// Filter todos
 	let filteredTasks = STATE.todos.tasks ? STATE.todos.tasks
@@ -202,4 +199,4 @@ async function renderTasks() {
 	});
 }
 
-export { renderTasks }
+export { renderTasks, toggleAside }

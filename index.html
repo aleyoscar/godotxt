@@ -208,8 +208,7 @@
 			</section>
 			<section>
 				<a id="show-all"
-					class="secondary hide pointer"
-					onclick="clearFilters()">
+					class="secondary hide pointer">
 					Show All
 				</a>
 			</section>
@@ -227,12 +226,9 @@
 							<h6>Lists</h6>
 							<hr>
 							<ul>
-								<li><a class="contrast"
-									href="#tasks"
-									onclick="renderTasks(); toggleAside();">
-									Tasks</a>
-								</li>
+								<li><a id="list-all" class="contrast pointer">All Tasks</a></li>
 							</ul>
+							<ul id="list-projects"></ul>
 						</nav>
 					</article>
 				</aside>
