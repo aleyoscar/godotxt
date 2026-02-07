@@ -143,24 +143,6 @@ async function submitForm(e) {
 				}
 				saveFile();
 				break;
-			case 'delete-form':
-				const deleteIds = Array.from(form.querySelectorAll('.delete-switch:checked'))
-					.flatMap(input => STATE.todos.tasks.filter(task => task.isCompleted && task.projects.includes(input.dataset.project)).map(task => task.id));
-				if (!deleteIds.length) return;
-				const deleteList = STATE.todos.tasks.filter(task => deleteIds.includes(task.id));
-				deleteList.forEach(d => { STATE.todos.delete(d); });
-				saveFile();
-				break;
-			case 'import-form':
-				const reader = new FileReader();
-				reader.onload = function () {
-					const lines = reader.result.split('\n');
-					const appending = formData.get('import-append');
-					STATE.todos.parse(reader.result, appending);
-					saveFile();
-				}
-				reader.readAsText(formData.get('import-file'));
-				break;
 		}
 		renderTasks();
 		if (STATE.visibleModal) closeModal(STATE.visibleModal);

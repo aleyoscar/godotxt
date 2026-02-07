@@ -1,5 +1,5 @@
 
-import { openFile, readFile, saveFile } from './file.js';
+import { openFile, readFile } from './file.js';
 import { toggleModal, openModal, closeModal } from './modal.js';
 import { Task, TodoTxt } from './todotxt.js';
 import { load } from '@tauri-apps/plugin-store';
@@ -18,19 +18,6 @@ import {
 import { renderTasks, toggleAside } from './render.js';
 import { submitForm, addTask, populateTags, filterTags, deleteTask, deleteConfirm } from './manage.js';
 import { getVersion } from '@tauri-apps/api/app';
-
-// DOM.todosForm.addEventListener("submit", async (e) => {
-// 	e.preventDefault();
-// 	const formData = new FormData(e.currentTarget);
-// 	const content = formData.get('todos-textarea');
-// 	const todoPath = await store.get(KEY_TODO_PATH);
-// 	if (todoPath) {
-// 		await saveFile(todoPath, content);
-// 	} else {
-// 		console.error(`No todo.txt path set`);
-// 		return;
-// 	}
-// });
 
 // PROJECT LIST ---------------------------------------------------------------
 
