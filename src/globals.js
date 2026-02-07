@@ -51,6 +51,7 @@ const DOM = {
 	sortToggle: document.getElementById('sort-toggle'),
 	status: document.getElementById('status'),
 	taskList: document.getElementById('tasks'),
+	taskListUl: document.getElementById('task-list'),
 	toggleModals: document.querySelectorAll('.toggle-modal'),
 	versionInfo: document.getElementById('version-info'),
 }

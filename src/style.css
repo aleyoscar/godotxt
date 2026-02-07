@@ -1,3 +1,4 @@
+html, body { overflow: hidden; height: 100%; }
 aside { width: 220px; }
 div[role="search"] { margin-bottom: 0; }
 header { position: relative; }
@@ -70,6 +71,12 @@ button.danger:hover {
 	border-color: var(--pico-form-element-invalid-active-border-color);
 }
 
+#task-list { overflow-y: auto; }
+#task-list::-webkit-scrollbar { width: 6px; }
+#task-list::-webkit-scrollbar-thumb {
+  background: var(--pico-muted-color);
+  border-radius: 3px;
+}
 #task-list input[type='checkbox'] { margin-top: 0; }
 #autocomplete {
 	background: var(--pico-form-element-background-color);
