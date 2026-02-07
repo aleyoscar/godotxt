@@ -1,24 +1,39 @@
 
-v3.0.0
-## [v3.0.0](https://github.com/aleyoscar/groctxt/compare/v2.1.1...v3.0.0) (2026-02-02)
+v4.0.0
+## [v4.0.0](https://github.com/aleyoscar/groctxt/compare/v3.0.0...v4.0.0) (2026-02-06)
 
 ### Bug Fixes
 
-* **web:** CSS not caching correctly
+* **core:** Move home link to title
+* **core:** Missing task-list id
+* **core:** Task attribute links not filtering
+* **core:** Tasks not updating after editing
+* **core:** Toggle aside not working
+* **core:** Show all not working
+* **core:** Toggle modal losing currentTarget on async calls
+* **core:** cPanel deployment failing with $CPANEL_USER
 
 ### Code Refactoring
 
-* **core:** Remove node and backend server
-* **core:** Remove docker example and dockerfile
-* **docs:** Update docs for file access API
-* **web:** Replace fetch from server with file system access API
-* **web:** Remove authentication
-* **web:** Remove online status indicator
+* **core:** Remove old code
+* **core:** Compartmentalize javascript into modules
 
 ### Features
 
-* **core:** Add cpanel deployment
-* **core:** Change internal node port with .env
-* **docs:** Added user and notes to compose example
-* **web:** Show version info in 3-dot menu
+* **core:** Show status in bottom bar
+* **core:** Edit and delete task
+* **core:** Load refinements at startup. Closes [#19](https://github.com/aleyoscar/groctxt/issues/19)
+* **core:** Changed 'priority' sort text to 'default'
+* **core:** Scroll only the task list
+* **core:** Remove delete done tasks for now
+* **core:** Print task list updates to status bar
+* **core:** Add task and save file
+* **core:** Get version info from tauri
+* **core:** Add aside menu with project list
+* **core:** Add render, filter and sort tasks
+* **core:** Add todotxt & modal modules
+* **core:** Base structure for native apps using tauri
+* **core:** Add header. Moved file picker to menu
+* **desktop:** Larger default window
+* **docs:** Add index.html to chglog script
 
