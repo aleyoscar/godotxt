@@ -1,7 +1,7 @@
 
 import { DOM, REGEX, STATE } from './globals.js';
 import { Task } from './todotxt.js';
-import { getDateString } from './helpers.js';
+import { getDateString, stdout, stderr } from './helpers.js';
 import { saveFile } from './file.js';
 import { closeModal } from './modal.js';
 import { renderTasks } from './render.js';
@@ -73,6 +73,7 @@ function completeTask(event) {
 	if (!task) return;
 	event.currentTarget.checked ? task.complete() : task.uncomplete();
 	STATE.todos.replace(task);
+	stdout(`Completed task #${task.id}`);
 	saveFile();
 	renderTasks();
 }
@@ -87,6 +88,7 @@ function deleteTask(event) {
 	const task = STATE.todos.tasks.find(t => t.id === id);
 	if (!task) return;
 	STATE.todos.delete(task);
+	stdout(`Deleted task #${task.id}`);
 	saveFile();
 	renderTasks();
 	if (STATE.visibleModal) closeModal(STATE.visibleModal);
@@ -138,8 +140,10 @@ async function submitForm(e) {
 					newTask.id = task.id;
 					newTask.lineNum = task.lineNum;
 					STATE.todos.replace(newTask);
+					stdout(`Edited task #${task.id}`);
 				} else { // Add
 					STATE.todos.addTask(newTask);
+					stdout(`Added task`);
 				}
 				saveFile();
 				break;
@@ -148,7 +152,7 @@ async function submitForm(e) {
 		if (STATE.visibleModal) closeModal(STATE.visibleModal);
 		form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
 	} catch (error) {
-		console.error(error);
+		stderr(`Unable to update tasks`, error);
 		form.querySelector('.error').textContent = error.message;
 		form.querySelector('.error').classList.remove('hide');
 		form.parentNode.querySelector(".form-submit").setAttribute('aria-busy', 'false');
