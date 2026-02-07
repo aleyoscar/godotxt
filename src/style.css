@@ -1,6 +1,6 @@
 aside { width: 220px; }
 div[role="search"] { margin-bottom: 0; }
-header {position: relative; }
+header { position: relative; }
 hgroup { margin-bottom: 0; }
 svg, use { pointer-events: none; }
 ul { list-style-type: none; padding-left: 0; }
@@ -37,6 +37,7 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .ml-xs { margin-left: calc(var(--pico-spacing) / 3); }
 .mr-xs { margin-right: calc(var(--pico-spacing) / 3); }
 .muted-color { color: var(--pico-muted-color); }
+.no-decoration { text-decoration: none; }
 .overflow-auto {
 	-webkit-overflow-scrolling: touch;
 	&::-webkit-scrollbar { display: none; }
