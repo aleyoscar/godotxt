@@ -1,6 +1,20 @@
+@font-face {
+	font-family: 'Inter';
+	src: url('/src/fonts/InterVariable.woff2') format('woff2-variations');
+	font-weight: 100 900;
+	font-display: swap;
+	font-style: normal;
+}
+
+@supports (font-variation-settings: normal) {
+  :root { font-family: InterVariable, sans-serif; }
+}
+
 :root {
 	--safe-top: env(safe-area-inset-top, 24px);
 	--safe-bottom: env(safe-area-inset-bottom, 48px);
+	--pico-font-family-sans-serif: 'Inter', system-ui, sans-serif !important;
+	font-feature-settings: 'liga' 1, 'calt' 1;
 }
 
 html, body { overflow: hidden; height: 100%; }
