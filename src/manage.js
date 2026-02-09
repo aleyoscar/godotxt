@@ -1,5 +1,5 @@
 
-import { DOM, REGEX, STATE } from './globals.js';
+import { DOM, REGEX, STATE, KEYS } from './globals.js';
 import { Task } from './todotxt.js';
 import { getDateString, stdout, stderr } from './helpers.js';
 import { saveFile } from './file.js';
@@ -36,12 +36,12 @@ function deleteTag(event) {
 	target.remove();
 }
 
-function addTask() {
-	const hash = location.hash.slice(1) || '';
+async function addTask() {
+	const currentProject = await STATE.store.get(KEYS.filterList);
 	DOM.editForm.reset();
 	DOM.editTitle.textContent = 'Add task';
 	DOM.editId.value = '';
-	DOM.editDescription.value = hash && hash !== 'tasks' ? ` +${hash}` : '';
+	DOM.editDescription.value = currentProject ? ` +${currentProject}` : '';
 	DOM.editDescription.setSelectionRange(0, 0);
 	DOM.editDelete.classList.add('hide');
 	DOM.editDeleteConfirm.classList.add('hide');
