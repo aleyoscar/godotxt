@@ -44,6 +44,7 @@ function addTask() {
 	DOM.editDescription.value = hash && hash !== 'tasks' ? ` +${hash}` : '';
 	DOM.editDescription.setSelectionRange(0, 0);
 	DOM.editDelete.classList.add('hide');
+	DOM.editDeleteConfirm.classList.add('hide');
 	DOM.editSubmit.textContent = 'Add';
 	populateTags();
 }
