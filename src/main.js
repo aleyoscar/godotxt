@@ -262,18 +262,24 @@ document.addEventListener('click', e => {
 
 DOM.forms.forEach(f => f.addEventListener('submit', submitForm));
 
-function resizeTaskList() {
-	const rect = DOM.taskListUl.getBoundingClientRect();
+function resizeScrollLists() {
+	const taskRect = DOM.taskListUl.getBoundingClientRect();
+	const listRect = DOM.projectList.getBoundingClientRect();
 	const footerRect = DOM.status.getBoundingClientRect();
-	const availableHeight = window.innerHeight - rect.top - footerRect.height;
+	const availableTaskHeight = window.innerHeight - taskRect.top - footerRect.height;
+	const availableListHeight = window.innerHeight - listRect.top - footerRect.height;
 
-	if (availableHeight > 0) {
-		DOM.taskListUl.style.height = `calc(${availableHeight}px - var(--pico-spacing))`;
+	if (availableTaskHeight > 0) {
+		DOM.taskListUl.style.height = `calc(${availableTaskHeight}px - var(--pico-spacing))`;
+	}
+
+	if (availableListHeight > 0) {
+		DOM.projectList.style.height = `calc(${availableListHeight}px - var(--pico-spacing))`;
 	}
 }
 
-window.addEventListener('load', resizeTaskList);
-window.addEventListener('resize', resizeTaskList);
+window.addEventListener('load', resizeScrollLists);
+window.addEventListener('resize', resizeScrollLists);
 
 // MAIN -----------------------------------------------------------------------
 

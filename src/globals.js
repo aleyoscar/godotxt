@@ -41,6 +41,7 @@ const DOM = {
 	menuTheme: document.getElementById('menu-theme'),
 	pickFile: document.getElementById('pick-file'),
 	pickFileOpen: document.getElementById('pick-file-open'),
+	projectList: document.getElementById('project-list'),
 	projectsBtn: document.getElementById('projects-btn'),
 	projectsModal: document.getElementById('projects-modal'),
 	search: document.getElementById('search'),

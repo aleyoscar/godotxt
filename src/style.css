@@ -73,6 +73,9 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .show-hover-parent:hover .show-hover { display: unset; }
 .space-between { justify-content: space-between; }
 .strike { text-decoration: line-through; }
+.scroll { overflow-y: auto; }
+.scroll::-webkit-scrollbar { width: 6px; }
+.scroll::-webkit-scrollbar-thumb { background: var(--pico-muted-color); border-radius: 3px; }
 .text-center { text-align: center; }
 
 .arc-1 { fill: var(--arc1, --pico-color); }
@@ -90,12 +93,6 @@ button.danger:hover {
 	border-color: var(--pico-form-element-invalid-active-border-color);
 }
 
-#task-list { overflow-y: auto; }
-#task-list::-webkit-scrollbar { width: 6px; }
-#task-list::-webkit-scrollbar-thumb {
-  background: var(--pico-muted-color);
-  border-radius: 3px;
-}
 #task-list input[type='checkbox'] { margin-top: 0; }
 #autocomplete {
 	background: var(--pico-form-element-background-color);
