@@ -236,6 +236,24 @@ function resizeTaskList() {
 window.addEventListener('load', resizeTaskList);
 window.addEventListener('resize', resizeTaskList);
 
+function setTheme(theme) {
+	DOM.menuTheme.dataset.theme = theme;
+	DOM.menuTheme.querySelector('use').setAttribute('xlink:href', `#icon-${theme}`);
+	if (theme === 'auto') document.documentElement.removeAttribute('data-theme');
+	else document.documentElement.setAttribute('data-theme', theme);
+}
+
+DOM.menuTheme.addEventListener('click', async (e) => {
+	const currentTheme = e.currentTarget.dataset.theme;
+	let newTheme = '';
+	if (currentTheme === 'auto') newTheme = 'light';
+	else if (currentTheme === 'light') newTheme = 'dark';
+	else newTheme = 'auto';
+	setTheme(newTheme);
+	await STATE.store.set(KEYS.theme, newTheme);
+	await STATE.store.save();
+});
+
 // MAIN -----------------------------------------------------------------------
 
 async function setContent(path) {
@@ -280,6 +298,7 @@ async function loadStore() {
 		if (!await STATE.store.has(KEYS.filterContexts)) await STATE.store.set(KEYS.filterContexts, []);
 		if (!await STATE.store.has(KEYS.filterList)) await STATE.store.set(KEYS.filterList, '');
 		if (!await STATE.store.has(KEYS.filterProjects)) await STATE.store.set(KEYS.filterProjects, []);
+		if (!await STATE.store.has(KEYS.theme)) await STATE.store.set(KEYS.theme, 'auto');
 		await STATE.store.save();
 		console.log(`Loaded store`);
 	} catch (err) {
@@ -301,6 +320,7 @@ async function startup() {
 	await loadVersion();
 	await loadStore();
 	await loadPersistedTodo();
+	setTheme(await STATE.store.get(KEYS.theme));
 	setAttributeFiltersChecked('projects', await STATE.store.get(KEYS.filterProjects));
 	setAttributeFiltersDOM('projects');
 	setAttributeFiltersChecked('contexts', await STATE.store.get(KEYS.filterContexts));

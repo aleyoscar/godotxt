@@ -37,6 +37,7 @@ const DOM = {
 	listTitle: document.getElementById('list-title'),
 	logo: document.getElementById('logo'),
 	menuOpenFile: document.getElementById('menu-open-file'),
+	menuTheme: document.getElementById('menu-theme'),
 	noList: document.getElementById('no-list'),
 	pickFile: document.getElementById('pick-file'),
 	projectsBtn: document.getElementById('projects-btn'),
@@ -66,6 +67,7 @@ const KEYS = {
 	filterContexts: 'filter-contexts',
 	filterList: 'filter-list',
 	filterProjects: 'filter-projects',
+	theme: 'theme',
 }
 
 const REGEX = {
