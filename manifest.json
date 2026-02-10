@@ -1,8 +1,8 @@
 {
-	"default": "app-icon.png",
+	"default": "src/images/app-icon.png",
 	"bg_color": "#202632",
-	"android_bg": "app-icon-bg.png",
-	"android_fg": "app-icon-fg.png",
+	"android_bg": "src/images/app-icon-bg.png",
+	"android_fg": "src/images/app-icon-fg.png",
 	"android_fg_scale": 62,
-	"android_monochrome": "app-icon-monochrome.png"
+	"android_monochrome": "src/images/app-icon-monochrome.png"
 }
