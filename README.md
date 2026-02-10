@@ -40,8 +40,15 @@ References and sources used in the project.
 - [Pico CSS](https://picocss.com/)
 - [Bootstrap Icons](https://icons.getbootstrap.com/)
 
-> Changelog script
+> Build
 
 ```
-python gen-chglog.py {version} -r README.md -r package.json -r src-tauri/tauri.conf.json
+python gen-chglog.py {version} -r README.md -r package.json -r src-tauri/tauri.conf.json -r src-tauri/Cargo.toml
+# Unstage commit
+npm install --package-lock-only
+cd src-tauri
+cargo update
+cd ..
+npm run tauri build
+npm run tauri android build
 ```
