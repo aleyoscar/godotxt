@@ -9,6 +9,12 @@ function toggleAside() {
 	DOM.aside?.classList.toggle('open');
 }
 
+async function togglePickFile() {
+	const todoPath = await STATE.store.get(KEYS.todoPath);
+	DOM.pickFile.classList.toggle('hide', todoPath);
+	DOM.taskList.classList.toggle('hide', !todoPath);
+}
+
 function parseTask(task) {
 	const taskSub = task.priority ? `<a>(${task.priority})</a>` : '';
 	const taskDates = [
@@ -245,4 +251,4 @@ async function renderTasks() {
 	});
 }
 
-export { renderTasks, toggleAside }
+export { renderTasks, toggleAside, togglePickFile }

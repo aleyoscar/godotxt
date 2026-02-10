@@ -15,7 +15,7 @@ import {
 	sortBy,
 	setSortBy
 } from './refine.js';
-import { renderTasks, toggleAside } from './render.js';
+import { renderTasks, toggleAside,togglePickFile } from './render.js';
 import { submitForm, addTask, populateTags, filterTags, deleteTask, deleteConfirm } from './manage.js';
 import { getVersion } from '@tauri-apps/api/app';
 
@@ -141,6 +141,43 @@ DOM.menuCloseFile.addEventListener('click', async (e) => {
 	}
 });
 
+DOM.pickFileOpen.addEventListener('click', chooseFile);
+DOM.menuOpenFile.addEventListener("click", chooseFile);
+
+async function chooseFile(e) {
+	try {
+		const todoPath = await openFile();
+		if (todoPath) {
+			await STATE.store.set(KEYS.todoPath, todoPath);
+			console.log('Selected file:', todoPath);
+			await STATE.store.save();
+			await setContent(todoPath);
+		} else {
+			stdout('No file selected');
+		}
+	} catch (err) {
+		stderr('Unable to choose a file to open', err);
+	}
+}
+
+function setTheme(theme) {
+	DOM.menuTheme.dataset.theme = theme;
+	DOM.menuTheme.querySelector('use').setAttribute('xlink:href', `#icon-${theme}`);
+	if (theme === 'auto') document.documentElement.removeAttribute('data-theme');
+	else document.documentElement.setAttribute('data-theme', theme);
+}
+
+DOM.menuTheme.addEventListener('click', async (e) => {
+	const currentTheme = e.currentTarget.dataset.theme;
+	let newTheme = '';
+	if (currentTheme === 'auto') newTheme = 'light';
+	else if (currentTheme === 'light') newTheme = 'dark';
+	else newTheme = 'auto';
+	setTheme(newTheme);
+	await STATE.store.set(KEYS.theme, newTheme);
+	await STATE.store.save();
+});
+
 // Add/edit
 
 DOM.addTaskBtn.addEventListener('click', (e) => {
@@ -238,24 +275,6 @@ function resizeTaskList() {
 window.addEventListener('load', resizeTaskList);
 window.addEventListener('resize', resizeTaskList);
 
-function setTheme(theme) {
-	DOM.menuTheme.dataset.theme = theme;
-	DOM.menuTheme.querySelector('use').setAttribute('xlink:href', `#icon-${theme}`);
-	if (theme === 'auto') document.documentElement.removeAttribute('data-theme');
-	else document.documentElement.setAttribute('data-theme', theme);
-}
-
-DOM.menuTheme.addEventListener('click', async (e) => {
-	const currentTheme = e.currentTarget.dataset.theme;
-	let newTheme = '';
-	if (currentTheme === 'auto') newTheme = 'light';
-	else if (currentTheme === 'light') newTheme = 'dark';
-	else newTheme = 'auto';
-	setTheme(newTheme);
-	await STATE.store.set(KEYS.theme, newTheme);
-	await STATE.store.save();
-});
-
 // MAIN -----------------------------------------------------------------------
 
 async function setContent(path) {
@@ -263,12 +282,13 @@ async function setContent(path) {
 	try {
 		const content = await readFile(path);
 		STATE.todos = new TodoTxt(content);
-		console.log('Set content successfully');
+		stdout(`Opened file ${path}`);
 		await renderTasks();
 	} catch (err) {
-		console.error('Failed to set content', err);
+		stderr('Failed to set content', err);
 	} finally {
 		toggleLoading(false);
+		await togglePickFile();
 	}
 }
 
@@ -279,8 +299,10 @@ async function loadPersistedTodo() {
 			stdout(`Loaded persisted file: ${todoPath}`);
 			await setContent(todoPath);
 		} else {
+			toggleLoading(false);
 			stdout(`No todo.txt file set. Please open a todo.txt file`);
 		}
+		await togglePickFile();
 	} catch (err) {
 		stderr(`Unable to load persisted todo file`, err);
 	}
