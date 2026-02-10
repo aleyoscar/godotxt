@@ -28,8 +28,9 @@ Download and install for your respective OS from the [releasees](https://github.
 
 **Available platforms:**
 
-- Windows `exe` and `msi`
+- Windows `exe` `msi`
 - Android `apk`
+- Linux `deb` `rpm` `AppImage`
 
 ## Sources
 
