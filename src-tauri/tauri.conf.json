@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "godotxt",
+  "productName": "GoDo.txt",
   "version": "4.0.0",
   "identifier": "com.aleyoscar.godotxt",
   "build": {
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "godotxt",
+        "title": "GoDo.txt",
         "width": 1280,
         "height": 720
       }
