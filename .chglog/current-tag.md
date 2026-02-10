@@ -1,39 +1,19 @@
 
-v4.0.0
-## [v4.0.0](https://github.com/aleyoscar/groctxt/compare/v3.0.0...v4.0.0) (2026-02-06)
+v4.1.0
+## [v4.1.0](https://github.com/aleyoscar/groctxt/compare/v4.0.0...v4.1.0) (2026-02-10)
 
 ### Bug Fixes
 
-* **core:** Move home link to title
-* **core:** Missing task-list id
-* **core:** Task attribute links not filtering
-* **core:** Tasks not updating after editing
-* **core:** Toggle aside not working
-* **core:** Show all not working
-* **core:** Toggle modal losing currentTarget on async calls
-* **core:** cPanel deployment failing with $CPANEL_USER
-
-### Code Refactoring
-
-* **core:** Remove old code
-* **core:** Compartmentalize javascript into modules
+* **android:** Confirm delete button text too long. Fixes [#50](https://github.com/aleyoscar/groctxt/issues/50)
+* **android:** Use safe area padding. Fixes [#48](https://github.com/aleyoscar/groctxt/issues/48)
+* **core:** Add task not inserting current project. Fixes [#53](https://github.com/aleyoscar/groctxt/issues/53)
+* **core:** Confirm delete not hiding when adding new task. Fixes [#52](https://github.com/aleyoscar/groctxt/issues/52)
+* **docs:** Screenshot had old link
 
 ### Features
 
-* **core:** Show status in bottom bar
-* **core:** Edit and delete task
-* **core:** Load refinements at startup. Closes [#19](https://github.com/aleyoscar/groctxt/issues/19)
-* **core:** Changed 'priority' sort text to 'default'
-* **core:** Scroll only the task list
-* **core:** Remove delete done tasks for now
-* **core:** Print task list updates to status bar
-* **core:** Add task and save file
-* **core:** Get version info from tauri
-* **core:** Add aside menu with project list
-* **core:** Add render, filter and sort tasks
-* **core:** Add todotxt & modal modules
-* **core:** Base structure for native apps using tauri
-* **core:** Add header. Moved file picker to menu
-* **desktop:** Larger default window
-* **docs:** Add index.html to chglog script
+* **core:** Theme switcher
+* **core:** Cleaner android icons
+* **core:** Use single font for all platforms. Closes [#49](https://github.com/aleyoscar/groctxt/issues/49)
+* **core:** Add linux packages
 
