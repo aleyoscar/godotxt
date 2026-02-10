@@ -126,16 +126,18 @@ function setGroup(group) {
 
 // Menu
 
-DOM.menuOpenFile.addEventListener("click", async (e) => {
-	e.preventDefault();
-	const todoPath = await openFile();
-	if (todoPath) {
-		await STATE.store.set(KEYS.todoPath, todoPath);
-		console.log('Selected file:', todoPath);
+DOM.menuCloseFile.addEventListener('click', async (e) => {
+	try {
+		const currentFile = await STATE.store.get(KEYS.todoPath);
+		STATE.todos = [];
+		await STATE.store.set(KEYS.todoPath, null);
 		await STATE.store.save();
-		await setContent(todoPath);
-	} else {
-		console.log('No file selected');
+		await renderTasks();
+		stdout(`Closed file ${currentFile}`);
+	} catch (err) {
+		stderr(`Unable to close file`, err);
+	} finally {
+		togglePickFile();
 	}
 });
 

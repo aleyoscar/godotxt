@@ -36,6 +36,7 @@ const DOM = {
 	listProjects: document.getElementById('list-projects'),
 	listTitle: document.getElementById('list-title'),
 	logo: document.getElementById('logo'),
+	menuCloseFile: document.getElementById('menu-close-file'),
 	menuOpenFile: document.getElementById('menu-open-file'),
 	menuTheme: document.getElementById('menu-theme'),
 	noList: document.getElementById('no-list'),
