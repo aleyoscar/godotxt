@@ -166,6 +166,9 @@ button.danger:hover {
 	.flex-column-lg { flex-direction: column; }
 	.hide-sm { display: none; }
 	.max-width-xs { max-width: 100%; }
+	.scroll-sm { overflow-y: auto; }
+	.scroll-sm::-webkit-scrollbar { width: 6px; }
+	.scroll-sm::-webkit-scrollbar-thumb { background: var(--pico-muted-color); border-radius: 3px; }
 	.space-between-sm { justify-content: space-between; width: 100%; }
 	.width-100-sm { width: 100%; }
 
