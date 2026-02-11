@@ -10,10 +10,12 @@ import {
 	setAttributeFilters,
 	setAttributeFiltersChecked,
 	setAttributeFiltersDOM,
+	setFilterPriorities,
 	clearFilters,
 	clearSearch,
 	sortBy,
-	setSortBy
+	setSortBy,
+	filterPriority
 } from './refine.js';
 import { renderTasks, toggleAside,togglePickFile } from './render.js';
 import { submitForm, addTask, populateTags, filterTags, deleteTask, deleteConfirm } from './manage.js';
@@ -59,6 +61,18 @@ DOM.sortBtns.querySelectorAll('button').forEach((b) => {
 		sortBy(e.currentTarget.dataset.sort);
 		toggleModal(e);
 	});
+});
+
+DOM.priorityGrid.querySelectorAll('button').forEach((b) => {
+	b.addEventListener('click', filterPriority);
+});
+
+DOM.clearPrioritiesBtn.addEventListener('click', async (e) => {
+	await STATE.store.set(KEYS.filterPriorities, []);
+	await STATE.store.save();
+	setFilterPriorities([]);
+	await renderTasks();
+	if (STATE.visibleModal) closeModal(STATE.visibleModal);
 });
 
 DOM.filterAttributeBtns.forEach((b) => {
@@ -327,6 +341,8 @@ async function loadStore() {
 		setShowComplete(await STATE.store.get(KEYS.showComplete));
 		if (!await STATE.store.has(KEYS.filterContexts)) await STATE.store.set(KEYS.filterContexts, []);
 		if (!await STATE.store.has(KEYS.filterList)) await STATE.store.set(KEYS.filterList, '');
+		if (!await STATE.store.has(KEYS.filterPriorities)) await STATE.store.set(KEYS.filterPriorities, []);
+		setFilterPriorities(await STATE.store.get(KEYS.filterPriorities));
 		if (!await STATE.store.has(KEYS.filterProjects)) await STATE.store.set(KEYS.filterProjects, []);
 		if (!await STATE.store.has(KEYS.theme)) await STATE.store.set(KEYS.theme, 'auto');
 		await STATE.store.save();

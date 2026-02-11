@@ -4,6 +4,31 @@ import { clearBtn, capitalize } from './helpers.js';
 import { renderTasks } from './render.js';
 import { toggleModal } from './modal.js';
 
+async function filterPriority(e) {
+	let next = [];
+	if (!STATE.todos.priorities.length) {
+		await STATE.store.set(KEYS.filterPriorities, next);
+	} else {
+		const priority = e.currentTarget.textContent.trim();
+		const current = (await STATE.store.get(KEYS.filterPriorities)) ?? [];
+		next = current.includes(priority)
+			? current.filter(p => p !== priority)
+			: [...current, priority].sort();
+		await STATE.store.set(KEYS.filterPriorities, next);
+	}
+	setFilterPriorities(next);
+	await renderTasks();
+}
+
+function setFilterPriorities(priorities) {
+	DOM.priorityGrid.querySelectorAll('button').forEach((b) => {
+		b.classList.toggle('outline', !priorities.includes(b.textContent));
+	});
+	DOM.prioritiesBtn.classList.toggle('outline', !priorities.length);
+	if (priorities.length) DOM.prioritiesBtn.querySelector('use').setAttribute('xlink:href', '#icon-flag-fill');
+	else DOM.prioritiesBtn.querySelector('use').setAttribute('xlink:href', '#icon-flag');
+}
+
 function selectAttribute(event) {
 	event.stopPropagation();
 	event.preventDefault();
@@ -43,10 +68,12 @@ function setAttributeFiltersDOM(attribute) {
 	return checked;
 }
 
-function clearFilters() {
+async function clearFilters() {
 	clearSearch();
 	[DOM.projectsModal, DOM.contextsModal].forEach(modal => modal.querySelectorAll('input').forEach(i => i.checked = false));
 	setAttributeFilters();
+	await STATE.store.set(KEYS.filterPriorities, []);
+	setFilterPriorities([]);
 }
 
 function clearSearch() {
@@ -76,8 +103,10 @@ export {
 	setAttributeFilters,
 	setAttributeFiltersChecked,
 	setAttributeFiltersDOM,
+	setFilterPriorities,
 	clearFilters,
 	clearSearch,
 	sortBy,
-	setSortBy
+	setSortBy,
+	filterPriority
 }

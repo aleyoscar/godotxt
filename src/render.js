@@ -3,7 +3,7 @@ import { DOM, KEYS, REGEX, STATE } from './globals.js';
 import { capitalize, getDateString } from './helpers.js';
 import { completeTask, editTask } from './manage.js';
 import { toggleModal } from './modal.js';
-import { selectAttribute } from './refine.js';
+import { selectAttribute, setFilterPriorities } from './refine.js';
 
 function toggleAside() {
 	DOM.aside?.classList.toggle('open');
@@ -16,7 +16,7 @@ async function togglePickFile() {
 }
 
 function parseTask(task) {
-	const taskSub = task.priority ? `<a>(${task.priority})</a>` : '';
+	const taskSub = task.priority ? `<a class="task-priority-filter" data-priority="${task.priority}">(${task.priority})</a>` : '';
 	const taskDates = [
 		task.creationDate ? `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(task.creationDate)}</small>` : '',
 		task.completionDate ? `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(task.completionDate)}</ins></small>` : '',
@@ -69,6 +69,7 @@ function parseTask(task) {
 }
 
 async function renderTasks() {
+	const filterPriorities = await STATE.store.get(KEYS.filterPriorities);
 	const filterProjects = await STATE.store.get(KEYS.filterProjects);
 	const filterContexts = await STATE.store.get(KEYS.filterContexts);
 	const filterList = await STATE.store.get(KEYS.filterList);
@@ -92,6 +93,18 @@ async function renderTasks() {
 			toggleAside();
 		});
 		DOM.listProjects.append(li);
+	});
+
+	// Populate priority filter
+	DOM.prioritiesBtn.classList.toggle('secondary', !STATE.todos.priorities.length);
+	if (!STATE.todos.priorities.length)
+		DOM.prioritiesBtn.setAttribute('disabled', true);
+	else DOM.prioritiesBtn.removeAttribute('disabled');
+	DOM.priorityGrid.querySelectorAll('button').forEach((b) => {
+		const hasPriority = STATE.todos.priorities.includes(b.textContent);
+		if (hasPriority) b.removeAttribute('disabled');
+		else b.setAttribute('disabled', true);
+		b.classList.toggle('secondary', !hasPriority)
 	});
 
 	// Populate project & context dropdowns
@@ -124,6 +137,7 @@ async function renderTasks() {
 		.filter(task => (
 			(!STATE.search || task.raw.toLowerCase().includes(STATE.search.toLowerCase())) &&
 			(showComplete ? true : !task.isCompleted) &&
+			(!filterPriorities.length || filterPriorities.includes(task.priority)) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
 			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c))) &&
 			(!filterList || task.projects.includes(filterList))
@@ -232,7 +246,7 @@ async function renderTasks() {
 
 	// Update showAll button visibility
 	if (DOM.showAll) {
-		DOM.showAll.classList.toggle('hide', !(STATE.search || filterProjects.length || filterContexts.length));
+		DOM.showAll.classList.toggle('hide', !(STATE.search || filterProjects.length || filterContexts.length || filterPriorities.length));
 	}
 
 	// Update task links to stop propagation
@@ -249,6 +263,17 @@ async function renderTasks() {
 			selectAttribute(e);
 		});
 	});
+
+	// Select priorty filter by clicking on priority
+	document.querySelectorAll('.task-priority-filter').forEach((link) => {
+		link.addEventListener('click', async (e) => {
+			e.stopPropagation();
+			const priorityList = [e.currentTarget.dataset.priority];
+			await STATE.store.set(KEYS.filterPriorities, priorityList);
+			setFilterPriorities(priorityList);
+			await renderTasks();
+		});
+	})
 }
 
 export { renderTasks, toggleAside, togglePickFile }
