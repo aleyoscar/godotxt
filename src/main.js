@@ -143,7 +143,7 @@ function setGroup(group) {
 DOM.menuCloseFile.addEventListener('click', async (e) => {
 	try {
 		const currentFile = await STATE.store.get(KEYS.todoPath);
-		STATE.todos = [];
+		STATE.todos = null;
 		await STATE.store.set(KEYS.todoPath, null);
 		await STATE.store.save();
 		await renderTasks();

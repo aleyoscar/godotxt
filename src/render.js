@@ -80,10 +80,10 @@ async function renderTasks() {
 
 	// Update aside menu
 	DOM.listProjects.innerHTML = '';
-	DOM.logo.classList.toggle('hide-sm', STATE.todos.projects?.length);
-	DOM.logo.nextElementSibling.classList.toggle('hide', !STATE.todos.projects?.length);
-	DOM.aside.classList.toggle('hide', !STATE.todos.projects?.length);
-	STATE.todos.projects?.forEach(project => {
+	DOM.logo.classList.toggle('hide-sm', STATE.todos?.projects.length);
+	DOM.logo.nextElementSibling.classList.toggle('hide', !STATE.todos?.projects.length);
+	DOM.aside.classList.toggle('hide', !STATE.todos?.projects.length);
+	STATE.todos?.projects.forEach(project => {
 		const li = document.createElement('li');
 		li.innerHTML = `<a id="list-${project}" class="contrast pointer">${project}</a>`;
 		li.addEventListener('click', async (e) => {
@@ -96,12 +96,15 @@ async function renderTasks() {
 	});
 
 	// Populate priority filter
-	DOM.prioritiesBtn.classList.toggle('secondary', !STATE.todos.priorities.length);
-	if (!STATE.todos.priorities.length)
+	if (STATE.todos && STATE.todos.priorities.length) {
+		DOM.prioritiesBtn.classList.remove('secondary');
+		DOM.prioritiesBtn.removeAttribute('disabled');
+	} else {
+		DOM.prioritiesBtn.classList.add('secondary');
 		DOM.prioritiesBtn.setAttribute('disabled', true);
-	else DOM.prioritiesBtn.removeAttribute('disabled');
+	}
 	DOM.priorityGrid.querySelectorAll('button').forEach((b) => {
-		const hasPriority = STATE.todos.priorities.includes(b.textContent);
+		const hasPriority = STATE.todos !== null && STATE.todos.priorities.includes(b.textContent);
 		if (hasPriority) b.removeAttribute('disabled');
 		else b.setAttribute('disabled', true);
 		b.classList.toggle('secondary', !hasPriority)
@@ -126,14 +129,14 @@ async function renderTasks() {
 			btn.classList.toggle('secondary', !items.length);
 		}
 	};
-	updateModal(DOM.projectsModal, DOM.projectsBtn, STATE.todos.projects, 'projects', filterProjects);
-	updateModal(DOM.contextsModal, DOM.contextsBtn, STATE.todos.contexts, 'contexts', filterContexts);
+	updateModal(DOM.projectsModal, DOM.projectsBtn, STATE.todos?.projects, 'projects', filterProjects);
+	updateModal(DOM.contextsModal, DOM.contextsBtn, STATE.todos?.contexts, 'contexts', filterContexts);
 
 	// Update list title
 	DOM.listTitle.textContent = filterList === '' ? 'Tasks' : capitalize(filterList);
 
 	// Filter todos
-	let filteredTasks = STATE.todos.tasks ? STATE.todos.tasks
+	let filteredTasks = STATE.todos?.tasks ? STATE.todos.tasks
 		.filter(task => (
 			(!STATE.search || task.raw.toLowerCase().includes(STATE.search.toLowerCase())) &&
 			(showComplete ? true : !task.completed) &&

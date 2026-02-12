@@ -86,7 +86,7 @@ const REGEX = {
 
 const STATE = {
 	store: null,
-	todos: [],
+	todos: null,
 	search: '',
 	visibleModal: null,
 }
