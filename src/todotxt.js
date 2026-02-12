@@ -4,7 +4,7 @@ class Task {
 		this.lineNum = lineNum;
 		this.description = '';
 		this.rawDescription = '';
-		this.isCompleted = false;
+		this.completed = false;
 		this.completionDate = null;
 		this.creationDate = null;
 		this.priority = null;
@@ -21,7 +21,7 @@ class Task {
 
 		// Parse completion status and date
 		if (remaining.startsWith('x ')) {
-			this.isCompleted = true;
+			this.completed = true;
 			remaining = remaining.slice(2).trim();
 			const dateMatch = remaining.match(/^(\d{4}-\d{2}-\d{2})\s+/);
 			if (dateMatch) {
@@ -67,7 +67,7 @@ class Task {
 
 	toString() {
 		let parts = [];
-		if (this.isCompleted) {
+		if (this.completed) {
 			parts.push('x');
 			if (this.completionDate) {
 				parts.push(this.completionDate);
@@ -108,12 +108,12 @@ class Task {
 	}
 
 	complete(completionDate = null) {
-		this.isCompleted = true;
+		this.completed = true;
 		this.completionDate = completionDate || new Date().toISOString().split('T')[0];
 	}
 
 	uncomplete() {
-		this.isCompleted = false;
+		this.completed = false;
 		this.completionDate = null;
 	}
 

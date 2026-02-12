@@ -58,7 +58,7 @@ function editTask(id) {
 	DOM.editId.value = task.id;
 	DOM.editDescription.value = task.rawDescription;
 	DOM.editPriority.value = task.priority || '--';
-	DOM.editComplete.checked = task.isCompleted;
+	DOM.editComplete.checked = task.completed;
 	DOM.editDelete.dataset.id = task.id;
 	DOM.editDelete.classList.remove('hide');
 	DOM.editDeleteConfirm.classList.add('hide');

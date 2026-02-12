@@ -45,7 +45,7 @@ function parseTask(task) {
 
 	const input = document.createElement('input');
 	input.type = 'checkbox';
-	input.checked = task.isCompleted;
+	input.checked = task.completed;
 	input.dataset.id = task.id;
 	input.addEventListener('click', completeTask);
 	li.appendChild(input);
@@ -58,7 +58,7 @@ function parseTask(task) {
 		toggleModal(e);
 	});
 	hgroup.innerHTML = `
-		<h5 class="flex space-between ${task.isCompleted ? 'muted-color strike' : ''}">
+		<h5 class="flex space-between ${task.completed ? 'muted-color strike' : ''}">
 			<span>${taskSub} ${taskDesc}</span>
 		</h5>
 		<p class="flex gap-xs align-center">${taskDates}</p>
@@ -136,7 +136,7 @@ async function renderTasks() {
 	let filteredTasks = STATE.todos.tasks ? STATE.todos.tasks
 		.filter(task => (
 			(!STATE.search || task.raw.toLowerCase().includes(STATE.search.toLowerCase())) &&
-			(showComplete ? true : !task.isCompleted) &&
+			(showComplete ? true : !task.completed) &&
 			(!filterPriorities.length || filterPriorities.includes(task.priority)) &&
 			(!filterProjects.length || task.projects.some(p => filterProjects.includes(p))) &&
 			(!filterContexts.length || task.contexts.some(c => filterContexts.includes(c))) &&
