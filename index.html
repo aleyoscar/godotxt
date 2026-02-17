@@ -204,24 +204,27 @@
 						</svg>
 					</button>
 					<button id="priorities-btn"
-						class="flex-inline align-center outline toggle-modal"
-						data-target="priorities-modal">
+						class="flex-inline align-center outline toggle-modal secondary"
+						data-target="priorities-modal"
+						disabled>
 						Priority
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-flag"/>
 						</svg>
 					</button>
 					<button id="projects-btn"
-						class="flex-inline align-center outline toggle-modal"
-						data-target="projects-modal">
+						class="flex-inline align-center outline toggle-modal secondary"
+						data-target="projects-modal"
+						disabled>
 						Projects
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-rocket"/>
 						</svg>
 					</button>
 					<button id="contexts-btn"
-						class="flex-inline align-center outline toggle-modal"
-						data-target="contexts-modal">
+						class="flex-inline align-center outline toggle-modal secondary"
+						data-target="contexts-modal"
+						disabled>
 						Contexts
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-at"/>
@@ -244,7 +247,7 @@
 				</a>
 			</section>
 			<div class="content flex">
-				<aside class="width-xs">
+				<aside class="width-xs hide">
 					<article id="project-list" class="scroll">
 						<nav class="scroll-sm">
 							<a id="menu-close"
@@ -264,7 +267,7 @@
 				</aside>
 				<div class="flex-1">
 					<div id="pick-file" class="hide">Please <a id="pick-file-open" class="pointer">open a todo.txt file</a></div>
-					<div id="tasks">
+					<div id="tasks" class="hide">
 						<section class="flex align-center">
 							<h3 id="list-title" class="mb-0">Tasks</h3>
 							<button id="add-task-btn"
@@ -274,7 +277,7 @@
 							</button>
 						</section>
 						<section>
-							<div class="loading" aria-busy="true"></div>
+							<div class="loading hide" aria-busy="true"></div>
 							<ul id="task-list" class="scroll"></ul>
 						</section>
 					</div>
