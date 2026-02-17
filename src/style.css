@@ -112,9 +112,9 @@ button.danger:hover {
 	padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
 }
 #autocomplete li.selected { background: var(--pico-dropdown-hover-background-color); }
-#dot-menu { margin-bottom: 0; }
-#dot-menu summary { height: unset; background-color: transparent; border-color: transparent; }
-#dot-menu summary:after { display: none; }
+#menu { margin-bottom: 0; }
+#menu summary { height: unset; background-color: transparent; border-color: transparent; }
+#menu summary:after { display: none; }
 #menu-close { line-height: 1em; }
 #priority-grid { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; }
 #status {
