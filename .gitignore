@@ -65,4 +65,4 @@ src-tauri/*.exe
 .env
 .env.local
 .env.*.local
-todo.txt
+todo.txt*
