@@ -1,15 +1,90 @@
-
-import { DOM, KEYS, REGEX, STATE } from './globals.js';
-import { capitalize, getDateString } from './helpers.js';
-import { completeTask, editTask } from './manage.js';
+import { DOM } from './dom.js';
+import { capitalize, stderr, stdout, getDateString } from './utils.js';
+import { STATE } from './state.js';
+import { KEYS, REGEX } from './constants.js';
+import { readFile } from './file.js';
+import { TodoTxt } from './todotxt.js';
+import { completeTask, deleteTag } from './manage.js';
 import { toggleModal } from './modal.js';
-import { selectAttribute, setFilterPriorities } from './refine.js';
 
-function toggleAside() {
+export function populateTags() {
+	const taskTags = {
+		projects: { regex: REGEX.project, container: DOM.editProjects, classes: 'background-primary mr-xs mb-xs' },
+		contexts: { regex: REGEX.context, container: DOM.editContexts, classes: 'mr-xs mb-xs' },
+	};
+
+	Object.values(taskTags).forEach(({ regex, container, classes }) => {
+		const span = container.querySelector('span');
+		const icon = container.querySelector('i');
+		span.innerHTML = '';
+		icon.classList.toggle('hide', !!DOM.editDescription.value.match(regex));
+		(DOM.editDescription.value.match(regex) || []).forEach(tag => {
+			const kbd = document.createElement('kbd');
+			const b = document.createElement('b');
+			kbd.className = classes;
+			kbd.textContent = `${tag} `;
+			b.classList.add('pointer');
+			b.addEventListener('click', deleteTag);
+			b.innerHTML = '<svg width="1em" height="1em"><use xlink:href="#icon-x"/></svg>';
+			kbd.appendChild(b);
+			span.appendChild(kbd);
+		});
+	});
+}
+
+export async function addTask() {
+	const currentProject = await STATE.store.get(KEYS.filterList);
+	DOM.editForm.reset();
+	DOM.editTitle.textContent = 'Add task';
+	DOM.editId.value = '';
+	DOM.editDescription.value = currentProject ? ` +${currentProject}` : '';
+	DOM.editDescription.setSelectionRange(0, 0);
+	DOM.editDelete.classList.add('hide');
+	DOM.editDeleteConfirm.classList.add('hide');
+	DOM.editSubmit.textContent = 'Add';
+	populateTags();
+}
+
+function editTask(id) {
+	const task = STATE.todos.tasks.find(t => t.id === id);
+	if (!task) return;
+	DOM.autocomplete.classList.add('hide');
+	DOM.editForm.reset();
+	DOM.editTitle.textContent = `Edit task #${task.lineNum}`;
+	DOM.editId.value = task.id;
+	DOM.editDescription.value = task.rawDescription;
+	DOM.editPriority.value = task.priority || '--';
+	DOM.editComplete.checked = task.completed;
+	DOM.editDelete.dataset.id = task.id;
+	DOM.editDelete.classList.remove('hide');
+	DOM.editDeleteConfirm.classList.add('hide');
+	DOM.editSubmit.textContent = 'Save';
+	DOM.editDescription.focus();
+	DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
+	populateTags();
+}
+
+export function deleteConfirm(event) {
+	DOM.editDeleteConfirm.classList.remove('hide');
+	DOM.editDeleteConfirm.dataset.id = event.currentTarget.dataset.id;
+}
+
+function openDelete() {
+	DOM.deleteLists.innerHTML = (STATE.todos.projects?.length ? ['All Tasks', ...STATE.todos.projects] : [])
+		.map(project => `
+			<label>
+				<input class="delete-switch" type="checkbox" role="switch" data-project="${project}" />
+				${project}
+			</label>
+		`).join('');
+	openModal(DOM.deleteModal);
+}
+
+export function toggleAside() {
 	DOM.aside?.classList.toggle('open');
 }
 
-async function togglePickFile() {
+export async function togglePickFile() {
 	const todoPath = await STATE.store.get(KEYS.todoPath);
 	DOM.pickFile.classList.toggle('hide', todoPath);
 	DOM.taskList.classList.toggle('hide', !todoPath);
@@ -68,7 +143,7 @@ function parseTask(task) {
 	return li;
 }
 
-async function renderTasks() {
+export async function renderTasks() {
 	const filterPriorities = await STATE.store.get(KEYS.filterPriorities);
 	const filterProjects = await STATE.store.get(KEYS.filterProjects);
 	const filterContexts = await STATE.store.get(KEYS.filterContexts);
@@ -279,4 +354,95 @@ async function renderTasks() {
 	})
 }
 
-export { renderTasks, toggleAside, togglePickFile }
+export function setShowComplete(showComplete) {
+	const newIcon = showComplete ? '#icon-eye-fill' : '#icon-eye';
+	DOM.completeToggle.classList.toggle('outline', !showComplete);
+	DOM.completeToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+}
+
+export function setSort(sortAscending) {
+	const newIcon = sortAscending ? '#icon-caret-down' : '#icon-caret-up-fill';
+	DOM.sortToggle.classList.toggle('outline', sortAscending);
+	DOM.sortToggle.querySelector('use').setAttribute('xlink:href', newIcon);
+}
+
+export function setGroup(group) {
+	const newIcon = group === 'none' ? '#icon-group' : '#icon-group-fill';
+	DOM.groupBtn.classList.toggle('outline', group === 'none');
+	DOM.groupBtn.querySelector('use').setAttribute('xlink:href', newIcon);
+	Array.from(DOM.groupBtns.children).forEach((btn) => {
+		btn.classList.toggle('outline', !btn.id.includes(group));
+	});
+	DOM.groupClearBtn.classList.toggle('hide', group === 'none');
+}
+
+export function setTheme(theme) {
+	DOM.menuTheme.dataset.theme = theme;
+	DOM.menuTheme.querySelector('use').setAttribute('xlink:href', `#icon-${theme}`);
+	if (theme === 'auto') document.documentElement.removeAttribute('data-theme');
+	else document.documentElement.setAttribute('data-theme', theme);
+}
+
+export function resizeScrollLists() {
+	const taskRect = DOM.taskListUl.getBoundingClientRect();
+	const listRect = DOM.projectList.getBoundingClientRect();
+	const footerRect = DOM.status.getBoundingClientRect();
+	const availableTaskHeight = window.innerHeight - taskRect.top - footerRect.height;
+	const availableListHeight = window.innerHeight - listRect.top - footerRect.height;
+
+	if (availableTaskHeight > 0) {
+		DOM.taskListUl.style.height = `calc(${availableTaskHeight}px - var(--pico-spacing))`;
+	}
+
+	if (availableListHeight > 0) {
+		DOM.projectList.style.height = `calc(${availableListHeight}px - var(--pico-spacing))`;
+	}
+}
+
+export function setSortBy(type) {
+	Array.from(DOM.sortBtns.children).forEach((btn) => {
+		btn.classList.toggle('outline', !btn.id.includes(type));
+	});
+	DOM.sortByToggle.classList.toggle('outline', !DOM.sortDefaultBtn.classList.contains('outline'));
+	DOM.sortByText.textContent = capitalize(type);
+}
+
+export function setFilterPriorities(priorities) {
+	DOM.priorityGrid.querySelectorAll('button').forEach((b) => {
+		b.classList.toggle('outline', !priorities.includes(b.textContent));
+	});
+	DOM.prioritiesBtn.classList.toggle('outline', !priorities.length);
+	if (priorities.length) DOM.prioritiesBtn.querySelector('use').setAttribute('xlink:href', '#icon-flag-fill');
+	else DOM.prioritiesBtn.querySelector('use').setAttribute('xlink:href', '#icon-flag');
+}
+
+export const toggleLoading = (show) => {
+	document.querySelectorAll('.loading').forEach(el => el.classList.toggle('hide', !show));
+};
+
+export function setAttributeFiltersDOM(attribute) {
+	const checked = [];
+	DOM[`${attribute}Btn`].classList.add('outline');
+	document.querySelectorAll('.attribute-filter').forEach(input => {
+		if (input.checked && input.dataset.attribute === attribute) {
+			checked.push(input.name);
+			DOM[`${attribute}Btn`].classList.remove('outline');
+		}
+	});
+	return checked;
+}
+
+export async function setContent(path) {
+	toggleLoading(true);
+	try {
+		const content = await readFile(path);
+		STATE.todos = new TodoTxt(content);
+		stdout(`Opened file ${path}`);
+		await renderTasks();
+	} catch (err) {
+		stderr('Failed to set content', err);
+	} finally {
+		toggleLoading(false);
+		await togglePickFile();
+	}
+}

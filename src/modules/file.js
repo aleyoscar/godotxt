@@ -2,9 +2,12 @@
 import { open } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import { AndroidFs, isAndroid } from 'tauri-plugin-android-fs-api';
-import { KEYS, STATE } from './globals.js';
+import { KEYS } from './constants.js';
+import { STATE } from './state.js';
+import { stdout, stderr } from './utils.js';
+import { toggleLoading, togglePickFile, setContent } from './render.js';
 
-async function saveFile() {
+export async function saveFile() {
 	try {
 		const path = await STATE.store.get(KEYS.todoPath);
 		await writeTextFile(path, STATE.todos.toString());
@@ -47,7 +50,7 @@ async function openFile() {
 	}
 }
 
-async function readFile(path) {
+export async function readFile(path) {
 	try {
 		const content = await readTextFile(path);
 		console.log(`Read file: ${path}`);
@@ -57,4 +60,34 @@ async function readFile(path) {
 	}
 }
 
-export { openFile, readFile, saveFile };
+export async function chooseFile(e) {
+	try {
+		const todoPath = await openFile();
+		if (todoPath) {
+			await STATE.store.set(KEYS.todoPath, todoPath);
+			console.log('Selected file:', todoPath);
+			await STATE.store.save();
+			await setContent(todoPath);
+		} else {
+			stdout('No file selected');
+		}
+	} catch (err) {
+		stderr('Unable to choose a file to open', err);
+	}
+}
+
+export async function loadPersistedTodo() {
+	try {
+		const todoPath = await STATE.store.get(KEYS.todoPath);
+		if (todoPath) {
+			stdout(`Loaded persisted file: ${todoPath}`);
+			await setContent(todoPath);
+		} else {
+			toggleLoading(false);
+			stdout(`No todo.txt file set. Please open a todo.txt file`);
+		}
+		await togglePickFile();
+	} catch (err) {
+		stderr(`Unable to load persisted todo file`, err);
+	}
+}

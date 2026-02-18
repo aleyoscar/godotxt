@@ -1,5 +1,4 @@
-
-import { STATE } from './globals.js';
+import { STATE } from './state.js';
 
 // CONFIG ---------------------------------------------------------------------
 
@@ -17,14 +16,14 @@ const getScrollbarWidth = () => window.innerWidth - document.documentElement.cli
 
 // MODAL HANDLING -------------------------------------------------------------
 
-function toggleModal(event, currentTarget=null) {
+export function toggleModal(event, currentTarget=null) {
 	currentTarget = currentTarget ? currentTarget : event.currentTarget;
 	event.preventDefault();
 	const modal = document.getElementById(currentTarget.dataset.target);
 	if (modal) modal.open ? closeModal(modal) : openModal(modal);
 }
 
-function openModal(modal) {
+export function openModal(modal) {
 	const scrollbarWidth = getScrollbarWidth();
 	if (scrollbarWidth) document.documentElement.style.setProperty(CONFIG.scrollbarWidthCssVar, `${scrollbarWidth}px`);
 	document.documentElement.classList.add(CONFIG.isOpenClass, CONFIG.openingClass);
@@ -36,7 +35,7 @@ function openModal(modal) {
 	}, CONFIG.animationDuration);
 }
 
-function closeModal(modal) {
+export function closeModal(modal) {
 	STATE.visibleModal = null;
 	document.documentElement.classList.add(CONFIG.closingClass);
 	setTimeout(() => {
@@ -58,5 +57,3 @@ document.addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
 	if (event.key === 'Escape' && STATE.visibleModal) closeModal(STATE.visibleModal);
 });
-
-export { toggleModal, openModal, closeModal }

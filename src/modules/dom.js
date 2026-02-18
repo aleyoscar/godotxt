@@ -1,6 +1,4 @@
-// CONSTANTS ------------------------------------------------------------------
-
-const DOM = {
+export const DOM = {
 	addTaskBtn: document.getElementById('add-task-btn'),
 	aside: document.querySelector('aside'),
 	asideClosers: document.querySelectorAll('.aside-closer'),
@@ -61,34 +59,3 @@ const DOM = {
 	toggleModals: document.querySelectorAll('.toggle-modal'),
 	versionInfo: document.getElementById('version-info'),
 }
-
-const KEYS = {
-	storeFile: 'store.json',
-	todoPath: 'todo-path',
-	sortAscending: 'sort-ascending',
-	sortGroup: 'sort-group',
-	sortType: 'sort-type',
-	showComplete: 'show-complete',
-	filterContexts: 'filter-contexts',
-	filterList: 'filter-list',
-	filterPriorities: 'filter-priorities',
-	filterProjects: 'filter-projects',
-	theme: 'theme',
-}
-
-const REGEX = {
-	project: /\+[A-Za-z0-9_-]+/g,
-	context: /@[A-Za-z0-9_-]+/g,
-	projectSingle: /^\+[A-Za-z0-9_-]+$/,
-	contextSingle: /^@[A-Za-z0-9_-]+$/,
-	url: /(https?:\/\/|ftp:\/\/|www\.)[\w\-%.]+\.[a-z]{2,}(?:[\/\w\-.$?=&%#:]*)?/gi,
-};
-
-const STATE = {
-	store: null,
-	todos: null,
-	search: '',
-	visibleModal: null,
-}
-
-export { DOM, KEYS, REGEX, STATE }
