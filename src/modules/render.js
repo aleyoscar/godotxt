@@ -251,14 +251,14 @@ export function resizeScrollLists() {
 	const listRect = DOM.filterListWrapper.getBoundingClientRect();
 	const footerRect = DOM.status.getBoundingClientRect();
 	const availableTaskHeight = window.innerHeight - taskRect.top - footerRect.height;
-	const availableListHeight = window.innerHeight - listRect.top - footerRect.height;
+	const availableListHeight = window.innerHeight;
 
 	if (availableTaskHeight > 0) {
 		DOM.taskListUl.style.height = `calc(${availableTaskHeight}px - var(--pico-spacing))`;
 	}
 
 	if (availableListHeight > 0) {
-		DOM.filterListWrapper.style.height = `calc(${availableListHeight}px - var(--pico-spacing))`;
+		DOM.filterListWrapper.style.height = `${availableListHeight}px`;
 	}
 }
 

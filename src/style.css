@@ -164,6 +164,14 @@ button.danger:hover {
 	aside.open { width: 100%; }
 	aside.open nav { transform: translateX(0); }
 
+	aside #filter-list-wrapper {
+		width: 220px;
+		transform: translateX(-220px);
+		transition: transform var(--pico-transition);
+	}
+
+	aside.open #filter-list-wrapper { transform: translateX(0); }
+
 	.align-left-sm { align-items: start; }
 	.flex-column-lg { flex-direction: column; }
 	.hide-sm { display: none; }
