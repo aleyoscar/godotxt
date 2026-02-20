@@ -7,7 +7,7 @@ import { TodoTxt } from './todotxt.js';
 import { completeTask, deleteTag } from './manage.js';
 import { toggleModal } from './modal.js';
 import * as refine from './refine.js';
-import { getTaskHtml } from './components.js';
+import { getTaskHtml, createGroupHeader } from './components.js';
 
 export function populateTags() {
 	const taskTags = {
@@ -99,68 +99,43 @@ export async function renderTasks() {
 	}
 
 	// Group todos
-	DOM.taskList.querySelector('ul').innerHTML = '';
-	switch(STATE.sortGroup) {
-		case 'project':
-			STATE.todos.projects.forEach(tag => {
-				if (filteredTasks.filter(task => task.projects.includes(tag)).length) {
-					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>+${tag}</h5></li><li class="group"><hr></li>`;
-					filteredTasks.forEach((t) => {
-						if (t.projects.includes(tag))
-							DOM.taskList.querySelector('ul').appendChild(t.element);
-					});
-				}
-			});
-			if (filteredTasks.filter(task => !task.projects.length)) {
-				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No project</h5></li><li class="group"><hr></li>`;
-				filteredTasks.forEach((t) => {
-					if (!t.projects.length)
-						DOM.taskList.querySelector('ul').appendChild(t.element);
-				});
-			}
-			break;
-		case 'context':
-			STATE.todos.contexts.forEach(tag => {
-				if (filteredTasks.filter(task => task.contexts.includes(tag)).length) {
-					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>@${tag}</h5></li><li class="group"><hr></li>`;
-					filteredTasks.forEach((t) => {
-						if (t.contexts.includes(tag))
-							DOM.taskList.querySelector('ul').appendChild(t.element);
-					});
-				}
-			});
-			if (filteredTasks.filter(task => !task.contexts.length)) {
-				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No context</h5></li><li class="group"><hr></li>`;
-				filteredTasks.forEach((t) => {
-					if (!t.contexts.length)
-						DOM.taskList.querySelector('ul').appendChild(t.element);
-				});
-			}
-			break;
-		case 'priority':
-			STATE.todos.priorities.forEach(priority => {
-				if (priority && filteredTasks.filter(task => task.priority === priority).length) {
-					DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>Priority '${priority}'</h5></li><li class="group"><hr></li>`;
-					filteredTasks.forEach((t) => {
-						if (t.priority === priority)
-							DOM.taskList.querySelector('ul').appendChild(t.element);
-					});
-				}
-			});
-			if (filteredTasks.filter(task => !task.priority)) {
-				DOM.taskList.querySelector('ul').innerHTML += `<li class="group"><h5>No priority</h5></li><li class="group"><hr></li>`;
-				filteredTasks.forEach((t) => {
-					if (!t.priority)
-						DOM.taskList.querySelector('ul').appendChild(t.element);
-				});
-			}
-			break;
-		default:
-			// Render todos
-			filteredTasks.forEach((t) => {
-				DOM.taskList.querySelector('ul').appendChild(t.element);
-			});
+	DOM.taskListUl.innerHTML = '';
+
+	const fragment = document.createDocumentFragment();
+
+	const { prefix = '', emptyLabel, getKey, formatLabel } = {
+		project:  { prefix: '+',    getKey: t => t.projects?.[0] || '', emptyLabel: 'No project' },
+		context:  { prefix: '@',    getKey: t => t.contexts?.[0] || '', emptyLabel: 'No context' },
+		priority: { prefix: '',     getKey: t => t.priority || '',      emptyLabel: 'No priority', label: p => `Priority '${p}'` },
+	}[STATE.sortGroup] || {};
+
+	if (!prefix && !emptyLabel) filteredTasks.forEach(t => fragment.appendChild(t.element));
+	else {
+		const grouped = filteredTasks.reduce((acc, t) => {
+			const key = getKey(t);
+			acc[key] = acc[key] || [];
+			acc[key].push(t);
+			return acc;
+		}, {});
+
+		const namedGroups = Object.entries(grouped)
+			.filter(([key]) => key !== '')
+			.sort(([a], [b]) => dir * a.toLowerCase().localeCompare(b.toLowerCase()));
+		const noGroups = grouped[''];
+
+		namedGroups.forEach(([key, tasks]) => {
+			const title = formatLabel ? formatLabel(key) : `${prefix}${key}`;
+			fragment.appendChild(createGroupHeader(title));
+			tasks.forEach(t => fragment.appendChild(t.element));
+		});
+
+		if (noGroups?.length) {
+			fragment.appendChild(createGroupHeader(emptyLabel));
+			noGroups.forEach(t => fragment.appendChild(t.element));
+		}
 	}
+
+	DOM.taskListUl.appendChild(fragment);
 
 	// Update showAll button visibility
 	DOM.showAllBtn.classList.toggle('hide',

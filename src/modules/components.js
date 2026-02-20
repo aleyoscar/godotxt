@@ -20,6 +20,20 @@ export function createIcon(id, width='1em', height='1em') {
 	return svg;
 }
 
+export function createGroupHeader(title) {
+	const fragment = document.createDocumentFragment();
+	fragment.appendChild(createElement('li', {
+		class: 'group',
+		innerHTML: `<h5>${title}</h5>`,
+	}));
+
+	fragment.appendChild(createElement('li', {
+		class: 'group',
+		innerHTML: '<hr>',
+	}));
+	return fragment;
+}
+
 export function createElement(tag, options = {}) {
 	const el = document.createElement(tag);
 
