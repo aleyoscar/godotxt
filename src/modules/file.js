@@ -38,10 +38,10 @@ async function openFile() {
 			todoPath = await open({
 				multiple: false,
 				directory: false,
-				filters: [{
-					name: 'Text',
-					extensions: ['txt', 'md'],
-				}],
+				filters: [
+					{ name: 'Text', extensions: ['txt', 'md'] },
+					{ name: 'All Files', extensions: ['*'] },
+				],
 				title: 'Select your Todo.txt file',
 			});
 		}
