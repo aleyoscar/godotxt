@@ -303,6 +303,7 @@ export function toggleFilterList() {
 
 export function toggleTheme() {
 	DOM.themeBtn.dataset.theme = STATE.theme;
+	DOM.themeName.textContent = `Theme|${capitalize(STATE.theme)}`;
 	DOM.themeBtn.querySelector('use').setAttribute('xlink:href', `#icon-${STATE.theme}`);
 	if (STATE.theme === 'auto') document.documentElement.removeAttribute('data-theme');
 	else document.documentElement.setAttribute('data-theme', STATE.theme);

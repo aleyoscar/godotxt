@@ -51,6 +51,7 @@ export const DOM = {
 	taskList: document.getElementById('tasks'),
 	taskListUl: document.getElementById('task-list'),
 	themeBtn: document.getElementById('theme-btn'),
+	themeName: document.getElementById('theme-name'),
 	toggleModals: document.querySelectorAll('.toggle-modal'),
 	versionInfo: document.getElementById('version-info'),
 }
