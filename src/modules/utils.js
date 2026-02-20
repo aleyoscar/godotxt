@@ -20,3 +20,13 @@ export function stderr(message, ...args) {
 }
 
 export const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+export function toggleArrayElement(arr, ele) {
+	const newArr = arr;
+	const i = newArr.indexOf(ele);
+	if (i > -1) newArr.splice(i, 1);
+	else newArr.push(ele);
+	return newArr;
+}
+
+export const getScrollbarWidth = () => window.innerWidth - document.documentElement.clientWidth;

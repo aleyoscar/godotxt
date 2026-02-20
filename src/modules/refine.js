@@ -1,72 +1,109 @@
-import { setSortBy } from './render.js';
-import { STATE } from './state.js';
+import * as render from './render.js';
+import { STATE, saveStore } from './state.js';
 import { KEYS } from './constants.js';
-import { renderTasks, setFilterPriorities, setAttributeFiltersDOM } from './render.js';
 import { toggleModal } from './modal.js';
 import { DOM } from './dom.js';
 import { clearBtn } from './components.js';
+import { toggleArrayElement } from './utils.js';
 
-export async function filterPriority(e) {
-	let next = [];
-	if (!STATE.todos.priorities.length) {
-		await STATE.store.set(KEYS.filterPriorities, next);
-	} else {
-		const priority = e.currentTarget.textContent.trim();
-		const current = (await STATE.store.get(KEYS.filterPriorities)) ?? [];
-		next = current.includes(priority)
-			? current.filter(p => p !== priority)
-			: [...current, priority].sort();
-		await STATE.store.set(KEYS.filterPriorities, next);
-	}
-	setFilterPriorities(next);
-	await renderTasks();
+export function setFilterSearch(e) {
+	if (!e || e.target.dataset.clear) DOM.filterSearchInput.value = '';
+	STATE.filterSearch = DOM.filterSearchInput.value.trim();
+	if (STATE.filterSearch) DOM.filterSearchInput.parentElement.appendChild(clearBtn);
+	else clearBtn.remove();
+	render.renderTasks();
 }
 
-function selectAttribute(event) {
-	event.stopPropagation();
-	event.preventDefault();
-	const { attribute, name } = event.target.dataset;
-	document.querySelectorAll('.attribute-filter').forEach(input => {
-		input.checked = input.dataset.attribute === attribute && input.name === name;
-	});
-	setAttributeFilters();
+export async function setSortType(e) {
+	STATE.sortType = e.currentTarget.dataset.type;
+	render.toggleSortType();
+	await saveStore('sortType');
+	await render.renderTasks();
 }
 
-export function setAttributeFiltersChecked(attribute, checked) {
-	document.querySelectorAll('.attribute-filter').forEach(input => {
-		input.checked = input.dataset.attribute === attribute && checked.includes(input.name);
-	});
+export async function setSortAscending(e) {
+	STATE.sortAscending = !STATE.sortAscending;
+	render.toggleSortAscending();
+	await saveStore('sortAscending');
+	await render.renderTasks();
 }
 
-export async function setAttributeFilters(e) {
-	const currentTarget = e ? e.currentTarget : null;
-	const filterProjects = setAttributeFiltersDOM('projects');
-	const filterContexts = setAttributeFiltersDOM('contexts');
-	await STATE.store.set(KEYS.filterProjects, filterProjects);
-	await STATE.store.set(KEYS.filterContexts, filterContexts);
-	await STATE.store.save();
-	await renderTasks();
-	if (e) toggleModal(e, currentTarget);
+export async function setSortGroup(e) {
+	STATE.sortGroup = e.currentTarget.dataset.group;
+	render.toggleSortGroup();
+	await saveStore('sortGroup');
+	await render.renderTasks();
 }
 
-export async function clearFilters() {
-	clearSearch();
-	[DOM.projectsModal, DOM.contextsModal].forEach(modal => modal.querySelectorAll('input').forEach(i => i.checked = false));
-	setAttributeFilters();
-	await STATE.store.set(KEYS.filterPriorities, []);
-	setFilterPriorities([]);
+export async function setShowComplete(e) {
+	STATE.showComplete = !STATE.showComplete;
+	render.toggleShowComplete();
+	await saveStore('showComplete');
+	await render.renderTasks();
 }
 
-export function clearSearch() {
-	DOM.search.value = '';
-	STATE.search = '';
-	clearBtn.remove();
-	renderTasks();
+export async function setFilterPriorities(e) {
+	let target = e.currentTarget ? e.currentTarget : e;
+	const priority = target.textContent.trim().replace('(', '').replace(')', '');
+	if (priority === 'Clear') STATE.filterPriorities = [];
+	else if (!e.currentTarget) STATE.filterPriorities = [priority]
+	else STATE.filterPriorities = toggleArrayElement(STATE.filterPriorities, priority);
+	render.toggleFilterPriorities();
+	await saveStore('filterPriorities');
+	await render.renderTasks();
 }
 
-export async function sortBy(type) {
-	setSortBy(type);
-	await STATE.store.set(KEYS.sortType, type);
-	await STATE.store.save();
-	await renderTasks();
+export async function setFilterProjects(e) {
+	let target = e.currentTarget ? e.currentTarget : e;
+	const project = target.dataset.project;
+	if (!project) STATE.filterProjects = [];
+	else if (!e.currentTarget) STATE.filterProjects = [project];
+	else STATE.filterProjects = toggleArrayElement(STATE.filterProjects, project);
+	render.toggleFilterProjects();
+	await saveStore('filterProjects');
+	await render.renderTasks();
+}
+
+export async function setFilterContexts(e) {
+	let target = e.currentTarget ? e.currentTarget : e;
+	const context = target.dataset.context;
+	if (!context) STATE.filterContexts = [];
+	else if (!e.currentTarget) STATE.filterContexts = [context];
+	else STATE.filterContexts = toggleArrayElement(STATE.filterContexts, context);
+	render.toggleFilterContexts();
+	await saveStore('filterContexts');
+	await render.renderTasks();
+}
+
+export async function setFilterList(e) {
+	const list = e.currentTarget.dataset.list;
+	STATE.filterList = list;
+	STATE.filterProjects = list ? [list] : [];
+	render.toggleFilterList();
+	render.toggleFilterProjects();
+	await saveStore('filterList');
+	await render.renderTasks();
+	render.toggleAside();
+}
+
+export async function setTheme(e) {
+	const currentTheme = e.currentTarget.dataset.theme;
+	if (currentTheme === 'auto') STATE.theme = 'light';
+	else if (currentTheme === 'light') STATE.theme = 'dark';
+	else STATE.theme = 'auto';
+	render.toggleTheme();
+	await saveStore('theme');
+}
+
+export function clearFilters() {
+	STATE.filterContexts = [];
+	STATE.filterList = '';
+	STATE.filterPriorities = [];
+	STATE.filterProjects = [];
+	render.toggleFilterContexts();
+	render.toggleFilterList();
+	render.toggleFilterPriorities();
+	render.toggleFilterProjects();
+	setFilterSearch(null);
+	saveStore();
 }

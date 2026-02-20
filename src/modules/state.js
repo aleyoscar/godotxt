@@ -4,31 +4,69 @@ import { load } from '@tauri-apps/plugin-store';
 import { KEYS } from './constants.js';
 import * as render from './render.js';
 
-async function loadStore() {
+export async function saveStore(key=null) {
 	try {
-		STATE.store = await load(KEYS.storeFile, { autosave: false });
-		if (!await STATE.store.has(KEYS.sortAscending)) await STATE.store.set(KEYS.sortAscending, true);
-		render.setSort(await STATE.store.get(KEYS.sortAscending));
-		if (!await STATE.store.has(KEYS.sortGroup)) await STATE.store.set(KEYS.sortGroup, 'none');
-		render.setGroup(await STATE.store.get(KEYS.sortGroup));
-		if (!await STATE.store.has(KEYS.sortType)) await STATE.store.set(KEYS.sortType, 'priority');
-		render.setSortBy(await STATE.store.get(KEYS.sortType));
-		if (!await STATE.store.has(KEYS.showComplete)) await STATE.store.set(KEYS.showComplete, false);
-		render.setShowComplete(await STATE.store.get(KEYS.showComplete));
-		if (!await STATE.store.has(KEYS.filterContexts)) await STATE.store.set(KEYS.filterContexts, []);
-		if (!await STATE.store.has(KEYS.filterList)) await STATE.store.set(KEYS.filterList, '');
-		if (!await STATE.store.has(KEYS.filterPriorities)) await STATE.store.set(KEYS.filterPriorities, []);
-		render.setFilterPriorities(await STATE.store.get(KEYS.filterPriorities));
-		if (!await STATE.store.has(KEYS.filterProjects)) await STATE.store.set(KEYS.filterProjects, []);
-		if (!await STATE.store.has(KEYS.theme)) await STATE.store.set(KEYS.theme, 'auto');
-		await STATE.store.save();
+		console.log(`Saving key '${KEYS[key]}' as '${STATE[key]}'`);
+		if (key) {
+			await STATE.store.set(KEYS[key], STATE[key]);
+		} else {
+			await STATE.store.set(KEYS.filterContexts, STATE.filterContexts);
+			await STATE.store.set(KEYS.filterList, STATE.filterList);
+			await STATE.store.set(KEYS.filterPriorities, STATE.filterPriorities);
+			await STATE.store.set(KEYS.filterProjects, STATE.filterProjects);
+			await STATE.store.set(KEYS.showComplete, STATE.showComplete);
+			await STATE.store.set(KEYS.sortAscending, STATE.sortAscending);
+			await STATE.store.set(KEYS.sortGroup, STATE.sortGroup);
+			await STATE.store.set(KEYS.sortType, STATE.sortType);
+			await STATE.store.set(KEYS.theme, STATE.theme);
+			await STATE.store.set(KEYS.todoPath, STATE.todoPath);
+		}
+		console.log(`Successfully saved store '${key ? key : "all"}'`);
+	} catch (err) {
+		console.error('Unable to save store', err);
+	}
+}
+
+async function loadState() {
+	try {
+		STATE.filterContexts = await STATE.store.get(KEYS.filterContexts);
+		STATE.filterList = await STATE.store.get(KEYS.filterList);
+		STATE.filterPriorities = await STATE.store.get(KEYS.filterPriorities);
+		STATE.filterProjects = STATE.filterList ? [STATE.filterList] : await STATE.store.get(KEYS.filterProjects);
+		STATE.showComplete = await STATE.store.get(KEYS.showComplete);
+		STATE.sortAscending = await STATE.store.get(KEYS.sortAscending);
+		STATE.sortGroup = await STATE.store.get(KEYS.sortGroup);
+		STATE.sortType = await STATE.store.get(KEYS.sortType);
+		STATE.theme = await STATE.store.get(KEYS.theme);
+		STATE.todoPath = await STATE.store.get(KEYS.todoPath);
+		console.log('Loaded store into state');
+	} catch (err) {
+		console.error('Unable to load store into state');
+	}
+}
+
+export async function loadStore() {
+	try {
+		STATE.store = await load(KEYS.storeFile, { defaults: {
+			filterContexts: [],
+			filterList: '',
+			filterPriorities: [],
+			filterProjects: [],
+			showComplete: false,
+			sortAscending: true,
+			sortGroup: 'none',
+			sortType: 'default',
+			theme: 'auto',
+			todoPath: '',
+		}});
+		await loadState();
 		console.log(`Loaded store`);
 	} catch (err) {
 		console.error(`Unable to load store`, err);
 	}
 }
 
-async function loadVersion() {
+export async function loadVersion() {
 	try {
 		const version = await getVersion();
 		DOM.versionInfo.textContent = `v${version}`;
@@ -38,11 +76,25 @@ async function loadVersion() {
 	}
 }
 
-const STATE = {
-	store: null,
-	todos: null,
+export const STATE = {
+	animationDuration: 400, // ms
+	closingClass: 'modal-is-closing',
+	filterContexts: [],
+	filterList: '',
+	filterPriorities: [],
+	filterProjects: [],
+	filterSearch: '',
+	isOpenClass: 'modal-is-open',
+	openingClass: 'modal-is-opening',
+	scrollbarWidthCssVar: '--pico-scrollbar-width',
 	search: '',
+	showComplete: false,
+	sortAscending: true,
+	sortGroup: 'none',
+	sortType: 'default',
+	store: null,
+	theme: 'auto',
+	todoPath: '',
+	todos: null,
 	visibleModal: null,
 }
-
-export { STATE, loadVersion, loadStore }

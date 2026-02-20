@@ -151,25 +151,25 @@
 			</h1>
 			<div class="flex align-center width-100-sm">
 				<div class="max-width-xs" role="search">
-					<input type="search" id="search" placeholder="Search">
+					<input type="search" id="filter-search-input" placeholder="Search">
 				</div>
 				<details id="menu" class="dropdown">
 					<summary><svg width="1.6em" height="1.6em"><use xlink:href="#icon-menu-dot"/></svg></summary>
 					<ul dir="rtl">
 						<li class="min-width-xxs">
-							<a id="menu-open-file" class="pointer flex align-center space-between gap-xs"
+							<a id="open-file-btn" class="choose-file-btn pointer flex align-center space-between gap-xs"
 								dir="ltr">
 								Open File<svg width="1em" height="1em"><use xlink:href="#icon-folder"/></svg>
 							</a>
 						</li>
 						<li class="min-width-xxs">
-							<a id="menu-close-file" class="pointer flex align-center space-between gap-xs"
+							<a id="close-file-btn" class="pointer flex align-center space-between gap-xs"
 								dir="ltr">
 								Close File<svg width="1em" height="1em"><use xlink:href="#icon-folder-x"/></svg>
 							</a>
 						</li>
 						<li class="min-width-xxs">
-							<a id="menu-theme" class="pointer flex align-center space-between gap-xs"
+							<a id="theme-btn" class="pointer flex align-center space-between gap-xs"
 								dir="ltr" data-theme="auto">
 								Theme<svg width="1em" height="1em"><use xlink:href="#icon-auto"/></svg>
 							</a>
@@ -182,28 +182,28 @@
 		<main class="container">
 			<section class="overflow-auto">
 				<div class="horizontal-scroll">
-					<button id="sort-toggle" class="flex-inline align-center outline">
+					<button id="sort-ascending-btn" class="flex-inline align-center outline">
 						Sort
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-caret-down"/>
 						</svg>
 					</button>
-					<button id="sortby-toggle"
+					<button id="sort-type-btn"
 						class="flex-inline align-center outline toggle-modal"
 						data-target="sort-modal">
-						<span id="sortby-text">Default</span>
+						<span>Default</span>
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-sort"/>
 						</svg>
 					</button>
-					<button id="complete-toggle"
+					<button id="show-complete-btn"
 						class="flex-inline align-center outline">
 						Completed
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-eye"/>
 						</svg>
 					</button>
-					<button id="priorities-btn"
+					<button id="filter-priorities-btn"
 						class="flex-inline align-center outline toggle-modal secondary"
 						data-target="priorities-modal"
 						disabled>
@@ -212,8 +212,8 @@
 							<use xlink:href="#icon-flag"/>
 						</svg>
 					</button>
-					<button id="projects-btn"
-						class="flex-inline align-center outline toggle-modal secondary"
+					<button id="filter-projects-btn"
+						class="flex-inline align-center toggle-modal outline secondary"
 						data-target="projects-modal"
 						disabled>
 						Projects
@@ -221,7 +221,7 @@
 							<use xlink:href="#icon-rocket"/>
 						</svg>
 					</button>
-					<button id="contexts-btn"
+					<button id="filter-contexts-btn"
 						class="flex-inline align-center outline toggle-modal secondary"
 						data-target="contexts-modal"
 						disabled>
@@ -230,8 +230,8 @@
 							<use xlink:href="#icon-at"/>
 						</svg>
 					</button>
-					<button id="group-btn"
-						class="flex-inline align-center outline toggle-modal"
+					<button id="sort-group-btn"
+						class="toggle-modal flex-inline align-center outline"
 						data-target="group-modal">
 						Group
 						<svg width="1em" height="1em">
@@ -240,15 +240,9 @@
 					</button>
 				</div>
 			</section>
-			<section>
-				<a id="show-all"
-					class="secondary hide pointer">
-					Show All
-				</a>
-			</section>
 			<div class="content flex">
 				<aside class="width-xs hide">
-					<article id="project-list" class="scroll">
+					<article id="filter-list-wrapper" class="scroll">
 						<nav class="scroll-sm">
 							<a id="menu-close"
 								class="show-sm float-right pointer secondary aside-closer">
@@ -259,22 +253,28 @@
 							<h6>Lists</h6>
 							<hr>
 							<ul>
-								<li><a id="list-all" class="contrast pointer">All Tasks</a></li>
+								<li><a id="filter-list-all-btn"
+									class="filter-list-btn contrast pointer"
+									data-list=""
+								>All Tasks</a></li>
 							</ul>
-							<ul id="list-projects"></ul>
+							<ul id="filter-list"></ul>
 						</nav>
 					</article>
 				</aside>
 				<div class="flex-1">
-					<div id="pick-file" class="hide">Please <a id="pick-file-open" class="pointer">open a todo.txt file</a></div>
+					<div id="pick-file" class="choose-file-btn hide">Please <a id="pick-file-open" class="pointer">open a todo.txt file</a></div>
 					<div id="tasks" class="hide">
-						<section class="flex align-center">
-							<h3 id="list-title" class="mb-0">Tasks</h3>
-							<button id="add-task-btn"
-								class="border-round flex-inline align-center padding-xs"
-								data-target="edit-modal">
-								<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
-							</button>
+						<section class="flex align-center space-between">
+							<div class="flex align-center">
+								<h3 id="filter-list-title" class="mb-0">Tasks</h3>
+								<button id="open-add-task-btn"
+									class="toggle-modal border-round flex-inline align-center padding-xs"
+									data-target="edit-modal">
+									<svg width="1em" height="1em"><use xlink:href="#icon-add"/></svg>
+								</button>
+							</div>
+							<a id="show-all-btn" class="secondary hide pointer float-right">Show All</a>
 						</section>
 						<section>
 							<div class="loading hide" aria-busy="true"></div>
@@ -295,7 +295,7 @@
 					</button>
 					<h3>Priorities</h3>
 				</header>
-				<div id="priority-grid" class="grid">
+				<div id="filter-priorities-btns" class="grid">
 					<button class="outline">A</button>
 					<button class="outline">B</button>
 					<button class="outline">C</button>
@@ -324,13 +324,14 @@
 					<button class="outline">Z</button>
 				</div>
 				<footer>
-					<button id="clear-priorities-btn" class="secondary"
+					<button id="filter-priorities-clear-btn"
+						class="secondary toggle-modal"
 						data-target="priorities-modal">
 						Clear
 					</button>
 					<button class="toggle-modal"
 						data-target="priorities-modal">
-						Filter
+						Close
 					</button>
 				</footer>
 			</article>
@@ -338,22 +339,24 @@
 		<dialog id="projects-modal">
 			<article>
 				<header>
-					<button class="filter-attribute-btn"
+					<button class="toggle-modal"
 						aria-label="Close"
 						rel="prev"
 						data-target="projects-modal">
 					</button>
 					<h3>Projects</h3>
 				</header>
-				<ul></ul>
+				<div id="filter-projects-list" class="flex-inline flex-wrap"></div>
 				<footer>
-					<button class="secondary clear-attributes-btn"
-						data-target="projects-modal">
+					<button id="filter-projects-clear-btn"
+						class="toggle-modal secondary"
+						data-target="projects-modal"
+						data-project="">
 						Clear
 					</button>
-					<button class="filter-attribute-btn"
+					<button class="toggle-modal"
 						data-target="projects-modal">
-						Filter
+						Close
 					</button>
 				</footer>
 			</article>
@@ -362,22 +365,24 @@
 			<article>
 				<header>
 					<button
-						class="filter-attribute-btn"
+						class="toggle-modal"
 						aria-label="Close"
 						rel="prev"
 						data-target="contexts-modal">
 					</button>
 					<h3>Contexts</h3>
 				</header>
-				<ul></ul>
+				<div id="filter-contexts-list" class="flex-inline flex-wrap"></div>
 				<footer>
-					<button class="secondary clear-attributes-btn"
-						data-target="contexts-modal">
+					<button id="filter-contexts-clear-btn"
+						class="secondary toggle-modal"
+						data-target="contexts-modal"
+						data-context="">
 						Clear
 					</button>
-					<button class="filter-attribute-btn"
+					<button class="toggle-modal"
 						data-target="contexts-modal">
-						Filter
+						Close
 					</button>
 				</footer>
 			</article>
@@ -392,27 +397,27 @@
 					</button>
 					<h3>Group By</h3>
 				</header>
-				<div id="group-btns" class="grid">
-					<button id="group-clear-btn"
-						class="contrast outline hide group-sort-btn"
+				<div class="grid">
+					<button
+						class="sort-group-btn toggle-modal contrast outline hide"
 						data-target="group-modal"
 						data-group="none">
 						None
 					</button>
-					<button id="group-priority"
-						class="outline group-sort-btn"
+					<button
+						class="sort-group-btn toggle-modal outline"
 						data-target="group-modal"
 						data-group="priority">
 						Priority
 					</button>
-					<button id="group-project"
-						class="outline group-sort-btn"
+					<button
+						class="sort-group-btn toggle-modal outline"
 						data-target="group-modal"
 						data-group="project">
 						Project
 					</button>
-					<button id="group-context"
-						class="outline group-sort-btn"
+					<button
+						class="sort-group-btn toggle-modal outline"
 						data-target="group-modal"
 						data-group="context">
 						Context
@@ -435,23 +440,23 @@
 					</button>
 					<h3>Sort By</h3>
 				</header>
-				<div id="sort-btns" class="grid">
-					<button id="sort-default"
-						class=""
+				<div class="grid">
+					<button
+						class="sort-type-btn toggle-modal"
 						data-target="sort-modal"
-						data-sort="default">
+						data-type="default">
 						Default
 					</button>
-					<button id="sort-description"
-						class="outline"
+					<button
+						class="sort-type-btn toggle-modal outline"
 						data-target="sort-modal"
-						data-sort="description">
+						data-type="description">
 						Description
 					</button>
-					<button id="sort-date"
-						class="outline"
+					<button
+						class="sort-type-btn toggle-modal outline"
 						data-target="sort-modal"
-						data-sort="date">
+						data-type="date">
 						Date
 					</button>
 				</div>
@@ -473,8 +478,8 @@
 					</button>
 					<h3 id="edit-title">Edit Task</h3>
 				</header>
-				<form id="edit-form" class="form">
-					<p class="error message hide">There was an error updating the task.</p>
+				<form id="edit-form">
+					<p id="edit-error" class="error message hide">There was an error updating the task.</p>
 					<fieldset>
 						<input type="hidden" id="edit-id" name="edit-id" value="" />
 						<label class="position-relative">Task
@@ -527,14 +532,14 @@
 					</fieldset>
 				</form>
 				<footer>
-					<button id="edit-delete"
+					<button id="open-delete-task-btn"
 						class="float-left"
 						data-id="">
 						<svg width="1em" height="1em">
 							<use xlink:href="#icon-trash"/>
 						</svg>
 					</button>
-					<button id="edit-delete-confirm"
+					<button id="delete-task-btn"
 						class="float-left danger hide">
 						Delete?
 					</button>
@@ -542,7 +547,7 @@
 						data-target="edit-modal">
 						Cancel
 					</button>
-					<button id="edit-submit" class="form-submit" form="edit-form">Save</button>
+					<button id="edit-submit-btn" form="edit-form">Save</button>
 				</footer>
 			</article>
 		</dialog>

@@ -40,6 +40,7 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .flex-column { flex-direction: column; }
 .flex-inline { display: inline-flex; gap: var(--pico-spacing); }
 .flex-grow { flex: 1; }
+.flex-wrap { flex-wrap: wrap; }
 .float-left { float: left; }
 .float-right { float: right; }
 .gap-xxs { gap: 4px; }
@@ -116,7 +117,7 @@ button.danger:hover {
 #menu summary { height: unset; background-color: transparent; border-color: transparent; }
 #menu summary:after { display: none; }
 #menu-close { line-height: 1em; }
-#priority-grid { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; }
+#filter-priorities-btns { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; }
 #status {
 	padding-bottom: calc(0.375rem + var(--safe-bottom));
 	position: fixed;
@@ -179,7 +180,7 @@ button.danger:hover {
 		top: calc(var(--pico-spacing) / 1.6);
 	}
 	#dot-menu summary { padding-right: 0; padding-left: 0; }
-	#priority-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+	#filter-priorities-btns { grid-template-columns: 1fr 1fr 1fr 1fr; }
 }
 
 @media only screen and (max-width: 768px) {
