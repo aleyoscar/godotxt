@@ -29,16 +29,17 @@ export async function saveStore(key=null) {
 
 async function loadState() {
 	try {
-		STATE.filterContexts = await STATE.store.get(KEYS.filterContexts);
-		STATE.filterList = await STATE.store.get(KEYS.filterList);
-		STATE.filterPriorities = await STATE.store.get(KEYS.filterPriorities);
-		STATE.filterProjects = STATE.filterList ? [STATE.filterList] : await STATE.store.get(KEYS.filterProjects);
-		STATE.showComplete = await STATE.store.get(KEYS.showComplete);
-		STATE.sortAscending = await STATE.store.get(KEYS.sortAscending);
-		STATE.sortGroup = await STATE.store.get(KEYS.sortGroup);
-		STATE.sortType = await STATE.store.get(KEYS.sortType);
-		STATE.theme = await STATE.store.get(KEYS.theme);
-		STATE.todoPath = await STATE.store.get(KEYS.todoPath);
+		STATE.filterContexts = await STATE.store.get(KEYS.filterContexts) || DEFAULTS.filterContexts;
+		STATE.filterList = await STATE.store.get(KEYS.filterList) || DEFAULTS.filterList;
+		STATE.filterPriorities = await STATE.store.get(KEYS.filterPriorities) || DEFAULTS.filterPriorities;
+		STATE.filterProjects = STATE.filterList ? [STATE.filterList] :
+			await STATE.store.get(KEYS.filterProjects) || DEFAULTS.filterProjects;
+		STATE.showComplete = await STATE.store.get(KEYS.showComplete) || DEFAULTS.showComplete;
+		STATE.sortAscending = await STATE.store.get(KEYS.sortAscending) || DEFAULTS.sortAscending;
+		STATE.sortGroup = await STATE.store.get(KEYS.sortGroup) || DEFAULTS.sortGroup;
+		STATE.sortType = await STATE.store.get(KEYS.sortType) || DEFAULTS.sortType;
+		STATE.theme = await STATE.store.get(KEYS.theme) || DEFAULTS.theme;
+		STATE.todoPath = await STATE.store.get(KEYS.todoPath) || DEFAULTS.todoPath;
 		console.log('Loaded store into state');
 	} catch (err) {
 		console.error('Unable to load store into state');
@@ -48,16 +49,16 @@ async function loadState() {
 export async function loadStore() {
 	try {
 		STATE.store = await load(KEYS.storeFile, { defaults: {
-			filterContexts: [],
-			filterList: '',
-			filterPriorities: [],
-			filterProjects: [],
-			showComplete: false,
-			sortAscending: true,
-			sortGroup: 'none',
-			sortType: 'default',
-			theme: 'auto',
-			todoPath: '',
+			filterContexts: DEFAULTS.filterContexts,
+			filterList: DEFAULTS.filterList,
+			filterPriorities: DEFAULTS.filterPriorities,
+			filterProjects: DEFAULTS.filterProjects,
+			showComplete: DEFAULTS.showComplete,
+			sortAscending: DEFAULTS.sortAscending,
+			sortGroup: DEFAULTS.sortGroup,
+			sortType: DEFAULTS.sortType,
+			theme: DEFAULTS.theme,
+			todoPath: DEFAULTS.todoPath,
 		}});
 		await loadState();
 		console.log(`Loaded store`);
@@ -76,8 +77,8 @@ export async function loadVersion() {
 	}
 }
 
-export const STATE = {
-	animationDuration: 400, // ms
+const DEFAULTS = {
+	animationDuration: 400,
 	closingClass: 'modal-is-closing',
 	filterContexts: [],
 	filterList: '',
@@ -98,3 +99,5 @@ export const STATE = {
 	todos: null,
 	visibleModal: null,
 }
+
+export const STATE = DEFAULTS;
