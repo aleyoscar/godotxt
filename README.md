@@ -1,6 +1,6 @@
 # GoDo.txt
 
-> v4.1.0
+> v4.2.0
 
 ![Widescreen Screenshot of GoDo.txt app](src/images/screenshot-wide-1280x720.png)
 
