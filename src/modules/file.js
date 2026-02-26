@@ -1,5 +1,5 @@
 
-import { open } from '@tauri-apps/plugin-dialog';
+import { open, save } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import { AndroidFs, isAndroid } from 'tauri-plugin-android-fs-api';
 import { KEYS } from './constants.js';
@@ -51,6 +51,31 @@ async function openFile() {
 	}
 }
 
+async function createFile() {
+	try {
+		let todoPath;
+		if (await isAndroid()) {
+			const todoFile = await AndroidFs.showSaveFilePicker('todo.txt');
+			if (todoFile) {
+				todoPath = await AndroidFs.getFsPath(todoFile);
+				await AndroidFs.persistPickerUriPermission(todoFile);
+				console.log('Created android file', todoPath);
+			} else {
+				console.log('No file picked');
+				return;
+			}
+		} else {
+			todoPath = await save({
+				filters: [ { name: 'Text File', extensions: ['txt', 'md'] } ],
+				title: 'Create a new Todo.txt file',
+			});
+		}
+		return todoPath || null;
+	} catch (err) {
+		console.error('Failed to create file', err);
+	}
+}
+
 export async function closeFile(e) {
 	try {
 		const currentFile = STATE.todoPath;
@@ -78,12 +103,14 @@ export async function readFile(path) {
 
 export async function chooseFile(e) {
 	try {
-		const todoPath = await openFile();
+		const todoPath = e.target.dataset.choose === 'open' ? await openFile() : await createFile();
 		if (todoPath) {
 			STATE.todoPath = todoPath;
 			console.log('Selected file:', todoPath);
 			await saveStore('todoPath');
-			await render.setContent(todoPath);
+			await loadFile();
+			render.populateRefine();
+			render.renderTasks();
 		} else {
 			stdout('No file selected');
 		}

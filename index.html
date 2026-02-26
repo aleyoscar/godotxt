@@ -121,6 +121,9 @@
 			<symbol id="icon-flag-fill" viewBox="0 0 16 16">
 				<path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12 12 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A20 20 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a20 20 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
 			</symbol>
+			<symbol id="icon-new-file" viewBox="0 0 16 16">
+				<path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0"/>
+			</symbol>
 		</svg>
 		<header class="container flex space-between align-center align-left-sm flex-column-lg">
 			<h1 id="title" class="flex align-center gap-xs">
@@ -144,12 +147,21 @@
 					<summary><svg width="1.6em" height="1.6em"><use xlink:href="#icon-menu-dot"/></svg></summary>
 					<ul dir="rtl">
 						<li class="min-width-xxs">
-							<a id="open-file-btn" class="choose-file-btn pointer flex align-center space-between gap-xs"
+							<a id="open-file-btn"
+								class="choose-file-btn pointer flex align-center space-between gap-xs"
+								data-choose="new"
+								dir="ltr">
+								New File<svg width="1em" height="1em"><use xlink:href="#icon-new-file"/></svg>
+							</a>
+						</li>
+						<li class="min-width-xxs">
+							<a id="open-file-btn"
+								class="choose-file-btn pointer flex align-center space-between gap-xs"
+								data-choose="open"
 								dir="ltr">
 								Open File<svg width="1em" height="1em"><use xlink:href="#icon-folder"/></svg>
 							</a>
 						</li>
-						<li class="min-width-xxs">
 							<a id="close-file-btn" class="pointer flex align-center space-between gap-xs"
 								dir="ltr">
 								Close File<svg width="1em" height="1em"><use xlink:href="#icon-folder-x"/></svg>
@@ -250,7 +262,10 @@
 					</article>
 				</aside>
 				<div class="flex-1">
-					<div id="pick-file" class="choose-file-btn hide">Please <a id="pick-file-open" class="pointer">open a todo.txt file</a></div>
+					<div id="pick-file" class="hide">
+						Please <a id="pick-file-open" class="choose-file-btn pointer" data-choose="open">open a todo.txt file</a>
+						or <a id="pick-new-file" class="choose-file-btn pointer" data-choose="new">create a new one</a>
+					</div>
 					<div id="tasks" class="hide">
 						<section class="flex align-center space-between">
 							<div class="flex align-center">
