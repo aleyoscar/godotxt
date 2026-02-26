@@ -47,6 +47,8 @@ export async function togglePickFile() {
 	const todoPath = STATE.todoPath;
 	DOM.pickFile.classList.toggle('hide', todoPath);
 	DOM.taskList.classList.toggle('hide', !todoPath);
+	DOM.closeFileBtnWrapper.classList.toggle('hide', !todoPath);
+	DOM.aside.classList.toggle('hide', !todoPath);
 }
 
 export async function renderTasks() {

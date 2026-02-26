@@ -5,6 +5,7 @@ export const DOM = {
 	chooseFileBtns: document.querySelectorAll('.choose-file-btn'),
 	clearPrioritiesBtn: document.getElementById('clear-priorities-btn'),
 	closeFileBtn: document.getElementById('close-file-btn'),
+	closeFileBtnWrapper: document.getElementById('close-file-btn-wrapper'),
 	contextsBtn: document.getElementById('contexts-btn'),
 	contextsModal: document.getElementById('contexts-modal'),
 	deleteTaskBtn: document.getElementById('delete-task-btn'),
