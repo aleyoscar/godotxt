@@ -7,7 +7,7 @@
 }
 
 @supports (font-variation-settings: normal) {
-  :root { font-family: InterVariable, sans-serif; }
+	:root { font-family: InterVariable, sans-serif; }
 }
 
 :root {
@@ -83,6 +83,15 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .arc-2 { fill: var(--arc2, --pico-color); }
 .arc-3 { fill: var(--arc3, --pico-color); }
 .arc-4 { fill: var(--arc4, --pico-color); }
+
+.task h5 {
+	white-space: normal;
+	overflow-wrap: break-word;
+	word-break: break-word;
+	hyphens: auto;
+}
+
+.task h5 span { overflow-wrap: anywhere; }
 
 button.danger {
 	background-color: var(--pico-form-element-invalid-border-color);
