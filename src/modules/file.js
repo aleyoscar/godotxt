@@ -8,10 +8,9 @@ import { stdout, stderr } from './utils.js';
 import * as render from './render.js';
 import { TodoTxt } from './todotxt.js';
 
-export async function saveFile() {
+export async function saveFile(path=STATE.todoPath, content=STATE.todos.toString()) {
 	try {
-		const path = await STATE.store.get(KEYS.todoPath);
-		await writeTextFile(path, STATE.todos.toString());
+		await writeTextFile(path, content);
 		console.log(`Saved ${path}`);
 	} catch (err) {
 		console.error(`Unable to save file ${path}`, err);
@@ -70,6 +69,7 @@ async function createFile() {
 				title: 'Create a new Todo.txt file',
 			});
 		}
+		await saveFile(todoPath, '\n');
 		return todoPath || null;
 	} catch (err) {
 		console.error('Failed to create file', err);
