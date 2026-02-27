@@ -49,7 +49,10 @@ export function completeTask(target) {
 	const id = target.dataset.id;
 	const task = STATE.todos.tasks.find(t => t.id === id);
 	if (!task) return;
-	target.checked ? task.complete() : task.uncomplete();
+	target.dataset.checked = target.dataset.checked === 'complete' ? 'incomplete' : 'complete';
+	target.dataset.checked === 'complete' ? task.complete() : task.uncomplete();
+	target.classList.toggle('secondary', !task.completed);
+	target.querySelector('use').setAttribute('xlink:href', task.completed ? '#icon-check-circle-fill' : '#icon-check-circle');
 	STATE.todos.replace(task);
 	stdout(`Completed task #${task.id}`);
 	saveFile();

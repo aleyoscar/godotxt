@@ -70,6 +70,8 @@ details.dropdown > summary + ul li a.flex { display: flex; }
 .position-relative { position: relative; }
 .primary { color: var(--pico-primary); }
 .settings-list { grid-template-columns: 1fr 1fr 72px; }
+.secondary-light { color: var(--pico-form-element-border-color); }
+.secondary-light:hover, .secondary-light:active { color: var(--pico-form-element-active-border-color); }
 .show-hover-parent .show-hover { display:none; }
 .show-hover-parent:hover .show-hover { display: unset; }
 .space-between { justify-content: space-between; }

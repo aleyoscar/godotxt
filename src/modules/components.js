@@ -8,15 +8,14 @@ clearBtn.textContent = 'Clear';
 clearBtn.dataset.clear = 'true';
 clearBtn.addEventListener('click', setFilterSearch);
 
-export function createIcon(id, width='1em', height='1em') {
-	const svg = createElement('svg', {
-		attributes: [ { width: width }, { height: height } ],
-		children: [
-			createElement('use', {
-				attributes: [ { 'xlink:href': `#${id}` } ],
-			}),
-		],
-	});
+export function createIcon(id, width = '1em', height = '1em') {
+	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	svg.setAttribute('width', width);
+	svg.setAttribute('height', height);
+	svg.setAttribute('aria-hidden', 'true');
+	const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+	use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `#${id}`);
+	svg.appendChild(use);
 	return svg;
 }
 
@@ -96,11 +95,10 @@ export function getTaskHtml(task) {
 		class: `task flex align-center hover-background padding-xs show-hover-parent ${task.projects.join(' ')} ${task.contexts.join(' ')}`,
 		dataset: { target: 'edit-modal', id: task.id },
 		children: [
-			createElement('input', {
-				class: 'task-complete-task-btn',
-				type: 'checkbox',
-				checked: task.completed,
-				dataset: { id: task.id },
+			createElement('a', {
+				class: `task-complete-task-btn pointer ${!task.completed ? 'secondary-light' : ''}`,
+				dataset: { id: task.id, checked: task.completed ? 'complete' : 'incomplete' },
+				children: [ createIcon(task.completed ? 'icon-check-circle-fill' : 'icon-check-circle') ]
 			}),
 			createElement('hgroup', {
 				class: 'pointer flex-grow',
