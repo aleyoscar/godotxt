@@ -82,6 +82,7 @@ export async function closeFile(e) {
 		STATE.todos = null;
 		STATE.todoPath = '';
 		await saveStore('todoPath');
+		await render.populateRefine();
 		await render.renderTasks();
 		stdout(`Closed file ${currentFile}`);
 	} catch (err) {
