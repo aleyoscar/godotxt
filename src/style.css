@@ -156,7 +156,7 @@ button.danger:hover {
 
 	aside article {
 		border-radius: 0;
-		padding: 0;
+		padding: var(--safe-top) 0 0;
 	}
 
 	aside nav {
