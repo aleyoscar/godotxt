@@ -44,6 +44,9 @@ export function attachListeners() {
 
 		const autocompletePopulate = e.target.closest('.autocomplete-populate-task');
 		if (autocompletePopulate) { autocomplete.populateDescription(autocompletePopulate); }
+
+		const autocompleteTag = e.target.closest('.autocomplete-inject-tag');
+		if (autocompleteTag) { autocomplete.injectTag(autocompleteTag); }
 	});
 
 	DOM.taskListUl.addEventListener('click', (e) => {
@@ -70,7 +73,7 @@ export function attachListeners() {
 		const tagClose = e.target.closest('b');
 		if (tagClose) manage.deleteTag(tagClose);
 	});
-	
+
 	DOM.editContexts.addEventListener('click', (e) => {
 		const tagClose = e.target.closest('b');
 		if (tagClose) manage.deleteTag(tagClose);

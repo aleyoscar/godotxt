@@ -16,7 +16,7 @@ export function updateDescription(e) {
 	const filteredTasks = query ? STATE.todos.tasks.filter(task => task.id !== currentTaskId && task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
 
 	DOM.autocomplete.innerHTML = (filteredTags.length || filteredTasks.length)
-		? [...filteredTags.map(t => `<li class="auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
+		? [...filteredTags.map(t => `<li class="autocomplete-inject-tag auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
 			 ...filteredTasks.map(t => `<li class="autocomplete-populate-task auto-tag flex space-between" data-id="${t.id}">${t.rawDescription}<b class="autocomplete-edit-task" data-id="${t.id}"><svg width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></b></li>`)].join('')
 		: '';
 	DOM.autocomplete.classList.toggle('hide', !filteredTags.length && !filteredTasks.length);
@@ -46,26 +46,26 @@ export function handleKeypress(e) {
 			else DOM.editDescription.value = items[index].textContent;
 			DOM.editDescription.focus();
 			DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
+			populateTags();
 		} else {
-			DOM.editDescription.value = DOM.editDescription.value.slice(0, item.dataset.start) + item.dataset.tag + DOM.editDescription.value.slice(item.dataset.end);
-			DOM.editDescription.focus();
-			DOM.editDescription.setSelectionRange(parseInt(item.dataset.start) + item.dataset.tag.length, parseInt(item.dataset.start) + item.dataset.tag.length);
+			injectTag(item);
 		}
-		populateTags();
 	}
 }
 
+export function injectTag(target) {
+	DOM.editDescription.value = DOM.editDescription.value.slice(0, target.dataset.start) + target.dataset.tag + DOM.editDescription.value.slice(target.dataset.end);
+	DOM.editDescription.focus();
+	DOM.editDescription.setSelectionRange(parseInt(target.dataset.start) + target.dataset.tag.length, parseInt(target.dataset.start) + target.dataset.tag.length);
+	populateTags();
+}
+
 export function populateDescription(target) {
+	if (!target.dataset.id) return;
 	DOM.autocomplete.classList.add('hide');
 	DOM.autocomplete.innerHTML = '';
-	if (target.dataset.id) {
-		DOM.editDescription.value = target.textContent;
-		DOM.editDescription.focus();
-		DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
-	} else {
-		DOM.editDescription.value = DOM.editDescription.value.slice(0, target.dataset.start) + target.dataset.tag + DOM.editDescription.value.slice(target.dataset.end);
-		DOM.editDescription.focus();
-		DOM.editDescription.setSelectionRange(parseInt(target.dataset.start) + target.dataset.tag.length, parseInt(target.dataset.start) + target.dataset.tag.length);
-	}
+	DOM.editDescription.value = target.textContent;
+	DOM.editDescription.focus();
+	DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 	populateTags();
 }
