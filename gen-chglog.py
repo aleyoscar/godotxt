@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import re
 import argparse
@@ -56,7 +58,7 @@ def validate_version(ver_str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Create CHANGELOG using git-chglog and update version info"
+        description="(v0.1.0) Create CHANGELOG using git-chglog and update version info"
     )
     parser.add_argument("version", help="New version string (e.g., v1.0.1)")
     parser.add_argument("--replace", "-r", action="append", type=Path, default=[],
@@ -80,35 +82,55 @@ def main():
     if not installed('git-chglog'):
         error_quit("Please install git-chglog")
 
-    # Handle version replacement
+    # Handle version replacement (safe for first release)
     if args.replace:
-        # Get the latest tag by committer date
-        prev_version_hash = run(['git', 'rev-list', '--tags', '--max-count=1'], "Getting previous version hash")
-        prev_version = run(['git', 'describe', '--tags', prev_version_hash], "Getting previous version")
-        if not prev_version:
-            error_quit("No tags found in the repository")
-        if not re.fullmatch(semver_pattern, prev_version):
-            error_quit(f"Invalid previous version {prev_version}")
-        else:
-            print(f"Previous version: {prev_version}")
-        for path in args.replace:
-            if not path.is_file():
-                error_quit(f"File {path} does not exist or is not a file")
-            if not args.dry:
-                update_version(path, prev_version, args.version)
+        try:
+            prev_version_hash = run(['git', 'rev-list', '--tags', '--max-count=1'])
+            if prev_version_hash:
+                prev_version = run(['git', 'describe', '--tags', prev_version_hash])
+                if prev_version and re.fullmatch(semver_pattern, prev_version):
+                    print(f"Previous version: {prev_version}")
+                    for path in args.replace:
+                        if not path.is_file():
+                            error_quit(f"File {path} does not exist or is not a file")
+                        if not args.dry:
+                            update_version(path, prev_version, args.version)
+                        else:
+                            print(f"Will update version info in {path}")
+                else:
+                    print("No valid previous version found (this appears to be the first tag). Skipping version replacement.")
             else:
-                print(f"Will update version info in {path}")
+                print("No previous tags found (this is the first tag). Skipping version replacement.")
+        except Exception:
+            print("Could not determine previous version (first release?). Skipping version replacement.")
 
     # Handle changelog and tag operations
+    changelog_path = str(args.output)
+    temp_path = str(args.temp)
+
     if args.dry:
         run(['git-chglog', '--next-tag', args.version])
         run(['git-chglog', '--config', str(args.config), '--next-tag', args.version, args.version])
     else:
-        run(['git-chglog', '--next-tag', args.version, '-o', str(args.output)], f"Writing changelog to {args.output}")
-        run(['git-chglog', '--config', str(args.config), '--next-tag', args.version, '-o', str(args.temp), args.version],
-            f"Writing tag annotation to {args.temp}")
-        run(['git', 'commit', '-am', f"release {args.version}"], "Committing release")
-        run(['git', 'tag', args.version, '-F', str(args.temp)], f"Creating git tag {args.version}")
+        run(['git-chglog', '--next-tag', args.version, '-o', changelog_path],
+            f"Writing changelog to {changelog_path}")
+
+        run(['git-chglog', '--config', str(args.config), '--next-tag', args.version, '-o', temp_path, args.version],
+            f"Writing tag annotation to {temp_path}")
+
+        # Explicitly stage the changelog (important when the file is newly created)
+        run(['git', 'add', changelog_path])
+
+        # Commit with --allow-empty so it works even on the very first release
+        try:
+            run(['git', 'commit', '--allow-empty', '-m', f"release {args.version}"])
+            print(f"Committed release {args.version}")
+        except Exception as e:  # fallback in case of unexpected issues
+            error_quit(f"Failed to commit: {e}")
+
+        # Create the annotated tag
+        run(['git', 'tag', args.version, '-F', temp_path],
+            f"Creating git tag {args.version}")
 
     print("DONE")
     if not args.dry:
