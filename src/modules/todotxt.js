@@ -199,15 +199,17 @@ class TodoTxt {
 		this.projects = [];
 		this.contexts = [];
 		this.priorities = [];
-		this.tasks.forEach(task => {
-			task.projects.forEach(project => {
+		for (let i = 0; i < this.count; i++) {
+			this.tasks[i].projects.forEach(project => {
 				if (!this.projects.includes(project)) this.projects.push(project);
 			});
-			task.contexts.forEach(context => {
+			this.tasks[i].contexts.forEach(context => {
 				if (!this.contexts.includes(context)) this.contexts.push(context);
 			});
-			if (task.priority && !this.priorities.includes(task.priority)) this.priorities.push(task.priority);
-		});
+			if (this.tasks[i].priority && !this.priorities.includes(this.tasks[i].priority)) this.priorities.push(this.tasks[i].priority);
+			this.tasks[i].id = `${i + 1}`;
+			this.tasks[i].lineNum = i + 1;
+		}
 		this.projects.sort();
 		this.contexts.sort();
 		this.priorities.sort();
