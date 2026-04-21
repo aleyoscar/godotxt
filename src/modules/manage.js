@@ -21,7 +21,11 @@ export function openAddTask(e) {
 
 export function openEditTask(id) {
 	const task = STATE.todos.tasks.find(t => t.id === id);
-	if (!task) return;
+	if (!task) {
+		stderr(`No task found with id ${id}`);
+		return false;
+	}
+	debug('openEditTask: Found task:', task);
 	DOM.autocomplete.classList.add('hide');
 	DOM.editForm.reset();
 	DOM.editTitle.textContent = `Edit task #${task.lineNum}`;
@@ -37,6 +41,7 @@ export function openEditTask(id) {
 	DOM.editDescription.focus();
 	DOM.editDescription.setSelectionRange(DOM.editDescription.value.length, DOM.editDescription.value.length);
 	populateTags();
+	return true;
 }
 
 export function deleteTag(target) {

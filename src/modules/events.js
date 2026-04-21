@@ -66,7 +66,9 @@ export function attachListeners() {
 		if (taskComplete) { manage.completeTask(taskComplete); return; }
 
 		const taskLi = e.target.closest('.task');
-		if (taskLi) { manage.openEditTask(taskLi.dataset.id); toggleModal(e, taskLi); }
+		if (taskLi) {
+			if (manage.openEditTask(taskLi.dataset.id)) toggleModal(e, taskLi);
+		}
 	});
 
 	DOM.editProjects.addEventListener('click', (e) => {
