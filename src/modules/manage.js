@@ -1,4 +1,4 @@
-import { stdout, stderr, getDateString, cleanString } from './utils.js';
+import { stdout, stderr, getDateString, cleanString, debug } from './utils.js';
 import { Task } from './todotxt.js';
 import { STATE } from './state.js';
 import { saveFile } from './file.js';
@@ -20,6 +20,7 @@ export function openAddTask(e) {
 }
 
 export function openEditTask(id) {
+	debug('openEditTask', id);
 	const task = STATE.todos.tasks.find(t => t.id === id);
 	if (!task) {
 		stderr(`No task found with id ${id}`);
@@ -65,6 +66,7 @@ export function completeTask(target) {
 }
 
 export function deleteTask(e) {
+	debug('deleteTask', e);
 	const id = e.currentTarget.dataset.id;
 	const task = STATE.todos.tasks.find(t => t.id === id);
 	if (!task) return;
@@ -77,6 +79,7 @@ export function deleteTask(e) {
 
 export async function submitEditForm(e) {
 	e.preventDefault();
+	debug('submitEditForm', e);
 	DOM.editError.classList.add('hide');
 
 	const formData = new FormData(DOM.editForm);

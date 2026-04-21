@@ -1,4 +1,5 @@
 import { DOM } from './dom.js';
+import { STATE } from './state.js';
 
 export const getDateString = (date) => {
 	const d = new Date(date ? date : Date.now());
@@ -8,7 +9,7 @@ export const getDateString = (date) => {
 export const cleanString = (text) => text.trim().replace(/\s+/g, ' ');
 
 export function stdout(message, ...args) {
-	console.log(message, ...args);
+	if (STATE.debug) console.log(message, ...args);
 	DOM.status.querySelector('small').textContent = message;
 	DOM.status.classList.remove('error');
 }
@@ -17,6 +18,10 @@ export function stderr(message, ...args) {
 	console.error(message, ...args);
 	DOM.status.querySelector('small').textContent = message;
 	DOM.status.classList.add('error');
+}
+
+export function debug(message, ...args) {
+	if (STATE.debug) console.log(message, ...args);
 }
 
 export const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();

@@ -3,13 +3,15 @@ import { DOM } from './dom.js';
 import { load } from '@tauri-apps/plugin-store';
 import { KEYS } from './constants.js';
 import * as render from './render.js';
+import { stdout, stderr, debug} from './utils.js';
 
 export async function saveStore(key=null) {
 	try {
-		console.log(`Saving key '${KEYS[key]}' as '${STATE[key]}'`);
+		debug(`Saving key '${KEYS[key]}' as '${STATE[key]}'`);
 		if (key) {
 			await STATE.store.set(KEYS[key], STATE[key]);
 		} else {
+			await STATE.store.set(KEYS.debug, STATE.debug);
 			await STATE.store.set(KEYS.filterContexts, STATE.filterContexts);
 			await STATE.store.set(KEYS.filterList, STATE.filterList);
 			await STATE.store.set(KEYS.filterPriorities, STATE.filterPriorities);
@@ -21,14 +23,15 @@ export async function saveStore(key=null) {
 			await STATE.store.set(KEYS.theme, STATE.theme);
 			await STATE.store.set(KEYS.todoPath, STATE.todoPath);
 		}
-		console.log(`Successfully saved store '${key ? key : "all"}'`);
+		debug(`Successfully saved store '${key ? key : "all"}'`);
 	} catch (err) {
-		console.error('Unable to save store', err);
+		stderr('Unable to save store', err);
 	}
 }
 
 async function loadState() {
 	try {
+		STATE.debug = await STATE.store.get(KEYS.debug) || DEFAULTS.debug;
 		STATE.filterContexts = await STATE.store.get(KEYS.filterContexts) || DEFAULTS.filterContexts;
 		STATE.filterList = await STATE.store.get(KEYS.filterList) || DEFAULTS.filterList;
 		STATE.filterPriorities = await STATE.store.get(KEYS.filterPriorities) || DEFAULTS.filterPriorities;
@@ -40,15 +43,16 @@ async function loadState() {
 		STATE.sortType = await STATE.store.get(KEYS.sortType) || DEFAULTS.sortType;
 		STATE.theme = await STATE.store.get(KEYS.theme) || DEFAULTS.theme;
 		STATE.todoPath = await STATE.store.get(KEYS.todoPath) || DEFAULTS.todoPath;
-		console.log('Loaded store into state');
+		debug('Loaded store into state', STATE);
 	} catch (err) {
-		console.error('Unable to load store into state');
+		stderr('Unable to load store into state');
 	}
 }
 
 export async function loadStore() {
 	try {
 		STATE.store = await load(KEYS.storeFile, { defaults: {
+			debug: DEFAULTS.debug,
 			filterContexts: DEFAULTS.filterContexts,
 			filterList: DEFAULTS.filterList,
 			filterPriorities: DEFAULTS.filterPriorities,
@@ -61,9 +65,9 @@ export async function loadStore() {
 			todoPath: DEFAULTS.todoPath,
 		}});
 		await loadState();
-		console.log(`Loaded store`);
+		debug(`Loaded store`);
 	} catch (err) {
-		console.error(`Unable to load store`, err);
+		stderr(`Unable to load store`, err);
 	}
 }
 
@@ -71,15 +75,16 @@ export async function loadVersion() {
 	try {
 		const version = await getVersion();
 		DOM.versionInfo.textContent = `v${version}`;
-		console.log(`App version: ${version}`);
+		debug(`App version: ${version}`);
 	} catch (err) {
-		console.error(`Unable to get app version info`, err);
+		stderr(`Unable to get app version info`, err);
 	}
 }
 
 const DEFAULTS = {
 	animationDuration: 400,
 	closingClass: 'modal-is-closing',
+	debug: false,
 	filterContexts: [],
 	filterList: '',
 	filterPriorities: [],

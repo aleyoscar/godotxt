@@ -1,4 +1,5 @@
 export const KEYS = {
+	debug: 'debug',
 	storeFile: 'store.json',
 	todoPath: 'todo-path',
 	sortAscending: 'sort-ascending',

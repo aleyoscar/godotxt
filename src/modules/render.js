@@ -1,5 +1,5 @@
 import { DOM } from './dom.js';
-import { capitalize, stderr, stdout, getDateString } from './utils.js';
+import { capitalize, stderr, stdout, getDateString, debug } from './utils.js';
 import { STATE } from './state.js';
 import { KEYS, REGEX } from './constants.js';
 import { readFile } from './file.js';
@@ -10,6 +10,7 @@ import * as refine from './refine.js';
 import { getTaskHtml, createGroupHeader } from './components.js';
 
 export function populateTags() {
+	debug('populateTags');
 	const taskTags = {
 		projects: { regex: REGEX.project, container: DOM.editProjects, classes: 'background-primary mr-xs mb-xs' },
 		contexts: { regex: REGEX.context, container: DOM.editContexts, classes: 'mr-xs mb-xs' },
@@ -52,6 +53,7 @@ export async function togglePickFile() {
 }
 
 export async function renderTasks() {
+	debug('renderTasks');
 	// Filter todos
 	let filteredTasks = STATE.todos?.tasks ? STATE.todos.tasks
 		.filter(task => (
@@ -151,6 +153,7 @@ export async function renderTasks() {
 }
 
 export function populateRefine() {
+	debug('populateRefine');
 	populateFilterContexts();
 	populateFilterList();
 	populateFilterPriorities();

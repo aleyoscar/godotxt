@@ -4,16 +4,17 @@ import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import { AndroidFs, isAndroid } from 'tauri-plugin-android-fs-api';
 import { KEYS } from './constants.js';
 import { STATE, saveStore } from './state.js';
-import { stdout, stderr } from './utils.js';
+import { stdout, stderr, debug } from './utils.js';
 import * as render from './render.js';
 import { TodoTxt } from './todotxt.js';
 
 export async function saveFile(path=STATE.todoPath, content=STATE.todos.toString()) {
+	debug('saveFile', path, content);
 	try {
 		await writeTextFile(path, content);
-		console.log(`Saved ${path}`);
+		debug(`Saved ${path}`);
 	} catch (err) {
-		console.error(`Unable to save file ${path}`, err);
+		stderr(`Unable to save file ${path}`, err);
 	}
 }
 
@@ -27,10 +28,10 @@ async function openFile() {
 			if (todoPathArr.length) {
 				todoPath = await AndroidFs.getFsPath(todoPathArr[0]);
 				await AndroidFs.persistPickerUriPermission(todoPathArr[0]);
-				console.log('Picked android file', todoPath);
+				debug('Picked android file', todoPath);
 			}
 			else {
-				console.log('No file picked');
+				debug('No file picked');
 				return;
 			}
 		} else {
@@ -46,7 +47,7 @@ async function openFile() {
 		}
 		return todoPath || null;
 	} catch (err) {
-		console.error('Failed to open dialog: ', err);
+		stderr('Failed to open dialog: ', err);
 	}
 }
 
@@ -58,9 +59,9 @@ async function createFile() {
 			if (todoFile) {
 				todoPath = await AndroidFs.getFsPath(todoFile);
 				await AndroidFs.persistPickerUriPermission(todoFile);
-				console.log('Created android file', todoPath);
+				debug('Created android file', todoPath);
 			} else {
-				console.log('No file picked');
+				debug('No file picked');
 				return;
 			}
 		} else {
@@ -72,7 +73,7 @@ async function createFile() {
 		await saveFile(todoPath, '\n');
 		return todoPath || null;
 	} catch (err) {
-		console.error('Failed to create file', err);
+		stderr('Failed to create file', err);
 	}
 }
 
@@ -95,10 +96,10 @@ export async function closeFile(e) {
 export async function readFile(path) {
 	try {
 		const content = await readTextFile(path);
-		console.log(`Read file: ${path}`);
+		debug(`Read file: ${path}`);
 		return content || '';
 	} catch (err) {
-		console.error(`Failed to read file ${path}: `, err);
+		stderr(`Failed to read file ${path}: `, err);
 	}
 }
 
@@ -107,7 +108,7 @@ export async function chooseFile(e) {
 		const todoPath = e.target.dataset.choose === 'open' ? await openFile() : await createFile();
 		if (todoPath) {
 			STATE.todoPath = todoPath;
-			console.log('Selected file:', todoPath);
+			debug('Selected file:', todoPath);
 			await saveStore('todoPath');
 			await loadFile();
 			render.populateRefine();
