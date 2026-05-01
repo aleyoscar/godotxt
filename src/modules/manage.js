@@ -118,6 +118,6 @@ export function filterTags(text, char, reg, taskTags) {
 	const cursorText = text.slice(0, cursor);
 	const index = cursorText.lastIndexOf(char);
 	const lastTag = index >= 0 ? cursorText.slice(index) : '';
-	return (reg.test(lastTag) ? taskTags.filter(t => t.toLowerCase().startsWith(lastTag.slice(1).toLowerCase())) : lastTag === char ? taskTags : [])
+	return (reg.test(lastTag) ? taskTags.filter(t => t.toLowerCase().indexOf(lastTag.slice(1).toLowerCase()) >= 0) : lastTag === char ? taskTags : [])
 		.map(t => ({ tag: `${char}${t}`, start: index, end: cursor }));
 }
