@@ -13,8 +13,7 @@ export function updateDescription(e) {
 		...filterTags(e.currentTarget.value, '@', REGEX.contextSingle, STATE.todos.contexts),
 	].sort((a, b) => a.tag.localeCompare(b.tag));
 	const currentTaskId = parseInt(DOM.editId.value) || 0;
-	const filteredTasks = query ? STATE.todos.tasks.filter(task => task.id !== currentTaskId && task.description.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
-
+	const filteredTasks = query ? STATE.todos.tasks.filter(task => task.id !== currentTaskId && task.rawDescription.toLowerCase().includes(query)).sort((a, b) => a.description.localeCompare(b.description)) : [];
 	DOM.autocomplete.innerHTML = (filteredTags.length || filteredTasks.length)
 		? [...filteredTags.map(t => `<li class="autocomplete-inject-tag auto-tag" data-tag="${t.tag}" data-start="${t.start}" data-end="${t.end}">${t.tag}</li>`),
 			 ...filteredTasks.map(t => `<li class="autocomplete-populate-task auto-tag flex space-between" data-id="${t.id}">${t.rawDescription}<b class="autocomplete-edit-task" data-id="${t.id}"><svg width="1em" height="1em"><use xlink:href="#icon-edit"/></svg></b></li>`)].join('')
