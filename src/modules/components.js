@@ -69,7 +69,7 @@ export function createElement(tag, options = {}) {
 }
 
 export function getTaskHtml(task) {
-	const taskSub = task.priority ? `<a class="task-filter-priorities-btn" data-priority="${task.priority}">(${task.priority})</a>` : '';
+	const taskSub = task.priority ? `<a class="task-filter-priorities-btn color-secondary color-priority-${task.priority.toLowerCase()}" data-priority="${task.priority}">(${task.priority})</a>` : '';
 	const taskDates = [
 		task.creationDate ? `<small><svg width="1em" height="1em"><use xlink:href="#icon-calendar"/></svg> ${getDateString(task.creationDate)}</small>` : '',
 		task.completionDate ? `<small><ins><svg width="1em" height="1em"><use xlink:href="#icon-calendar-check"/></svg> ${getDateString(task.completionDate)}</ins></small>` : '',

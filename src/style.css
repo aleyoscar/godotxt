@@ -15,6 +15,12 @@
 	--safe-bottom: env(safe-area-inset-bottom, 48px);
 	--pico-font-family-sans-serif: 'Inter', system-ui, sans-serif !important;
 	font-feature-settings: 'liga' 1, 'calt' 1;
+
+  --color-priority-a: #D93526; /* Red */
+  --color-priority-b: #D24317; /* Orange */
+  --color-priority-c: #FF9500; /* Orange/Yellow */
+  --color-priority-d: #FFBF00; /* Amber */
+  --color-priority-e: #F2DF0D; /* Yellow */
 }
 
 html, body { overflow: hidden; height: 100%; }
@@ -33,6 +39,11 @@ ul li { list-style-type: none; }
 .centered-card { margin: var(--pico-spacing) auto 0; }
 .code { background-color: var(--pico-card-background-color); }
 .color-secondary { color: var(--pico-secondary); }
+.color-priority-a { color: var(--color-priority-a); }
+.color-priority-b { color: var(--color-priority-b); }
+.color-priority-c { color: var(--color-priority-c); }
+.color-priority-d { color: var(--color-priority-d); }
+.color-priority-e { color: var(--color-priority-e); }
 .error { color: var(--pico-del-color); border: 1px solid var(--pico-del-color); }
 .flex { display: flex; gap: var(--pico-spacing); }
 details.dropdown > summary + ul li a.flex { display: flex; }
